@@ -156,6 +156,13 @@ if ($pdo) {
         }
     } catch (Exception $e) {}
 
+    // Drop deleted/unwanted legacy tables (blogs, expenses/ledger_entries)
+    try {
+        $pdo->exec("DROP TABLE IF EXISTS `blogs`");
+        $pdo->exec("DROP TABLE IF EXISTS `ledger_entries`");
+        log_msg('success', "✔ অপ্রয়োজনীয় টেবিল (`blogs`, `ledger_entries`) ডাটাবেস থেকে সম্পূর্ণ মুছে ফেলা হয়েছে।");
+    } catch (Exception $e) {}
+
     // 6. Inspect heavy base64 product images
     try {
         $stmt = $pdo->query("SELECT `id`, `name`, LENGTH(`product_image`) as img_len FROM `products` WHERE `product_image` LIKE 'data:image%'");
@@ -210,9 +217,7 @@ if ($pdo) {
             'incomplete_orders' => ['cart_snapshot'],
             'coupons'           => [],
             'settings'          => [],
-            'blogs'             => [],
             'sms_logs'          => ['gateway'],
-            'ledger_entries'    => [],
         ];
         $synced_count = 0;
         foreach ($sync_tables as $st => $jcols) {
@@ -238,7 +243,7 @@ if ($pdo) {
     }
 
     // 9. Table Row Count Summary
-    $tables = ['admins', 'products', 'categories', 'customers', 'orders', 'incomplete_orders', 'coupons', 'settings', 'blogs', 'sms_logs'];
+    $tables = ['admins', 'products', 'categories', 'customers', 'orders', 'incomplete_orders', 'coupons', 'settings', 'sms_logs'];
     $summary = [];
     foreach ($tables as $t) {
         try {

@@ -76,7 +76,11 @@ foreach ($statements as $stmt) {
 }
 echo "<div class='step success'>✔ Schema executed successfully. Verified/Created $tables_created tables.</div>";
 
-// Helper function to safely insert or replace a row
+// Drop deleted/unwanted legacy tables if present
+try {
+    $pdo->exec("DROP TABLE IF EXISTS `blogs`");
+    $pdo->exec("DROP TABLE IF EXISTS `ledger_entries`");
+} catch (Exception $e) {}
 function migrate_table_data($pdo, $table, $json_file, $key_col, $json_cols = []) {
     if (!file_exists($json_file)) {
         return 0;
@@ -229,11 +233,9 @@ $migrations = [
     'incomplete_orders' => [__DIR__ . '/database/incomplete_orders.json', 'id', ['cart_snapshot']],
     'coupons'           => [__DIR__ . '/database/coupons.json', 'id', []],
     'settings'          => [__DIR__ . '/database/settings.json', 'key', []],
-    'blogs'             => [__DIR__ . '/database/blogs.json', 'id', []],
     'sms_logs'          => [__DIR__ . '/database/sms_logs.json', 'id', ['gateway']],
     'fraud_cache'       => [__DIR__ . '/database/fraud_cache.json', 'phone', []],
     'otps'              => [__DIR__ . '/database/otps.json', 'phone', []],
-    'ledger_entries'    => [__DIR__ . '/database/ledger_entries.json', 'id', []],
     'order_status_history' => [__DIR__ . '/database/order_status_history.json', 'id', []],
     'visitor_profiles'  => [__DIR__ . '/database/visitor_profiles.json', 'id', []],
 ];

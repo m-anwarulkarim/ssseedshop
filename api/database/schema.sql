@@ -217,22 +217,6 @@ CREATE TABLE IF NOT EXISTS `settings` (
   `updated_at` VARCHAR(50) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- 11. Blogs Table
-CREATE TABLE IF NOT EXISTS `blogs` (
-  `id` VARCHAR(64) NOT NULL PRIMARY KEY,
-  `title` VARCHAR(255) NOT NULL,
-  `slug` VARCHAR(255) NOT NULL UNIQUE,
-  `author` VARCHAR(100) DEFAULT 'AgroSeed Team',
-  `cover_image` TEXT DEFAULT NULL,
-  `excerpt` TEXT DEFAULT NULL,
-  `content` LONGTEXT DEFAULT NULL,
-  `category` VARCHAR(100) DEFAULT NULL,
-  `is_published` TINYINT(1) DEFAULT 1,
-  `position` INT DEFAULT 0,
-  `created_at` VARCHAR(50) DEFAULT NULL,
-  `updated_at` VARCHAR(50) DEFAULT NULL,
-  INDEX `idx_blog_slug` (`slug`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- 12. SMS Logs Table
 CREATE TABLE IF NOT EXISTS `sms_logs` (
@@ -266,18 +250,6 @@ CREATE TABLE IF NOT EXISTS `otps` (
   `otp` VARCHAR(10) NOT NULL,
   `expires_at` VARCHAR(50) NOT NULL,
   `created_at` VARCHAR(50) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
--- 15. Ledger Entries Table
-CREATE TABLE IF NOT EXISTS `ledger_entries` (
-  `id` VARCHAR(64) NOT NULL PRIMARY KEY,
-  `entry_date` VARCHAR(50) DEFAULT NULL,
-  `type` VARCHAR(50) DEFAULT NULL,
-  `category` VARCHAR(100) DEFAULT NULL,
-  `amount` DECIMAL(10,2) DEFAULT 0.00,
-  `description` TEXT DEFAULT NULL,
-  `created_at` VARCHAR(50) DEFAULT NULL,
-  INDEX `idx_ledger_date` (`entry_date`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- 16. Order Status History Table

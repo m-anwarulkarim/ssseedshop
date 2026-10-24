@@ -191,48 +191,6 @@ export type Database = {
         }
         Relationships: []
       }
-      blogs: {
-        Row: {
-          category: string | null
-          content: string
-          cover_image: string | null
-          created_at: string
-          excerpt: string | null
-          id: string
-          is_published: boolean
-          position: number
-          slug: string
-          title: string
-          updated_at: string
-        }
-        Insert: {
-          category?: string | null
-          content?: string
-          cover_image?: string | null
-          created_at?: string
-          excerpt?: string | null
-          id?: string
-          is_published?: boolean
-          position?: number
-          slug: string
-          title: string
-          updated_at?: string
-        }
-        Update: {
-          category?: string | null
-          content?: string
-          cover_image?: string | null
-          created_at?: string
-          excerpt?: string | null
-          id?: string
-          is_published?: boolean
-          position?: number
-          slug?: string
-          title?: string
-          updated_at?: string
-        }
-        Relationships: []
-      }
       categories: {
         Row: {
           created_at: string
@@ -431,51 +389,6 @@ export type Database = {
           send_delay_ms?: number
           transactional_email_ttl_minutes?: number
           updated_at?: string
-        }
-        Relationships: []
-      }
-      expenses: {
-        Row: {
-          amount: number
-          category: string
-          created_at: string
-          created_by: string | null
-          description: string | null
-          expense_date: string
-          has_receipt: boolean | null
-          id: string
-          notes: string | null
-          payment_method: string | null
-          receipt_url: string | null
-          vendor: string | null
-        }
-        Insert: {
-          amount?: number
-          category: string
-          created_at?: string
-          created_by?: string | null
-          description?: string | null
-          expense_date: string
-          has_receipt?: boolean | null
-          id?: string
-          notes?: string | null
-          payment_method?: string | null
-          receipt_url?: string | null
-          vendor?: string | null
-        }
-        Update: {
-          amount?: number
-          category?: string
-          created_at?: string
-          created_by?: string | null
-          description?: string | null
-          expense_date?: string
-          has_receipt?: boolean | null
-          id?: string
-          notes?: string | null
-          payment_method?: string | null
-          receipt_url?: string | null
-          vendor?: string | null
         }
         Relationships: []
       }
