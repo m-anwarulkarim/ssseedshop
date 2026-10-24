@@ -1,6 +1,6 @@
 <?php
+// api/orders/get_single.php
 require_once __DIR__ . '/../db.php';
-$json_file = '../database/orders.json';
 
 $id = $_GET['id'] ?? null;
 
@@ -10,14 +10,10 @@ if (!$id) {
     exit;
 }
 
-if (file_exists($json_file)) {
-    $orders = json_decode(file_get_contents($json_file), true);
-    foreach ($orders as $o) {
-        if ((string)$o['order_id'] === (string)$id || (string)$o['id'] === (string)$id) {
-            echo json_encode($o);
-            exit;
-        }
-    }
+$order = DB::find('orders', $id, 'id') ?: DB::find('orders', $id, 'order_id');
+if ($order) {
+    echo json_encode($order, JSON_UNESCAPED_UNICODE);
+    exit;
 }
 
 http_response_code(404);

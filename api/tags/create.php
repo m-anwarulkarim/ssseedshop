@@ -1,6 +1,6 @@
 <?php
 require_once __DIR__ . '/../db.php';
-$json_file = '../database/tags.json';
+
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     http_response_code(405);
@@ -14,10 +14,7 @@ if (!isset($input['name'])) {
     exit;
 }
 
-$tags = [];
-if (file_exists($json_file)) {
-    $tags = json_decode(file_get_contents($json_file), true);
-}
+
 
 $newTag = [
     'id' => uniqid('tag_'),

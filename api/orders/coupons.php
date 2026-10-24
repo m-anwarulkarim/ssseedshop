@@ -4,16 +4,17 @@
 
 require_once __DIR__ . '/../db.php';
 
-$json_file = __DIR__ . '/../database/coupons.json';
-
 if (!function_exists('getCoupons')) {
-    function getCoupons($path) {
+    function getCoupons($path = null) {
         return DB::all('coupons');
     }
 }
 
 if (!function_exists('saveCoupons')) {
-    function saveCoupons($path, $data) {
+    function saveCoupons($path = null, $data = []) {
+        if (is_array($path) && empty($data)) {
+            $data = $path;
+        }
         DB::saveAll('coupons', $data);
     }
 }

@@ -3,7 +3,7 @@
 // Ss Seed Shop Settings Update & Upsert API
 
 require_once __DIR__ . '/../db.php';
-$json_file = __DIR__ . '/../database/settings.json';
+
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     http_response_code(405);

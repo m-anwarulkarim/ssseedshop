@@ -4,7 +4,7 @@
 
 require_once __DIR__ . '/../db.php';
 
-$json_file = __DIR__ . '/../database/orders.json';
+
 
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     http_response_code(200);

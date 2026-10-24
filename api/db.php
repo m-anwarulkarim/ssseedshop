@@ -216,14 +216,8 @@ class DB {
                     return self::decodeRow($table, $r);
                 }, $rows);
             } catch (Exception $e) {
-                // Fall through to JSON on table error
+                return [];
             }
-        }
-
-        $file = self::getJsonFile($table);
-        if (file_exists($file)) {
-            $raw = json_decode(file_get_contents($file), true);
-            return is_array($raw) ? $raw : [];
         }
         return [];
     }
@@ -240,14 +234,7 @@ class DB {
                 $row = $stmt->fetch(PDO::FETCH_ASSOC);
                 return $row ? self::decodeRow($table, $row) : null;
             } catch (Exception $e) {
-                // Fall through to JSON
-            }
-        }
-
-        $all = self::all($table);
-        foreach ($all as $item) {
-            if (isset($item[$column]) && (string)$item[$column] === (string)$value) {
-                return $item;
+                return null;
             }
         }
         return null;
@@ -279,7 +266,6 @@ class DB {
      */
     public static function insert(string $table, array $data): bool {
         $pdo = self::pdo();
-        $sql_ok = false;
         if ($pdo) {
             try {
                 $validCols = self::getTableColumns($table);
@@ -300,23 +286,13 @@ class DB {
                         if (is_bool($v)) $v = $v ? 1 : 0;
                         $params[":$k"] = $v;
                     }
-                    $stmt->execute($params);
-                    $sql_ok = true;
+                    return $stmt->execute($params);
                 }
             } catch (Exception $e) {
-                // Fallback to json if SQL fails
-                $sql_ok = false;
+                return false;
             }
         }
-
-        // Always sync to JSON for live local backup unless SQL succeeded on heavy write tables
-        if (!$sql_ok || !in_array($table, ['orders', 'sms_logs', 'visitors', 'fraud_cache'])) {
-            $file = self::getJsonFile($table);
-            $items = file_exists($file) ? json_decode(file_get_contents($file), true) ?: [] : [];
-            $items[] = $data;
-            self::atomicWriteJson($file, $items);
-        }
-        return true;
+        return false;
     }
 
     /**
@@ -324,7 +300,6 @@ class DB {
      */
     public static function update(string $table, array $data, $idVal, string $idCol = 'id'): bool {
         $pdo = self::pdo();
-        $sql_ok = false;
         if ($pdo) {
             try {
                 $validCols = self::getTableColumns($table);
@@ -346,30 +321,13 @@ class DB {
                 if (!empty($sets)) {
                     $sql = "UPDATE `$table` SET " . implode(', ', $sets) . " WHERE `$idCol` = :_idVal";
                     $stmt = $pdo->prepare($sql);
-                    $stmt->execute($params);
-                    $sql_ok = true;
+                    return $stmt->execute($params);
                 }
             } catch (Exception $e) {
-                // Fallback
-                $sql_ok = false;
+                return false;
             }
         }
-
-        // Sync to JSON backup unless SQL succeeded on heavy tables
-        if (!$sql_ok || !in_array($table, ['orders', 'sms_logs', 'visitors', 'fraud_cache'])) {
-            $file = self::getJsonFile($table);
-            if (file_exists($file)) {
-                $items = json_decode(file_get_contents($file), true) ?: [];
-                foreach ($items as $idx => $item) {
-                    if (isset($item[$idCol]) && (string)$item[$idCol] === (string)$idVal) {
-                        $items[$idx] = array_merge($item, $data);
-                        self::atomicWriteJson($file, $items);
-                        break;
-                    }
-                }
-            }
-        }
-        return true;
+        return false;
     }
 
     /**
@@ -380,22 +338,12 @@ class DB {
         if ($pdo) {
             try {
                 $stmt = $pdo->prepare("DELETE FROM `$table` WHERE `$idCol` = ?");
-                $stmt->execute([$idVal]);
+                return $stmt->execute([$idVal]);
             } catch (Exception $e) {
-                // Fallback
+                return false;
             }
         }
-
-        // Sync to JSON backup
-        $file = self::getJsonFile($table);
-        if (file_exists($file)) {
-            $items = json_decode(file_get_contents($file), true) ?: [];
-            $filtered = array_values(array_filter($items, function($i) use ($idCol, $idVal) {
-                return !isset($i[$idCol]) || (string)$i[$idCol] !== (string)$idVal;
-            }));
-            self::atomicWriteJson($file, $filtered);
-        }
-        return true;
+        return false;
     }
 
     /**

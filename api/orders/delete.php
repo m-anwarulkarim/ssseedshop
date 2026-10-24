@@ -4,7 +4,7 @@
 
 require_once __DIR__ . '/../db.php';
 
-$json_file = __DIR__ . '/../database/orders.json';
+
 
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     http_response_code(200);
@@ -59,36 +59,7 @@ if ($pdo) {
     }
 }
 
-// Sync to JSON backup
-if (file_exists($json_file)) {
-    $orders = json_decode(file_get_contents($json_file), true) ?: [];
-    $json_deleted = 0;
-    if ($permanent) {
-        $orders = array_values(array_filter($orders, function($o) use ($ids_to_delete, &$json_deleted) {
-            $oid   = (string)($o['id'] ?? '');
-            $ocode = (string)($o['order_id'] ?? '');
-            if (in_array($oid, $ids_to_delete, true) || in_array($ocode, $ids_to_delete, true)) {
-                $json_deleted++;
-                return false;
-            }
-            return true;
-        }));
-    } else {
-        foreach ($orders as $k => $o) {
-            $oid   = (string)($o['id'] ?? '');
-            $ocode = (string)($o['order_id'] ?? '');
-            if (in_array($oid, $ids_to_delete, true) || in_array($ocode, $ids_to_delete, true)) {
-                $orders[$k]['is_deleted'] = true;
-                $orders[$k]['updated_at'] = $now;
-                $json_deleted++;
-            }
-        }
-    }
-    DB::atomicWriteJson($json_file, $orders);
-    if ($deleted_count === 0) {
-        $deleted_count = $json_deleted;
-    }
-}
+
 
 echo json_encode([
     'status'        => 'success',

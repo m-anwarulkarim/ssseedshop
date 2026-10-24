@@ -3,12 +3,11 @@
 // Ss Seed Shop Settings Fetch API
 
 require_once __DIR__ . '/../db.php';
-$json_file = __DIR__ . '/../database/settings.json';
+
+
 
 header('Content-Type: application/json; charset=utf-8');
-header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
-header('Pragma: no-cache');
-header('Expires: 0');
+header('Cache-Control: public, max-age=300, stale-while-revalidate=1800');
 
 $settings = DB::all('settings');
 
@@ -39,4 +38,16 @@ if (isset($_GET['keys'])) {
 }
 
 // All settings
+// Exclude heavy admin internal accounting keys (176KB+) from generic public fetch to keep payload tiny (<7KB)
+$include_ledger = isset($_GET['include_ledger']) && ($_GET['include_ledger'] === '1' || $_GET['include_ledger'] === 'true');
+if (!$include_ledger) {
+    $settings = array_filter($settings, function($s) {
+        $k = $s['key'] ?? '';
+        return $k !== 'agroseed_ledger_entries_v2' && $k !== 'agroseed_ledger_meta_v2';
+    });
+}
+
+header_remove('Pragma');
+header_remove('Expires');
+header('Cache-Control: public, max-age=300, s-maxage=600, stale-while-revalidate=1800');
 echo json_encode(array_values($settings), JSON_UNESCAPED_UNICODE);

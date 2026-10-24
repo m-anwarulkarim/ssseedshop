@@ -6,11 +6,7 @@ require_once __DIR__ . '/../db.php';
 
 header('Content-Type: application/json');
 
-$json_file = __DIR__ . '/../database/products.json';
 
-if (!file_exists($json_file)) {
-    file_put_contents($json_file, json_encode([], JSON_PRETTY_PRINT));
-}
 
 $method = $_SERVER['REQUEST_METHOD'];
 
@@ -38,16 +34,6 @@ $existing = null;
 
 if ($target_id) {
     $existing = DB::find('products', $target_id);
-    if (!$existing) {
-        // Fallback check in json
-        $products = json_decode(file_get_contents($json_file), true) ?: [];
-        foreach ($products as $p) {
-            if ((string)($p['id'] ?? '') === $target_id) {
-                $existing = $p;
-                break;
-            }
-        }
-    }
 }
 
 if ($existing) {

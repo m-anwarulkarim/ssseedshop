@@ -6,8 +6,7 @@ require_once __DIR__ . '/../db.php';
 
 header('Content-Type: application/json');
 
-$orders_file   = __DIR__ . '/../database/orders.json';
-$settings_file = __DIR__ . '/../database/settings.json';
+
 
 function getSettingValue($key) {
     $s = DB::find('settings', $key, 'key');

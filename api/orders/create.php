@@ -1,8 +1,8 @@
 <?php
+// api/orders/create.php
+// Pure MySQL Order Creation & Customer Synchronization
+
 require_once __DIR__ . '/../db.php';
-$json_file = __DIR__ . '/../database/orders.json';
-$products_file = __DIR__ . '/../database/products.json';
-$customers_file = __DIR__ . '/../database/customers.json';
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     http_response_code(405);
@@ -16,22 +16,13 @@ if (!$input) {
     exit;
 }
 
-$orders = [];
-if (file_exists($json_file)) {
-    $orders = json_decode(file_get_contents($json_file), true) ?: [];
-}
-
 // Generate unique 5-digit Order ID (like 84729)
 $new_order_id = (string)rand(10000, 99999);
 while (true) {
-    $exists = false;
-    foreach ($orders as $o) {
-        if (isset($o['order_id']) && $o['order_id'] === $new_order_id) {
-            $exists = true;
-            break;
-        }
+    $existing_order = DB::find('orders', $new_order_id, 'order_id');
+    if (!$existing_order) {
+        break;
     }
-    if (!$exists) break;
     $new_order_id = (string)rand(10000, 99999);
 }
 
@@ -42,59 +33,38 @@ if (strlen($clean_phone) > 11 && str_starts_with($clean_phone, '88')) {
     $clean_phone = substr($clean_phone, 2);
 }
 
-// Link or create customer profile in customers.json
+// Link or create customer profile in MySQL customers table
 $profile_id = $input['profile_id'] ?? $input['customer_id'] ?? null;
 $customer_name = trim($input['customer_name'] ?? '');
 $address = trim($input['address'] ?? '');
 $alt_phone = trim($input['alt_phone'] ?? '');
 
-$customers = [];
-if (file_exists($customers_file)) {
-    $customers = json_decode(file_get_contents($customers_file), true) ?: [];
-}
-
-$matched_customer_idx = -1;
+$existing_cust = null;
 if (!empty($profile_id)) {
-    foreach ($customers as $idx => $c) {
-        if (($c['id'] ?? '') === $profile_id) {
-            $matched_customer_idx = $idx;
-            break;
-        }
+    $existing_cust = DB::find('customers', $profile_id, 'id');
+}
+if (!$existing_cust && !empty($clean_phone)) {
+    $existing_cust = DB::find('customers', $clean_phone, 'phone');
+    if ($existing_cust) {
+        $profile_id = $existing_cust['id'];
     }
 }
 
-if ($matched_customer_idx === -1 && !empty($clean_phone)) {
-    foreach ($customers as $idx => $c) {
-        $cp = preg_replace('/[^0-9]/', '', $c['phone'] ?? '');
-        if (strlen($cp) > 11 && str_starts_with($cp, '88')) $cp = substr($cp, 2);
-        if ($cp === $clean_phone) {
-            $matched_customer_idx = $idx;
-            $profile_id = $c['id'];
-            break;
-        }
-    }
-}
-
-if ($matched_customer_idx !== -1) {
+if ($existing_cust) {
     // Update existing customer info if missing
-    $existing = $customers[$matched_customer_idx];
-    $changed = false;
-    if (empty($existing['name']) && !empty($customer_name)) {
-        $existing['name'] = $customer_name;
-        $changed = true;
+    $update_cust = [];
+    if (empty($existing_cust['name']) && !empty($customer_name)) {
+        $update_cust['name'] = $customer_name;
     }
-    if (empty($existing['address']) && !empty($address)) {
-        $existing['address'] = $address;
-        $changed = true;
+    if (empty($existing_cust['address']) && !empty($address)) {
+        $update_cust['address'] = $address;
     }
-    if (empty($existing['alt_phone']) && !empty($alt_phone)) {
-        $existing['alt_phone'] = $alt_phone;
-        $changed = true;
+    if (empty($existing_cust['alt_phone']) && !empty($alt_phone)) {
+        $update_cust['alt_phone'] = $alt_phone;
     }
-    if ($changed) {
-        $existing['updated_at'] = date('c');
-        $customers[$matched_customer_idx] = $existing;
-        file_put_contents($customers_file, json_encode($customers, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+    if (!empty($update_cust)) {
+        $update_cust['updated_at'] = date('c');
+        DB::update('customers', $update_cust, $existing_cust['id']);
     }
 } elseif (!empty($clean_phone)) {
     // Auto-create customer profile for order delivery tracking
@@ -106,7 +76,7 @@ if ($matched_customer_idx !== -1) {
         'email'          => $input['email'] ?? '',
         'avatar_url'     => '',
         'alt_phone'      => $alt_phone ?: null,
-        'phone_verified' => false,
+        'phone_verified' => 0,
         'district'       => $input['district'] ?? null,
         'thana'          => $input['thana'] ?? null,
         'address'        => $address ?: null,
@@ -119,16 +89,13 @@ if ($matched_customer_idx !== -1) {
         'updated_at'     => date('c'),
         'last_login'     => null
     ];
-    $customers[] = $new_cust;
-    file_put_contents($customers_file, json_encode($customers, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+    DB::insert('customers', $new_cust);
 }
 
 // Build order data
 $order_data = [
     'id'              => uniqid(),
     'order_id'        => $new_order_id,
-    'profile_id'      => $profile_id,
-    'customer_id'     => $profile_id,
     'customer_name'   => $customer_name,
     'phone'           => $clean_phone ?: $phone_raw,
     'address'         => $address,
@@ -152,7 +119,7 @@ $order_data = [
 
 DB::insert('orders', $order_data);
 
-// Decrease stock from products
+// Decrease stock from products in MySQL
 if (isset($input['items']) && is_array($input['items'])) {
     foreach ($input['items'] as $item) {
         $pid = $item['product_id'] ?? null;
@@ -161,23 +128,20 @@ if (isset($input['items']) && is_array($input['items'])) {
             $p = DB::find('products', (string)$pid);
             if ($p) {
                 $new_stock = max(0, (int)($p['stock'] ?? 0) - $qty);
-                DB::update('products', ['stock' => $new_stock, 'in_stock' => $new_stock > 0], (string)$pid);
+                DB::update('products', ['stock' => $new_stock, 'available_stock' => $new_stock, 'in_stock' => $new_stock > 0], (string)$pid);
             }
         }
     }
 }
 
-// Clean up matching incomplete orders by phone
-$incomplete_file = __DIR__ . '/../database/incomplete_orders.json';
-if (file_exists($incomplete_file) && !empty($clean_phone)) {
-    $incomplete_orders = json_decode(file_get_contents($incomplete_file), true) ?: [];
-    $filtered_incomplete = array_filter($incomplete_orders, function($io) use ($clean_phone) {
-        $ip = preg_replace('/[^0-9]/', '', (string)($io['phone'] ?? ''));
-        if (strlen($ip) > 11 && str_starts_with($ip, '88')) $ip = substr($ip, 2);
-        return $ip !== $clean_phone;
-    });
-    if (count($filtered_incomplete) !== count($incomplete_orders)) {
-        file_put_contents($incomplete_file, json_encode(array_values($filtered_incomplete), JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+// Clean up matching incomplete orders in MySQL
+if (!empty($clean_phone)) {
+    $pdo = DB::pdo();
+    if ($pdo) {
+        try {
+            $stmt = $pdo->prepare("DELETE FROM `incomplete_orders` WHERE `phone` = ? OR `phone` = ?");
+            $stmt->execute([$clean_phone, $phone_raw]);
+        } catch (Exception $e) {}
     }
 }
 

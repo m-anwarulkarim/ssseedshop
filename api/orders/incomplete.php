@@ -4,7 +4,7 @@
 
 require_once __DIR__ . '/../db.php';
 
-$json_file = __DIR__ . '/../database/incomplete_orders.json';
+
 
 if (!function_exists('getIncompleteOrders')) {
     function getIncompleteOrders($path) {

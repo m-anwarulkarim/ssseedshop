@@ -191,48 +191,8 @@ if ($pdo) {
     // 7. SMS Gateway (Removed per request)
     // SMS modules and notification gateways have been disabled.
 
-    // 8. Handle Live MySQL -> JSON Sync if requested
-    if (isset($_GET['action']) && $_GET['action'] === 'sync_json') {
-        $sync_tables = [
-            'admins'            => ['permissions'],
-            'products'          => ['categories', 'tags', 'image_gallery', 'variations'],
-            'categories'        => [],
-            'subcategories'     => [],
-            'tags'              => [],
-            'customers'         => [],
-            'orders'            => ['items'],
-            'incomplete_orders' => ['cart_snapshot'],
-            'coupons'           => [],
-            'settings'          => [],
-            'blogs'             => [],
-            'sms_logs'          => ['gateway'],
-            'ledger_entries'    => [],
-        ];
-        $synced_count = 0;
-        foreach ($sync_tables as $st => $jcols) {
-            try {
-                $stmt = $pdo->query("SELECT * FROM `$st`");
-                $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
-                foreach ($rows as &$r) {
-                    foreach ($jcols as $jc) {
-                        if (isset($r[$jc]) && is_string($r[$jc])) {
-                            $dec = json_decode($r[$jc], true);
-                            if (json_last_error() === JSON_ERROR_NONE) $r[$jc] = $dec;
-                        }
-                    }
-                    if (isset($r['in_stock'])) $r['in_stock'] = (bool)$r['in_stock'];
-                    if (isset($r['is_hidden'])) $r['is_hidden'] = (bool)$r['is_hidden'];
-                }
-                $target_file = __DIR__ . "/database/{$st}.json";
-                file_put_contents($target_file, json_encode($rows, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
-                $synced_count++;
-            } catch (Exception $e) {}
-        }
-        log_msg('success', "💾 সফলভাবে $synced_count টি MySQL টেবিল থেকে লেটেস্ট ডাটা (ইমেজ, অর্ডার ও সেটিংস) লোকাল JSON ব্যাকআপে সিঙ্ক করা হয়েছে!");
-    }
-
-    // 9. Table Row Count Summary
-    $tables = ['admins', 'products', 'categories', 'customers', 'orders', 'incomplete_orders', 'coupons', 'settings', 'blogs', 'sms_logs'];
+    // 8. Table Row Count Summary
+    $tables = ['admins', 'products', 'categories', 'subcategories', 'tags', 'customers', 'orders', 'incomplete_orders', 'coupons', 'settings'];
     $summary = [];
     foreach ($tables as $t) {
         try {

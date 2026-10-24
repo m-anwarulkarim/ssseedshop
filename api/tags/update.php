@@ -1,6 +1,6 @@
 <?php
 require_once __DIR__ . '/../db.php';
-$json_file = '../database/tags.json';
+
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     http_response_code(405);

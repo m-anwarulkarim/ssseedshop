@@ -4,8 +4,7 @@
 
 require_once __DIR__ . '/../db.php';
 
-$customers_file = __DIR__ . '/../database/customers.json';
-$orders_file    = __DIR__ . '/../database/orders.json';
+
 
 if (!function_exists('normalizePhone')) {
     function normalizePhone($phone) {

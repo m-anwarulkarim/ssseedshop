@@ -1,5 +1,5 @@
 # ========================================================
-# Ss Seed Shop High-Performance Apache & Cloudflare Configuration
+# AgroSeed High-Performance Apache & Cloudflare Configuration
 # Supercharges cPanel API response speed & enables Gzip
 # ========================================================
 
@@ -15,13 +15,10 @@
     AddOutputFilterByType DEFLATE image/svg+xml
 </IfModule>
 
-# 2. Enable HTTP Keep-Alive & Global CORS for APIs and Assets
+# 2. Enable HTTP Keep-Alive for fast connection reuse
 <IfModule mod_headers.c>
     Header set Connection keep-alive
     Header append Vary "Accept-Encoding"
-    Header set Access-Control-Allow-Origin "*"
-    Header set Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS, HEAD"
-    Header set Access-Control-Allow-Headers "Content-Type, Authorization, X-Requested-With, Cache-Control"
 </IfModule>
 
 # 3. Leverage Browser & Cloudflare Edge Caching strictly for static images & media
@@ -34,23 +31,14 @@
     ExpiresByType font/woff2 "access plus 1 month"
 </IfModule>
 
-# 4. Strictly prevent caching of dynamic API endpoints and JSON data
-<FilesMatch "\.(php|json)$">
+# 4. Strictly prevent caching and public direct reading of internal JSON database files
+<FilesMatch "\.json$">
     Header set Cache-Control "no-store, no-cache, must-revalidate, max-age=0"
     Header set Pragma "no-cache"
     Header set Expires "0"
 </FilesMatch>
 
+
 # 5. Security & Optimization
 Options -Indexes
 ServerSignature Off
-
-<Files ".env*">
-    <IfModule mod_authz_core.c>
-        Require all denied
-    </IfModule>
-    <IfModule !mod_authz_core.c>
-        Order allow,deny
-        Deny from all
-    </IfModule>
-</Files>
