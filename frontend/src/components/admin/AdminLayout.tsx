@@ -60,11 +60,9 @@ const urlToPermission: Record<string, string> = {
   "/admin/website/import-export": "settings-import-export",
   
   
-  "/admin/settings/theme": "settings-theme",
   "/admin/settings/language": "settings-language",
   "/admin/settings/cursor": "settings-cursor",
   "/admin/support/ai-inbox": "support-inbox",
-  "/admin/notifications/orders": "notifications-orders",
 };
 
 // Route → page title/subtitle mapping
@@ -90,11 +88,9 @@ const routeTitles: Record<string, { bn: string; en: string; subBn?: string; subE
   "/admin/website/ai-training": { bn: "AI ট্রেনিং", en: "AI Training" },
   "/admin/website/rag": { bn: "RAG ডকুমেন্ট", en: "RAG Documents" },
   "/admin/website/meta-go": { bn: "Meta Go", en: "Meta Go", subBn: "মেটা ইকোসিস্টেমের সব ফিচার", subEn: "All Meta ecosystem features" },
-  "/admin/settings/theme": { bn: "থিম সেটিংস", en: "Theme Settings" },
   "/admin/settings/language": { bn: "ভাষা সেটিংস", en: "Language Settings" },
   "/admin/settings/cursor": { bn: "কার্সর সেটিংস", en: "Cursor Settings" },
   "/admin/support/ai-inbox": { bn: "ইনবক্স", en: "Inbox", subBn: "কাস্টমার চ্যাট সেশন", subEn: "Customer chat sessions" },
-  "/admin/notifications/orders": { bn: "অর্ডার নোটিফিকেশন", en: "Order Notifications" },
   
   "/admin/help-support": { bn: "হেল্প ও সাপোর্ট", en: "Help & Support", subBn: "ডেভেলপার সহায়তা ও সাপোর্ট সেন্টার", subEn: "Developer Assistance & Support Center" },
   "/admin/support": { bn: "হেল্প ও সাপোর্ট", en: "Help & Support", subBn: "ডেভেলপার সহায়তা ও সাপোর্ট সেন্টার", subEn: "Developer Assistance & Support Center" },
@@ -154,14 +150,10 @@ const sectionShortcuts: Record<string, Shortcut[]> = {
     { icon: Share2, label: "Meta Go", labelBn: "Meta Go", to: "/admin/website/meta-go" },
   ],
   settings: [
-    { icon: Palette, label: "Theme", labelBn: "থিম", to: "/admin/settings/theme" },
     { icon: Languages, label: "Language", labelBn: "ভাষা", to: "/admin/settings/language" },
     { icon: MousePointer2, label: "Cursor", labelBn: "কার্সর", to: "/admin/settings/cursor" },
   ],
   support: [],
-  notifications: [
-    { icon: Bell, label: "Orders", labelBn: "অর্ডার", to: "/admin/notifications/orders" },
-  ],
   myActivity: [
     { icon: Search, label: "Search", labelBn: "সার্চ", to: "/admin/orders/search" },
     { icon: Plus, label: "Add Order", labelBn: "নতুন অর্ডার", to: "/admin/orders/create" },
@@ -178,7 +170,6 @@ function getShortcutsForPath(pathname: string): Shortcut[] {
   if (pathname.startsWith("/admin/website/")) return sectionShortcuts.website;
   if (pathname.startsWith("/admin/settings/")) return sectionShortcuts.settings;
   if (pathname.startsWith("/admin/support/")) return sectionShortcuts.support;
-  if (pathname.startsWith("/admin/notifications/")) return sectionShortcuts.notifications;
   if (pathname === "/admin/my-activity") return sectionShortcuts.myActivity;
   if (pathname === "/admin/overview") return sectionShortcuts.myActivity;
   return [];
@@ -377,10 +368,6 @@ function AdminHeader() {
             <DropdownMenuItem onClick={() => navigate("/admin/my-activity")} className="cursor-pointer">
               <Activity className="w-4 h-4 mr-2 text-rose-500" />
               <span>{t("আমার অ্যাক্টিভিটি", "My Activity")}</span>
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => navigate("/admin/settings/theme")} className="cursor-pointer">
-              <Palette className="w-4 h-4 mr-2 text-indigo-500" />
-              <span>{t("থিম সেটিংস", "Theme Settings")}</span>
             </DropdownMenuItem>
             <DropdownMenuItem onClick={() => navigate("/admin/help-support")} className="cursor-pointer">
               <Headphones className="w-4 h-4 mr-2 text-purple-500" />

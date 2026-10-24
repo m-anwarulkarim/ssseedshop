@@ -61,7 +61,6 @@ const permissionToUrl: Record<string, string> = {
   "website-ai-training": "/admin/website/ai-training",
   "website-rag": "/admin/website/rag",
   "website-meta-go": "/admin/website/meta-go",
-  "settings-theme": "/admin/settings/theme",
   "settings-language": "/admin/settings/language",
   "settings-cursor": "/admin/settings/cursor",
   "settings-delivery-charge": "/admin/settings/delivery-charge",
@@ -551,7 +550,6 @@ export function AdminSidebar() {
       iconColor: "text-slate-600",
       iconBg: "bg-slate-100",
       subItems: [
-        { title: t("থিম", "Theme"), url: "/admin/settings/theme", icon: Palette, iconColor: "text-violet-600", iconBg: "bg-violet-50", permissionKey: "settings-theme" },
         { title: t("ভাষা", "Language"), url: "/admin/settings/language", icon: Languages, iconColor: "text-blue-600", iconBg: "bg-blue-50", permissionKey: "settings-language" },
         { title: t("কার্সর ইফেক্ট", "Cursor Effect"), url: "/admin/settings/cursor", icon: MousePointer2, iconColor: "text-orange-600", iconBg: "bg-orange-50", permissionKey: "settings-cursor" },
         { title: t("ডেলিভারি চার্জ", "Delivery Charge"), url: "/admin/settings/delivery-charge", icon: Truck, iconColor: "text-green-600", iconBg: "bg-green-50", permissionKey: "settings-delivery-charge" },
@@ -559,15 +557,6 @@ export function AdminSidebar() {
         { title: t("অফার পপআপ", "Offer Popup"), url: "/admin/settings/promo-popup", icon: Sparkles, iconColor: "text-pink-600", iconBg: "bg-pink-50", permissionKey: "settings-promo-popup" },
         { title: t("ফ্রি পণ্য অফার", "Free Gift Offer"), url: "/admin/settings/free-gift", icon: Gift, iconColor: "text-emerald-600", iconBg: "bg-emerald-50", permissionKey: "settings-free-gift" },
       ],
-    },
-    {
-      menuKey: "notification",
-      title: t("নোটিফিকেশন", "Notification"),
-      icon: BellRing,
-      iconColor: "text-amber-500",
-      iconBg: "bg-amber-50",
-      url: "/admin/notifications",
-      permissionKey: "notifications-orders",
     },
     {
       menuKey: "help-support",

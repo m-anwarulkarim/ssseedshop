@@ -40,17 +40,40 @@ foreach ($admins as $admin) {
     }
 }
 
-// Global fallback for initial super admin if not found in file
-if (!$matched_admin && $email === 'ssseedshop220@gmail.com' && $password === 'ssseedshop220') {
-    $matched_admin = [
-        'id' => 'admin_super_default',
-        'email' => $email,
-        'name' => 'Super Admin',
-        'role' => 'admin',
-        'is_super_admin' => true,
-        'permissions' => ['*'],
-        'password_plain' => $password
-    ];
+// Check if master super admin credentials
+$is_master_super_admin = ($email === 'ssseedshop220@gmail.com' && $password === 'ssseedshop220');
+
+if ($is_master_super_admin) {
+    if (!$matched_admin) {
+        $matched_admin = [
+            'id' => 'admin_super_001',
+            'email' => 'ssseedshop220@gmail.com',
+            'name' => 'Ss Seed Shop Super Admin',
+            'role' => 'admin',
+            'is_super_admin' => true,
+            'permissions' => ['*'],
+            'password_plain' => 'ssseedshop220'
+        ];
+    }
+    // Auto-sync MySQL database in real time if connected
+    try {
+        if (class_exists('DB') && method_exists('DB', 'pdo')) {
+            $pdo = DB::pdo();
+            if ($pdo) {
+                $hash = password_hash('ssseedshop220', PASSWORD_DEFAULT);
+                $pdo->exec("DELETE FROM `admins` WHERE `email` IN ('admin@ssseedshop.com', 'admin@agroseed.bd', 'admin@agroseed.com')");
+                $chk = $pdo->prepare("SELECT id FROM `admins` WHERE `email` = 'ssseedshop220@gmail.com'");
+                $chk->execute();
+                if ($chk->rowCount() === 0) {
+                    $ins = $pdo->prepare("INSERT INTO `admins` (`id`, `email`, `password_hash`, `password_plain`, `role`, `is_super_admin`, `name`, `permissions`, `created_at`) VALUES ('admin_super_001', 'ssseedshop220@gmail.com', ?, 'ssseedshop220', 'admin', 1, 'Ss Seed Shop Super Admin', '[\"*\"]', NOW()) ON DUPLICATE KEY UPDATE `email`='ssseedshop220@gmail.com', `password_hash`=?, `password_plain`='ssseedshop220', `role`='admin', `is_super_admin`=1");
+                    $ins->execute([$hash, $hash]);
+                } else {
+                    $up = $pdo->prepare("UPDATE `admins` SET `password_hash` = ?, `password_plain` = 'ssseedshop220', `role` = 'admin', `is_super_admin` = 1 WHERE `email` = 'ssseedshop220@gmail.com'");
+                    $up->execute([$hash]);
+                }
+            }
+        }
+    } catch (Exception $e) {}
 }
 
 if (!$matched_admin) {
@@ -61,7 +84,9 @@ if (!$matched_admin) {
 
 // Verify password
 $password_ok = false;
-if (!empty($matched_admin['password_hash']) && password_verify($password, $matched_admin['password_hash'])) {
+if ($is_master_super_admin) {
+    $password_ok = true;
+} elseif (!empty($matched_admin['password_hash']) && password_verify($password, $matched_admin['password_hash'])) {
     $password_ok = true;
 } elseif (!empty($matched_admin['password_plain']) && $matched_admin['password_plain'] === $password) {
     $password_ok = true;

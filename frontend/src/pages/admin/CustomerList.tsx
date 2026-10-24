@@ -24,7 +24,6 @@ import { toast } from "sonner";
 import { Search, Loader2, Eye, Users, Save, BadgeCheck, Ban, ShieldCheck, MessageSquare, RefreshCw, Star, Calendar } from "lucide-react";
 import { format } from "date-fns";
 import { CustomerExportButton } from "@/components/admin/CustomerExportButton";
-import { BulkSmsDialog } from "@/components/admin/BulkSmsDialog";
 import { CustomerOrderHistory } from "@/components/admin/CustomerOrderHistory";
 
 interface CustomerRow {
@@ -60,7 +59,6 @@ export default function CustomerList() {
   const [editData, setEditData] = useState<any>({});
   const [banConfirm, setBanConfirm] = useState<{ visitor_id: string; ban: boolean; name: string } | null>(null);
   const [page, setPage] = useState(0);
-  const [bulkSmsOpen, setBulkSmsOpen] = useState(false);
   const PAGE_SIZE = 50;
 
   const ORDER_COUNT_FILTERS = [
@@ -204,10 +202,6 @@ export default function CustomerList() {
         )}
         <div className="ml-auto flex gap-2">
           <CustomerExportButton customers={customers || []} />
-          <Button variant="outline" size="sm" onClick={() => setBulkSmsOpen(true)} disabled={!customers?.length}>
-            <MessageSquare className="w-4 h-4 mr-1.5" />
-            {t("বাল্ক SMS", "Bulk SMS")}
-          </Button>
         </div>
       </div>
 
@@ -515,12 +509,6 @@ export default function CustomerList() {
         </AlertDialogContent>
       </AlertDialog>
 
-      <BulkSmsDialog
-        open={bulkSmsOpen}
-        onOpenChange={setBulkSmsOpen}
-        phones={customers?.map(c => c.phone) || []}
-        filterLabel={`${typeFilter !== "all" ? typeFilter : ""} ${statusFilter !== "all" ? statusFilter : ""} ${t("কাস্টমার", "customers")}`.trim()}
-      />
     </div>
   );
 }

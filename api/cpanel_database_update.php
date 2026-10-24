@@ -70,6 +70,24 @@ if ($pdo) {
         try {
             $pdo->exec("DROP TABLE IF EXISTS `otps`");
         } catch (Exception $e) {}
+
+        // 2b. Sync Super Admin (ssseedshop220@gmail.com)
+        try {
+            $hash = password_hash('ssseedshop220', PASSWORD_DEFAULT);
+            $pdo->exec("DELETE FROM `admins` WHERE `email` IN ('admin@ssseedshop.com', 'admin@agroseed.bd', 'admin@agroseed.com')");
+            $chk = $pdo->prepare("SELECT id FROM `admins` WHERE `email` = 'ssseedshop220@gmail.com'");
+            $chk->execute();
+            if ($chk->rowCount() === 0) {
+                $ins = $pdo->prepare("INSERT INTO `admins` (`id`, `email`, `password_hash`, `password_plain`, `role`, `is_super_admin`, `name`, `permissions`, `created_at`) VALUES ('admin_super_001', 'ssseedshop220@gmail.com', ?, 'ssseedshop220', 'admin', 1, 'Ss Seed Shop Super Admin', '[\"*\"]', NOW()) ON DUPLICATE KEY UPDATE `email`='ssseedshop220@gmail.com', `password_hash`=?, `password_plain`='ssseedshop220', `role`='admin', `is_super_admin`=1");
+                $ins->execute([$hash, $hash]);
+            } else {
+                $up = $pdo->prepare("UPDATE `admins` SET `password_hash` = ?, `password_plain` = 'ssseedshop220', `role` = 'admin', `is_super_admin` = 1 WHERE `email` = 'ssseedshop220@gmail.com'");
+                $up->execute([$hash]);
+            }
+            log_msg('success', "🔑 সুপার অ্যাডমিন সফলভাবে সিঙ্ক ও আপডেট হয়েছে: <strong>ssseedshop220@gmail.com</strong> (পাসওয়ার্ড: ssseedshop220)");
+        } catch (Exception $e) {
+            log_msg('error', "অ্যাডমিন সিঙ্ক এরর: " . htmlspecialchars($e->getMessage()));
+        }
     }
 
     // 3. Helper to add column if not exists
@@ -207,29 +225,8 @@ if ($pdo) {
         }
     } catch (Exception $e) {}
 
-    // 7. Verify & Sync SMS Gateway
-    require_once __DIR__ . '/settings/sms_helper.php';
-    try {
-        $stmt = $pdo->prepare("SELECT `value` FROM `settings` WHERE `key` = 'ecomah_api_key' LIMIT 1");
-        $stmt->execute();
-        $key_row = $stmt->fetch();
-        $ecomah_key = $key_row['value'] ?? '';
-        if (!empty($ecomah_key)) {
-            $bal = ecomah_check_balance($ecomah_key);
-            if ($bal && !empty($bal['success'])) {
-                $rem = $bal['sms']['remaining'] ?? 0;
-                $limit = $bal['sms']['limit'] ?? 0;
-                $used = $bal['sms']['used'] ?? 0;
-                log_msg('success', "📱 E-COMAH SMS গেটওয়ে সক্রিয় ও সংযুক্ত! অবশিষ্ট SMS: <strong>{$rem}</strong> টি (ব্যবহৃত: {$used}, মোট কোটা: {$limit})");
-            } else {
-                log_msg('error', "⚠️ E-COMAH SMS ব্যালেন্স সংযোগে সমস্যা। গেটওয়ে রেসপন্স: " . json_encode($bal, JSON_UNESCAPED_UNICODE));
-            }
-        } else {
-            log_msg('info', "ℹ️ E-COMAH SMS API Key কনফিগার করা হয়নি। এডমিন প্যানেল থেকে যোগ করুন।");
-        }
-    } catch (Exception $e) {
-        log_msg('error', "SMS গেটওয়ে টেস্ট এরর: " . htmlspecialchars($e->getMessage()));
-    }
+    // 7. SMS Gateway (Disabled)
+    log_msg('info', "ℹ️ SMS গেটওয়ে সিস্টেম থেকে নিষ্ক্রিয় ও রিমুভ করা হয়েছে।");
 
     // 8. Handle Live MySQL -> JSON Sync if requested
     if (isset($_GET['action']) && $_GET['action'] === 'sync_json') {

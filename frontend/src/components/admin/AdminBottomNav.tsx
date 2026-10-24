@@ -1,5 +1,5 @@
 import { useLocation, useNavigate } from "react-router-dom";
-import { LayoutGrid, ShoppingBag, ClipboardList, Bell, Menu } from "lucide-react";
+import { LayoutGrid, ShoppingBag, ClipboardList, Search, Menu } from "lucide-react";
 import { useSidebar } from "@/components/ui/sidebar";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useWebCounts } from "@/stores/orderCountsStore";
@@ -48,8 +48,8 @@ export function AdminBottomNav() {
     pathname.startsWith("/admin/orders") &&
     !pathname.includes("search");
 
-  const isNotificationActive =
-    pathname.startsWith("/admin/notifications");
+  const isSearchActive =
+    pathname === "/admin/orders/search";
 
   const navItems = [
     {
@@ -77,20 +77,20 @@ export function AdminBottomNav() {
       label: t("অর্ডার লিস্ট", "Order List"),
       icon: ClipboardList,
       isActive: isOrderActive,
+      badge: pendingCount > 0 ? (pendingCount > 99 ? "99+" : pendingCount) : undefined,
       onClick: () => {
         setOpenMobile(false);
         navigate("/admin/orders/web");
       },
     },
     {
-      id: "notification",
-      label: t("নোটিফিকেশন", "Notification"),
-      icon: Bell,
-      isActive: isNotificationActive,
-      badge: pendingCount > 0 ? (pendingCount > 99 ? "99+" : pendingCount) : undefined,
+      id: "search",
+      label: t("সার্চ", "Search"),
+      icon: Search,
+      isActive: isSearchActive,
       onClick: () => {
         setOpenMobile(false);
-        navigate("/admin/notifications/orders");
+        navigate("/admin/orders/search");
       },
     },
     {

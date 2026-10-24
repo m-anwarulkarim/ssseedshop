@@ -16,8 +16,6 @@ import {
   Bell,
 } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
-import { Textarea } from "@/components/ui/textarea";
-import { SmsApiDialog } from "@/components/admin/SmsApiDialog";
 import { FraudCheckerDialog } from "@/components/admin/FraudCheckerDialog";
 import { PixelDialog, GtmDialog } from "@/components/admin/TrackingDialog";
 import { ECOMAH_SETTING_KEY } from "@/lib/ecomahSettings";
@@ -380,235 +378,13 @@ function ApiCard({ icon: Icon, title, description, status, onClick }: ApiCardPro
   );
 }
 
-const SMS_STATUS_OPTIONS = [
-  { key: "sms_on_pending", msgKey: "sms_msg_pending", labelBn: "পেন্ডিং (অর্ডার তৈরি)", labelEn: "Pending (Order Created)", defaultMsg: "{order_id} অর্ডার সফল হয়েছে, টোটাল {total} টাকা। ধন্যবাদ! - Ss Seed Shop", placeholders: "{order_id}, {total}" },
-  { key: "sms_on_no_response", msgKey: "sms_msg_no_response", labelBn: "নো রেসপন্স / বিজি", labelEn: "No Response / Busy", defaultMsg: "আপনাকে কল করে পাওয়া যায়নি, অনুগ্রহ করে 01933819799 নাম্বারে যোগাযোগ করুন", placeholders: "" },
-  { key: "sms_on_confirmed", msgKey: "sms_msg_confirmed", labelBn: "কনফার্ম", labelEn: "Confirmed", defaultMsg: "অভিনন্দন! অর্ডারটি কনফার্ম হয়েছে। টোটাল {total} টাকা।", placeholders: "{order_id}, {total}" },
-  { key: "sms_on_entry_done", msgKey: "sms_msg_entry_done", labelBn: "কুরিয়ার এন্ট্রি", labelEn: "Courier Entry", defaultMsg: "যেকোনো প্রয়োজনে মেসেজ করুন- ssseedshop.com/help", placeholders: "{order_id}, {tracking_link}" },
-];
-
-function SmsNotificationSettings() {
-  const { t } = useLanguage();
-  const queryClient = useQueryClient();
-
-  const allKeys = SMS_STATUS_OPTIONS.flatMap(o => [o.key, o.msgKey]);
-
-  const { data: settings, isLoading } = useQuery({
-    queryKey: ["sms-notification-settings"],
-    queryFn: async () => {
-      const url = API_URL;
-      const res = await fetch(`${url}/settings/get.php?keys=${allKeys.join(",")}`);
-      const data = await res.json();
-      const map: Record<string, string> = {};
-      SMS_STATUS_OPTIONS.forEach(o => { map[o.key] = "true"; }); // default ON
-      data?.forEach((r: any) => { map[r.key] = r.value; });
-      return map;
-    },
-  });
-
-  const [messages, setMessages] = useState<Record<string, string>>({});
-  const [savedMessages, setSavedMessages] = useState<Record<string, string>>({});
-
-  useEffect(() => {
-    if (settings) {
-      const msgs: Record<string, string> = {};
-      SMS_STATUS_OPTIONS.forEach(o => {
-        msgs[o.msgKey] = settings[o.msgKey] || o.defaultMsg;
-      });
-      setMessages(msgs);
-      setSavedMessages(msgs);
-    }
-  }, [settings]);
-
-  const toggleMutation = useMutation({
-    mutationFn: async ({ key, value }: { key: string; value: boolean }) => {
-      const url = API_URL;
-      await fetch(`${url}/settings/update.php`, {
-        method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ key, value: value ? "true" : "false" })
-      });
-    },
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["sms-notification-settings"] }),
-  });
-
-  const saveMsgMutation = useMutation({
-    mutationFn: async ({ key, value }: { key: string; value: string }) => {
-      const url = API_URL;
-      await fetch(`${url}/settings/update.php`, {
-        method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ key, value })
-      });
-    },
-    onSuccess: (_, vars) => {
-      setSavedMessages(prev => ({ ...prev, [vars.key]: vars.value }));
-      queryClient.invalidateQueries({ queryKey: ["sms-notification-settings"] });
-      toast.success(t("সংরক্ষিত হয়েছে", "Saved"));
-    },
-  });
-
-  if (isLoading) return null;
-
-  return (
-    <Card className="border-border">
-      <CardHeader className="pb-2">
-        <CardTitle className="text-base flex items-center gap-2">
-          <Bell className="w-4 h-4 text-primary" />
-          {t("SMS নোটিফিকেশন সেটিংস", "SMS Notification Settings")}
-        </CardTitle>
-        <CardDescription className="text-xs">
-          {t("কোন স্ট্যাটাসে কাস্টমারের ফোনে SMS পাঠানো হবে এবং কি টেক্সট যাবে তা নির্ধারণ করুন", "Configure which status changes trigger SMS and customize message text")}
-        </CardDescription>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        {SMS_STATUS_OPTIONS.map((opt) => {
-          const isOn = settings?.[opt.key] !== "false";
-          const msg = messages[opt.msgKey] || opt.defaultMsg;
-          const isDirty = msg !== savedMessages[opt.msgKey];
-          return (
-            <div key={opt.key} className="py-3 border-b border-border last:border-0 space-y-2">
-              <div className="flex items-center justify-between gap-3">
-                <p className="text-sm font-medium text-foreground">{t(opt.labelBn, opt.labelEn)}</p>
-                <Switch
-                  checked={isOn}
-                  onCheckedChange={(checked) => toggleMutation.mutate({ key: opt.key, value: checked })}
-                />
-              </div>
-              {isOn && (
-                <div className="space-y-1.5">
-                  <Textarea
-                    value={msg}
-                    onChange={(e) => setMessages(prev => ({ ...prev, [opt.msgKey]: e.target.value }))}
-                    className="text-xs min-h-[60px] resize-none"
-                    rows={2}
-                  />
-                  <div className="flex items-center justify-between gap-2">
-                    <div className="flex items-center gap-2 text-[10px] text-muted-foreground flex-wrap">
-                      <span>{msg.length} {t("অক্ষর", "chars")}</span>
-                      {opt.placeholders && (
-                        <span className="text-primary/70">{t("ভেরিয়েবল", "Variables")}: {opt.placeholders}</span>
-                      )}
-                    </div>
-                    <Button
-                      size="sm"
-                      variant={isDirty ? "default" : "outline"}
-                      className="h-6 text-[10px] px-2"
-                      disabled={saveMsgMutation.isPending || !isDirty}
-                      onClick={() => saveMsgMutation.mutate({ key: opt.msgKey, value: msg })}
-                    >
-                      <Save className="w-3 h-3 mr-1" />
-                      {isDirty ? t("সেভ করুন", "Save") : t("সেভড", "Saved")}
-                    </Button>
-                  </div>
-                </div>
-              )}
-            </div>
-          );
-        })}
-      </CardContent>
-    </Card>
-  );
-}
-
-// ─── Customer OTP SMS Template ───
-function CustomerOtpTemplateSettings() {
-  const { t } = useLanguage();
-  const queryClient = useQueryClient();
-  const TEMPLATE_KEY = "customer_otp_sms_template";
-  const DEFAULT_TPL = "Your Ss Seed Shop OTP is: {otp}. Valid for 5 minutes.";
-
-  const { data: saved, isLoading } = useQuery({
-    queryKey: ["customer-otp-template"],
-    queryFn: async () => {
-      const url = API_URL;
-      const res = await fetch(`${url}/settings/get.php?keys=${TEMPLATE_KEY}`);
-      const data = await res.json();
-      return (data?.[0]?.value as string) || DEFAULT_TPL;
-    },
-  });
-
-  const [value, setValue] = useState("");
-  useEffect(() => { if (saved !== undefined) setValue(saved); }, [saved]);
-
-  const saveMutation = useMutation({
-    mutationFn: async (v: string) => {
-      const url = API_URL;
-      await fetch(`${url}/settings/update.php`, {
-        method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ key: TEMPLATE_KEY, value: v })
-      });
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["customer-otp-template"] });
-      toast.success(t("সংরক্ষিত হয়েছে", "Saved"));
-    },
-  });
-
-  if (isLoading) return null;
-
-  const isDirty = value !== saved;
-  const preview = value.replace(/\{otp\}/gi, "1234");
-
-  return (
-    <Card className="border-border">
-      <CardHeader className="pb-2">
-        <CardTitle className="text-base flex items-center gap-2">
-          <Shield className="w-4 h-4 text-primary" />
-          {t("কাস্টমার OTP SMS টেমপ্লেট", "Customer OTP SMS Template")}
-        </CardTitle>
-        <CardDescription className="text-xs">
-          {t("প্রোফাইল তৈরি / লগইনের সময় কাস্টমারকে যে OTP SMS যায় তা এডিট করুন", "Edit the OTP SMS sent to customers during profile creation / login")}
-        </CardDescription>
-      </CardHeader>
-      <CardContent className="space-y-2">
-        <Textarea
-          value={value}
-          onChange={(e) => setValue(e.target.value)}
-          className="text-xs min-h-[70px] resize-none"
-          rows={3}
-          placeholder={DEFAULT_TPL}
-        />
-        <div className="text-[10px] text-muted-foreground">
-          {t("ভেরিয়েবল", "Variables")}: <span className="text-primary/80">{"{otp}"}</span> · {value.length} {t("অক্ষর", "chars")}
-        </div>
-        <div className="text-[11px] bg-muted/40 rounded px-2 py-1.5 border border-border">
-          <span className="text-muted-foreground">{t("প্রিভিউ", "Preview")}: </span>
-          <span className="text-foreground">{preview}</span>
-        </div>
-        <div className="flex items-center justify-end gap-2">
-          <Button
-            size="sm"
-            variant="outline"
-            className="h-7 text-[11px] px-2"
-            onClick={() => setValue(DEFAULT_TPL)}
-          >
-            {t("ডিফল্ট", "Default")}
-          </Button>
-          <Button
-            size="sm"
-            variant={isDirty ? "default" : "outline"}
-            className="h-7 text-[11px] px-2"
-            disabled={saveMutation.isPending || !isDirty || !value.trim()}
-            onClick={() => saveMutation.mutate(value)}
-          >
-            <Save className="w-3 h-3 mr-1" />
-            {isDirty ? t("সেভ করুন", "Save") : t("সেভড", "Saved")}
-          </Button>
-        </div>
-      </CardContent>
-    </Card>
-  );
-}
-
 // ─── Main Page ───
 export default function ApiManagement() {
   const { t } = useLanguage();
   const [courierOpen, setCourierOpen] = useState(false);
-  const [smsOpen, setSmsOpen] = useState(false);
   const [fraudOpen, setFraudOpen] = useState(false);
   const [pixelOpen, setPixelOpen] = useState(false);
   const [gtmOpen, setGtmOpen] = useState(false);
-  
-  
 
   const { data: courierStatus } = useQuery({
     queryKey: ["courier-status"],
@@ -662,12 +438,8 @@ export default function ApiManagement() {
     },
   });
 
-
-
-
   return (
     <div className="space-y-4">
-
       <div className="space-y-3">
         <ApiCard
           icon={Truck}
@@ -676,15 +448,6 @@ export default function ApiManagement() {
           status={courierStatus as "active" | "inactive" | undefined}
           onClick={() => setCourierOpen(true)}
         />
-        <ApiCard
-          icon={MessageSquare}
-          title={t("SMS API", "SMS API")}
-          description={t("কাস্টম Base URL ও Endpoint সহ SMS সার্ভিস", "SMS service with custom Base URL & endpoints")}
-          status={ecomahStatus as "active" | "inactive" | undefined}
-          onClick={() => setSmsOpen(true)}
-        />
-        {/* Hidden: Payment Gateway */}
-        {/* <ApiCard icon={CreditCard} title="Payment Gateway" ... /> */}
         <ApiCard
           icon={Shield}
           title={t("ফ্রড চেকার", "Fraud Checker")}
@@ -699,24 +462,12 @@ export default function ApiManagement() {
           status={pixelStatus as "active" | "inactive" | undefined}
           onClick={() => setPixelOpen(true)}
         />
-        {/* Hidden: Google Tag Manager */}
-        {/* <ApiCard icon={Code2} title="Google Tag Manager" ... onClick={() => setGtmOpen(true)} /> */}
-
-
       </div>
 
-      {/* SMS Notification Settings */}
-      <SmsNotificationSettings />
-
-      {/* Customer OTP SMS Template */}
-      <CustomerOtpTemplateSettings />
-
       <CourierApiDialog open={courierOpen} onOpenChange={setCourierOpen} />
-      <SmsApiDialog open={smsOpen} onOpenChange={setSmsOpen} />
       <FraudCheckerDialog open={fraudOpen} onOpenChange={setFraudOpen} />
       <PixelDialog open={pixelOpen} onOpenChange={setPixelOpen} />
       <GtmDialog open={gtmOpen} onOpenChange={setGtmOpen} />
-      
     </div>
   );
 }

@@ -78,7 +78,6 @@ const OrderList = lazyRetry(() => import("./pages/admin/OrderList.tsx"));
 const PreOrders = lazyRetry(() => import("./pages/admin/PreOrders.tsx"));
 const OrderSearch = lazyRetry(() => import("./pages/admin/OrderSearch.tsx"));
 const CustomerList = lazyRetry(() => import("./pages/admin/CustomerList.tsx"));
-const ThemeSettings = lazyRetry(() => import("./pages/admin/ThemeSettings.tsx"));
 const LanguageSettings = lazyRetry(() => import("./pages/admin/LanguageSettings.tsx"));
 const CursorSettings = lazyRetry(() => import("./pages/admin/CursorSettings.tsx"));
 const DeliveryChargeEditor = lazyRetry(() => import("./pages/admin/DeliveryChargeEditor.tsx"));
@@ -89,7 +88,6 @@ const AdminList = lazyRetry(() => import("./pages/admin/AdminList.tsx"));
 const DeletedOrders = lazyRetry(() => import("./pages/admin/DeletedOrders.tsx"));
 const ImportExport = lazyRetry(() => import("./pages/admin/ImportExport.tsx"));
 
-const OrderNotifications = lazyRetry(() => import("./pages/admin/Notifications.tsx"));
 const HelpSupport = lazyRetry(() => import("./pages/admin/HelpSupport.tsx"));
 const OrderControl = lazyRetry(() => import("./pages/admin/OrderControl.tsx"));
 const PromoPopupSettings = lazyRetry(() => import("./pages/admin/PromoPopupSettings.tsx"));
@@ -263,14 +261,12 @@ const App = () => {
                     <Route path="website/media" element={<MediaManagement />} />
                     <Route path="website/import-export" element={<ImportExport />} />
 
-                    <Route path="settings/theme" element={<ThemeSettings />} />
                     <Route path="settings/language" element={<LanguageSettings />} />
                     <Route path="settings/cursor" element={<CursorSettings />} />
                     <Route path="settings/delivery-charge" element={<DeliveryChargeEditor />} />
                     <Route path="settings/order-control" element={<OrderControl />} />
                     <Route path="settings/promo-popup" element={<PromoPopupSettings />} />
                     <Route path="settings/free-gift" element={<FreeGiftSettings />} />
-                    <Route path="notifications" element={<OrderNotifications />} />
                     <Route path="help-support" element={<HelpSupport />} />
                     <Route path="help" element={<HelpSupport />} />
                     <Route path="support" element={<HelpSupport />} />

@@ -187,9 +187,6 @@ export const ADMIN_MENU_TARGETS: { label: string; labelBn: string; url: string; 
   { label: "Import/Export", labelBn: "ইমপোর্ট/এক্সপোর্ট", url: "/admin/website/import-export", group: "Website" },
   { label: "Meta Go", labelBn: "Meta Go", url: "/admin/website/meta-go", group: "Website" },
   // Settings
-  { label: "Theme", labelBn: "থিম", url: "/admin/settings/theme", group: "Settings" },
   { label: "Language", labelBn: "ভাষা", url: "/admin/settings/language", group: "Settings" },
   { label: "Cursor Effect", labelBn: "কার্সর ইফেক্ট", url: "/admin/settings/cursor", group: "Settings" },
-  // Notifications
-  { label: "Notification Log", labelBn: "নোটিফিকেশন লগ", url: "/admin/notifications/orders", group: "Notification" },
 ];
