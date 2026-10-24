@@ -1,6 +1,6 @@
-# AgroSeed
+# Ss Seed Shop
 
-Official website for AgroSeed (https://agroseed.bd/)
+Official website for Ss Seed Shop (https://ssseedshop.com/)
 
 
 This project was built with [Lovable](https://lovable.dev).
