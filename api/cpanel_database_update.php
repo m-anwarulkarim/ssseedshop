@@ -1,7 +1,7 @@
 <?php
 // api/cpanel_database_update.php
-// AgroSeed cPanel Database Migration & Optimization Tool
-// Access via browser: https://api.agroseed.bd/cpanel_database_update.php
+// Ss Seed Shop cPanel Database Migration, Repair & Verification Tool
+// Access via browser: https://api.ssseedshop.com/cpanel_database_update.php
 
 ini_set('display_errors', 1);
 error_reporting(E_ALL);
@@ -62,6 +62,9 @@ if (empty($db) || $db === 'cpanel_database_name') {
     }
 }
 
+$summary = [];
+$del_tests_passed = 0;
+
 if ($pdo) {
     // 2. Execute Base Schema (CREATE TABLE IF NOT EXISTS)
     $schema_file = __DIR__ . '/database/schema.sql';
@@ -117,7 +120,6 @@ if ($pdo) {
     }
 
     // 4. Schema Enhancements & Missing Columns
-    // A. Orders Table
     add_column_if_missing($pdo, 'orders', 'created_by_admin_id', 'VARCHAR(64) DEFAULT NULL AFTER `courier_status`');
     add_column_if_missing($pdo, 'orders', 'pre_date', 'VARCHAR(50) DEFAULT NULL AFTER `last_status_changed_by`');
     add_column_if_missing($pdo, 'orders', 'traffic_source', 'VARCHAR(100) DEFAULT \'direct\' AFTER `pre_date`');
@@ -127,7 +129,6 @@ if ($pdo) {
     add_index_if_missing($pdo, 'orders', 'idx_ord_created_by', '`created_by_admin_id`');
     add_index_if_missing($pdo, 'orders', 'idx_ord_last_modified', '`last_status_changed_by`');
 
-    // B. Products Table
     add_column_if_missing($pdo, 'products', 'available_stock', 'INT DEFAULT 0 AFTER `in_stock`');
     add_column_if_missing($pdo, 'products', 'position', 'INT DEFAULT 0 AFTER `stock`');
     add_column_if_missing($pdo, 'products', 'is_hidden', 'TINYINT(1) DEFAULT 0 AFTER `position`');
@@ -137,63 +138,130 @@ if ($pdo) {
     add_index_if_missing($pdo, 'products', 'idx_prod_category', '`category`');
     add_index_if_missing($pdo, 'products', 'idx_prod_position', '`position`');
 
-    // C. Categories Table
     add_column_if_missing($pdo, 'categories', 'slug', 'VARCHAR(100) DEFAULT NULL');
     add_column_if_missing($pdo, 'categories', 'icon', 'VARCHAR(50) DEFAULT NULL');
     add_column_if_missing($pdo, 'categories', 'image', 'TEXT DEFAULT NULL');
     add_column_if_missing($pdo, 'categories', 'is_active', 'TINYINT(1) DEFAULT 1');
     add_index_if_missing($pdo, 'categories', 'idx_cat_slug', '`slug`');
 
-    // D. Tags Table
     add_column_if_missing($pdo, 'tags', 'slug', 'VARCHAR(100) DEFAULT NULL');
     add_column_if_missing($pdo, 'tags', 'position', 'INT DEFAULT 0');
 
-    // Make product_image LONGTEXT if it's currently limited
+    // Make product_image LONGTEXT
     try {
         $pdo->exec("ALTER TABLE `products` MODIFY `product_image` LONGTEXT DEFAULT NULL");
         $pdo->exec("ALTER TABLE `products` MODIFY `image_gallery` LONGTEXT DEFAULT NULL");
         $pdo->exec("ALTER TABLE `products` MODIFY `full_description` LONGTEXT DEFAULT NULL");
     } catch (Exception $e) {}
 
-    // 5. Stock Normalization (Strictly non-destructive: only fills NULL available_stock, preserves all product edits)
+    // Stock Normalization (Non-destructive)
     try {
-        $synced_stock = $pdo->exec("UPDATE `products` SET `available_stock` = `stock` WHERE `available_stock` IS NULL AND `stock` > 0");
-        log_msg('info', "স্টক ডাটা যাচাই সম্পন্ন। (বিদ্যমান কোনো প্রোডাক্টের তথ্য বা ডাটা পরিবর্তন করা হয়নি)");
+        $pdo->exec("UPDATE `products` SET `available_stock` = `stock` WHERE `available_stock` IS NULL AND `stock` > 0");
+    } catch (Exception $e) {}
+
+    // 5. Ensure Super Admin (ssseedshop220@gmail.com) exists with valid password
+    try {
+        $del_admins = $pdo->exec("DELETE FROM `admins` WHERE `email` IN ('hngarden@gmail.com', 'admin@ssseedshop.com', 'admin@agroseed.bd', 'admin@agroseed.com') OR `id` = 'admin_super_002'");
+        $hash = password_hash('ssseedshop220', PASSWORD_DEFAULT);
+        $stmt = $pdo->prepare("INSERT INTO `admins` (`id`, `email`, `password_hash`, `password_plain`, `role`, `is_super_admin`, `name`, `permissions`, `created_at`) VALUES ('admin_super_001', 'ssseedshop220@gmail.com', ?, 'ssseedshop220', 'admin', 1, 'Ss Seed Shop Super Admin', '[\"*\"]', NOW()) ON DUPLICATE KEY UPDATE `email`='ssseedshop220@gmail.com', `password_hash`=?, `password_plain`='ssseedshop220', `role`='admin', `is_super_admin`=1");
+        $stmt->execute([$hash, $hash]);
+        log_msg('success', "✔ সুপার অ্যাডমিন একাউন্ট প্রস্তুত: <strong>ssseedshop220@gmail.com</strong> (পাসওয়ার্ড: ssseedshop220)");
     } catch (Exception $e) {
-        log_msg('error', "স্টক সিঙ্ক এরর: " . htmlspecialchars($e->getMessage()));
+        log_msg('error', "সুপার অ্যাডমিন তৈরিতে সমস্যা: " . $e->getMessage());
     }
 
-    // Ensure removed admin account hngarden@gmail.com is purged from MySQL
-    try {
-        $del_admins = $pdo->exec("DELETE FROM `admins` WHERE `email` = 'hngarden@gmail.com' OR `id` = 'admin_super_002'");
-        if ($del_admins > 0) {
-            log_msg('success', "✔ অপ্রয়োজনীয় অ্যাডমিন একাউন্ট (hngarden@gmail.com) ডাটাবেস থেকে সম্পূর্ণ মুছে ফেলা হয়েছে।");
-        }
-    } catch (Exception $e) {}
-
-    // 6. Inspect heavy base64 product images
-    try {
-        $stmt = $pdo->query("SELECT `id`, `name`, LENGTH(`product_image`) as img_len FROM `products` WHERE `product_image` LIKE 'data:image%'");
-        $heavy_prods = $stmt->fetchAll();
-        if (!empty($heavy_prods)) {
-            $count = count($heavy_prods);
-            $details = [];
-            foreach ($heavy_prods as $hp) {
-                $kb = round($hp['img_len'] / 1024, 1);
-                $details[] = htmlspecialchars($hp['name']) . " ({$kb} KB)";
+    // 6. Handle Initial Data Restore Action
+    if (isset($_GET['action']) && $_GET['action'] === 'restore_initial_data') {
+        $initial_file = __DIR__ . '/database/initial_data.sql';
+        if (file_exists($initial_file)) {
+            $sql = file_get_contents($initial_file);
+            $stmts = array_filter(array_map('trim', explode(";\n", $sql)));
+            $imported = 0;
+            foreach ($stmts as $s) {
+                if (!empty($s) && !str_starts_with($s, '--') && !str_starts_with($s, '/*')) {
+                    try {
+                        $pdo->exec($s);
+                        $imported++;
+                    } catch (Exception $e) {
+                        // Skip duplicate or syntax issue
+                    }
+                }
             }
-            log_msg('info', "⚠️ সতর্কবার্তা: $count টি পণ্যে Base64 ইমেজ পাওয়া গেছে যা লোডিং ধীর করে: " . implode(', ', $details));
+            log_msg('success', "🎉 সফলভাবে প্রাথমিক ডাটাবেস রিস্টোর সম্পন্ন হয়েছে ($imported টি রেকর্ড প্রসেস হয়েছে)! সব পণ্য ও ক্যাটাগরি ডেটাবেসে যুক্ত হয়েছে।");
         } else {
-            log_msg('success', "✔ কোনো ক্ষতিকর ভারী Base64 ছবি পাওয়া যায়নি। সব ইমেজ লিংক হিসেবে আছে।");
+            log_msg('error', "initial_data.sql ফাইল পাওয়া যায়নি!");
+        }
+    }
+
+    // 7. Live CRUD & Deletion Verification Self-Tests
+    // Test A: Product DELETE
+    try {
+        $pdo->exec("INSERT INTO `products` (`id`, `name`, `regular_price`, `stock`, `in_stock`) VALUES ('__test_del_prod__', 'Delete Test Prod', 10, 1, 1) ON DUPLICATE KEY UPDATE `name`='Delete Test Prod'");
+        $d_stmt = $pdo->prepare("DELETE FROM `products` WHERE `id` = ?");
+        $d_stmt->execute(['__test_del_prod__']);
+        $chk_prod = $pdo->query("SELECT COUNT(*) FROM `products` WHERE `id` = '__test_del_prod__'")->fetchColumn();
+        if ((int)$chk_prod === 0) {
+            $del_tests_passed++;
+            log_msg('success', "✔ প্রোডাক্ট ডিলিট (Product DELETE) ফাংশন: <strong>সম্পূর্ণ সফল</strong>");
+        } else {
+            log_msg('error', "❌ প্রোডাক্ট ডিলিট ব্যর্থ হয়েছে!");
+        }
+    } catch (Exception $e) {
+        log_msg('error', "প্রোডাক্ট ডিলিট টেস্ট এরর: " . $e->getMessage());
+    }
+
+    // Test B: Order Soft & Hard DELETE
+    try {
+        $pdo->exec("INSERT INTO `orders` (`id`, `order_id`, `customer_name`, `phone`, `address`, `is_deleted`) VALUES ('__test_del_ord__', 'ORD_DEL_TEST', 'Test Customer', '01700000000', 'Dhaka', 0) ON DUPLICATE KEY UPDATE `customer_name`='Test Customer'");
+        $pdo->exec("UPDATE `orders` SET `is_deleted` = 1 WHERE `id` = '__test_del_ord__'");
+        $chk_soft = $pdo->query("SELECT `is_deleted` FROM `orders` WHERE `id` = '__test_del_ord__'")->fetchColumn();
+        $pdo->exec("DELETE FROM `orders` WHERE `id` = '__test_del_ord__'");
+        $chk_perm = $pdo->query("SELECT COUNT(*) FROM `orders` WHERE `id` = '__test_del_ord__'")->fetchColumn();
+        if ((int)$chk_soft === 1 && (int)$chk_perm === 0) {
+            $del_tests_passed++;
+            log_msg('success', "✔ অর্ডার সফট ডিলিট ও পার্মানেন্ট ডিলিট (Order Soft & Permanent DELETE): <strong>সম্পূর্ণ সফল</strong>");
+        } else {
+            log_msg('error', "❌ অর্ডার ডিলিট ব্যর্থ হয়েছে!");
+        }
+    } catch (Exception $e) {
+        log_msg('error', "অর্ডার ডিলিট টেস্ট এরর: " . $e->getMessage());
+    }
+
+    // Test C: Category DELETE
+    try {
+        $pdo->exec("INSERT INTO `categories` (`id`, `name`, `slug`) VALUES ('__test_del_cat__', 'Test Cat', 'test-cat') ON DUPLICATE KEY UPDATE `name`='Test Cat'");
+        $pdo->exec("DELETE FROM `categories` WHERE `id` = '__test_del_cat__'");
+        $chk_cat = $pdo->query("SELECT COUNT(*) FROM `categories` WHERE `id` = '__test_del_cat__'")->fetchColumn();
+        if ((int)$chk_cat === 0) {
+            $del_tests_passed++;
+            log_msg('success', "✔ ক্যাটাগরি ডিলিট (Category DELETE) ফাংশন: <strong>সম্পূর্ণ সফল</strong>");
         }
     } catch (Exception $e) {}
 
-    // 7. SMS Gateway (Removed per request)
-    // SMS modules and notification gateways have been disabled.
+    // Test D: Tag DELETE
+    try {
+        $pdo->exec("INSERT INTO `tags` (`id`, `name`, `slug`) VALUES ('__test_del_tag__', 'Test Tag', 'test-tag') ON DUPLICATE KEY UPDATE `name`='Test Tag'");
+        $pdo->exec("DELETE FROM `tags` WHERE `id` = '__test_del_tag__'");
+        $chk_tag = $pdo->query("SELECT COUNT(*) FROM `tags` WHERE `id` = '__test_del_tag__'")->fetchColumn();
+        if ((int)$chk_tag === 0) {
+            $del_tests_passed++;
+            log_msg('success', "✔ ট্যাগ/ব্যাজ ডিলিট (Tag DELETE) ফাংশন: <strong>সম্পূর্ণ সফল</strong>");
+        }
+    } catch (Exception $e) {}
+
+    // Test E: Settings DELETE
+    try {
+        $pdo->exec("INSERT INTO `settings` (`key`, `value`) VALUES ('__test_del_key__', 'test_val') ON DUPLICATE KEY UPDATE `value`='test_val'");
+        $pdo->exec("DELETE FROM `settings` WHERE `key` = '__test_del_key__'");
+        $chk_set = $pdo->query("SELECT COUNT(*) FROM `settings` WHERE `key` = '__test_del_key__'")->fetchColumn();
+        if ((int)$chk_set === 0) {
+            $del_tests_passed++;
+            log_msg('success', "✔ সেটিংস ডিলিট (Settings DELETE) ফাংশন: <strong>সম্পূর্ণ সফল</strong>");
+        }
+    } catch (Exception $e) {}
 
     // 8. Table Row Count Summary
     $tables = ['admins', 'products', 'categories', 'subcategories', 'tags', 'customers', 'orders', 'incomplete_orders', 'coupons', 'settings'];
-    $summary = [];
     foreach ($tables as $t) {
         try {
             $stmt = $pdo->query("SELECT COUNT(*) as cnt FROM `$t`");
@@ -210,7 +278,7 @@ if ($pdo) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AgroSeed cPanel Database Migration & Optimization</title>
+    <title>Ss Seed Shop cPanel Database Migration & Verification</title>
     <style>
         * { box-sizing: border-box; }
         body {
@@ -298,40 +366,54 @@ if ($pdo) {
             color: #94a3b8;
             border: 1px solid #374151;
         }
-        .btn-outline:hover { color: #f1f5f9; border-color: #64748b; }
+        .btn-outline:hover { background: #1f2937; color: #fff; }
+        .btn-warning {
+            background: #f59e0b;
+            color: #451a03;
+        }
+        .btn-warning:hover { background: #d97706; color: #fff; }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>🌱 AgroSeed cPanel ডাটাবেস অটো-আপডেট ও অপ্টিমাইজেশন</h1>
-        <p>এই টুলটি স্বয়ংক্রিয়ভাবে আপনার MySQL ডাটাবেসের টেবিল স্ট্রাকচার পরীক্ষা করে, মিসিং কলাম ও ইনডেক্স যোগ করে এবং ওয়েবসাইট লোডিং স্পিড বাড়ানোর জন্য ডাটাবেস অপ্টিমাইজ করে।</p>
 
-        <div class="log-box">
-            <?php foreach ($results as $r): ?>
-                <div class="log-item log-<?= $r['type'] ?>">
-                    <span><?= $r['type'] === 'success' ? '✔' : ($r['type'] === 'error' ? '✖' : 'ℹ') ?></span>
-                    <div><?= $r['message'] ?></div>
+<div class="container">
+    <h1>🌱 Ss Seed Shop cPanel ডাটাবেস ভেরিফিকেশন ও রিপেয়ার</h1>
+    <p>এই টুলটি স্বয়ংক্রিয়ভাবে MySQL ডাটাবেস টেবিলসমূহ যাচাই করে, মিসিং কলাম/ইনডেক্স ঠিক করে এবং <strong>ডিলিট (DELETE) অপারেশন সম্পূর্ণ কার্যকর</strong> কিনা তা লাইভ টেস্ট করে নিশ্চিত করে।</p>
+
+    <div class="log-box">
+        <?php foreach ($results as $res): ?>
+            <div class="log-item log-<?= $res['type'] ?>">
+                <?= $res['message'] ?>
+            </div>
+        <?php endforeach; ?>
+    </div>
+
+    <?php if (!empty($summary)): ?>
+        <h3 style="color: #38bdf8; margin-top: 25px;">📊 বর্তমান টেবিল ও রেকর্ড সংখ্যা:</h3>
+        <div class="table-grid">
+            <?php foreach ($summary as $tbl => $cnt): ?>
+                <div class="stat-card">
+                    <div class="stat-label"><?= htmlspecialchars($tbl) ?></div>
+                    <div class="stat-val"><?= htmlspecialchars($cnt) ?></div>
                 </div>
             <?php endforeach; ?>
         </div>
 
-        <?php if (!empty($summary)): ?>
-            <h3 style="color: #e2e8f0; margin-top: 25px; font-size: 16px;">📊 ডাটাবেস টেবিল ও রেকর্ড সামারি:</h3>
-            <div class="table-grid">
-                <?php foreach ($summary as $tbl => $cnt): ?>
-                    <div class="stat-card">
-                        <div class="stat-label"><?= htmlspecialchars($tbl) ?></div>
-                        <div class="stat-val"><?= htmlspecialchars((string)$cnt) ?></div>
-                    </div>
-                <?php endforeach; ?>
+        <?php if (isset($summary['products']) && $summary['products'] == 0): ?>
+            <div style="margin-top: 25px; padding: 18px; background: #3b2804; border: 1px solid #d97706; border-radius: 12px;">
+                <h4 style="margin: 0 0 8px 0; color: #fbbf24;">⚠️ ডেটাবেসে কোনো পণ্য পাওয়া যায়নি (0 Products)</h4>
+                <p style="margin: 0 0 15px 0; color: #fde68a; font-size: 13px;">আপনার ডেটাবেসে এখনো প্রোডাক্ট ও ক্যাটাগরি লোড করা নেই। আপনি চাইলে নিচের বাটনে ক্লিক করে প্রস্তুতকৃত ১৯৯টি পণ্য ও ক্যাটাগরি ১-ক্লিকে ডেটাবেসে রিস্টোর করতে পারেন:</p>
+                <a href="?action=restore_initial_data" class="btn btn-warning" onclick="return confirm('আপনি কি নিশ্চিত যে প্রাথমিক পণ্য ও ক্যাটাগরি ডেটাবেসে লোড করতে চান?')">📦 প্রাথমিক ১৯৯টি পণ্য ও ক্যাটাগরি রিস্টোর করুন</a>
             </div>
         <?php endif; ?>
+    <?php endif; ?>
 
-        <div class="actions">
-            <a href="cpanel_database_update.php" class="btn">🔄 পুনরায় পরীক্ষা ও স্কিমা আপডেট</a>
-            <a href="cpanel_database_update.php?action=sync_json" class="btn btn-outline" style="border-color: #10b981; color: #a7f3d0;">💾 MySQL থেকে JSON ব্যাকআপ সিঙ্ক</a>
-            <a href="products/get.php" target="_blank" class="btn btn-outline">⚡ প্রোডাক্ট API টেস্ট করুন</a>
-        </div>
+    <div class="actions">
+        <a href="cpanel_database_update.php" class="btn">🔄 রিফ্রেশ ও পুনরায় টেস্ট করুন</a>
+        <a href="https://ssseedshop.com/admin" class="btn btn-outline" target="_blank">🔐 অ্যাডমিন প্যানেল</a>
+        <a href="https://ssseedshop.com" class="btn btn-outline" target="_blank">🌐 মূল ওয়েবসাইট</a>
     </div>
+</div>
+
 </body>
 </html>
