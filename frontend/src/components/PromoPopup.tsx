@@ -47,7 +47,6 @@ export default function PromoPopup() {
 
   const hidden =
     location.pathname.startsWith("/admin") ||
-    location.pathname.startsWith("/lp/") ||
     location.pathname.startsWith("/checkout") ||
     location.pathname.startsWith("/order-confirmed");
 

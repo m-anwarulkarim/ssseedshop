@@ -61,7 +61,6 @@ const permissionToUrl: Record<string, string> = {
   "website-ai-training": "/admin/website/ai-training",
   "website-rag": "/admin/website/rag",
   "website-meta-go": "/admin/website/meta-go",
-  "website-landing-pages": "/admin/website/landing-pages",
   "settings-theme": "/admin/settings/theme",
   "settings-language": "/admin/settings/language",
   "settings-cursor": "/admin/settings/cursor",
@@ -207,6 +206,7 @@ function CollapsibleMenu({ item, currentPath, navigate, openMenus, onToggleMenu 
   item: MenuItem; currentPath: string; navigate: (url: string) => void;
   openMenus: Set<string>; onToggleMenu: (title: string, open: boolean) => void;
 }) {
+  const { isMobile, setOpenMobile } = useSidebar();
   const isOpen = openMenus.has(item.title);
   const hasActiveChild = item.subItems?.some((sub) => currentPath === sub.url);
   const totalBadge = item.subItems?.reduce((sum, sub) => sum + (sub.hideFromParent ? 0 : (sub.badge || 0)), 0) || 0;
@@ -265,7 +265,10 @@ function CollapsibleMenu({ item, currentPath, navigate, openMenus, onToggleMenu 
               return (
                 <button
                   key={sub.url}
-                  onClick={() => navigate(getSavedPath(sub.url))}
+                  onClick={() => {
+                    if (isMobile) setOpenMobile(false);
+                    navigate(getSavedPath(sub.url));
+                  }}
                   className={cn(
                     "flex items-center gap-2.5 w-full rounded-xl px-2.5 py-2 text-[13px] transition-all text-left group/sub cursor-pointer",
                     isActive
@@ -305,7 +308,7 @@ function CollapsibleMenu({ item, currentPath, navigate, openMenus, onToggleMenu 
 }
 
 export function AdminSidebar() {
-  const { state: sidebarState, toggleSidebar } = useSidebar();
+  const { state: sidebarState, toggleSidebar, isMobile, setOpenMobile } = useSidebar();
   const isCollapsed = sidebarState === "collapsed";
   const location = useLocation();
   const navigate = useNavigate();
@@ -537,7 +540,6 @@ export function AdminSidebar() {
       iconColor: "text-teal-600",
       iconBg: "bg-teal-50",
       subItems: [
-        { title: t("ল্যান্ডিং পেজসমূহ", "Landing Pages"), url: "/admin/website/landing-pages", icon: Globe, iconColor: "text-emerald-600", iconBg: "bg-emerald-50", permissionKey: "website-landing-pages" },
         { title: "API", url: "/admin/website/api", icon: Code, iconColor: "text-indigo-600", iconBg: "bg-indigo-50", permissionKey: "website-api" },
         { title: t("মিডিয়া", "Media"), url: "/admin/website/media", icon: FileImage, iconColor: "text-pink-600", iconBg: "bg-pink-50", permissionKey: "website-media" },
         { title: t("ইমপোর্ট/এক্সপোর্ট", "Import/Export"), url: "/admin/website/import-export", icon: ArrowUpDown, iconColor: "text-cyan-600", iconBg: "bg-cyan-50", permissionKey: "settings-import-export" },
@@ -663,7 +665,10 @@ export function AdminSidebar() {
                   "w-full",
                   currentPath === item.url ? itemActive : itemIdle
                 )}
-                onClick={() => navigate(getSavedPath(item.url!))}
+                onClick={() => {
+                  if (isMobile) setOpenMobile(false);
+                  navigate(getSavedPath(item.url!));
+                }}
               >
                 <span className="flex items-center gap-2.5">
                   <span

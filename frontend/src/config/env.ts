@@ -54,22 +54,28 @@ function normalizeUrl(url: string): string {
 /**
  * Resolves the primary API base URL.
  * Priority:
- * 1. Explicit `VITE_API_URL` set in environment (.env, .env.production, .env.development)
- * 2. Intelligent local detection (if hostname is localhost/127.0.0.1, use local dev port 8005)
+ * 1. When browsing on localhost / 127.0.0.1 or in Vite dev mode, default to local PHP backend ("http://127.0.0.1:8005")
+ *    (unless VITE_API_URL explicitly specifies a custom local port).
+ * 2. Explicit `VITE_API_URL` set in environment for staging/production.
  * 3. Default production URL ("https://api.ssseedshop.com")
  */
 function resolveApiUrl(): string {
-  const configuredUrl = import.meta.env.VITE_API_URL;
-  if (configuredUrl && typeof configuredUrl === "string" && configuredUrl.trim() !== "") {
-    return normalizeUrl(configuredUrl);
-  }
-
-  // Intelligent local development fallback when .env is missing
   const isBrowser = typeof window !== "undefined";
   const isLocalHost = isBrowser && (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1");
 
+  const configuredUrl = import.meta.env.VITE_API_URL;
+
+  // In local browser development (localhost/127.0.0.1) or Vite dev mode,
+  // automatically route to local PHP server on port 8005 so data always loads smoothly.
   if (isLocalHost || import.meta.env.DEV) {
+    if (configuredUrl && (configuredUrl.includes("localhost") || configuredUrl.includes("127.0.0.1"))) {
+      return normalizeUrl(configuredUrl);
+    }
     return "http://127.0.0.1:8005";
+  }
+
+  if (configuredUrl && typeof configuredUrl === "string" && configuredUrl.trim() !== "") {
+    return normalizeUrl(configuredUrl);
   }
 
   return "https://api.ssseedshop.com";

@@ -183,8 +183,8 @@ export default function OrderConfirmed() {
         {/* Hotline Notice */}
         <div className="bg-primary/5 border border-primary/20 rounded-xl p-3 text-xs text-muted-foreground leading-relaxed">
           ২৪ ঘণ্টার মধ্যে কল করা না হলে আমাদের হটলাইন নম্বরে কল করুন:
-          <a href="tel:01805080556" className="block text-primary font-bold text-base mt-1">
-            01805080556
+          <a href="tel:01933819799" className="block text-primary font-bold text-base mt-1">
+            01933819799
           </a>
           আমাদের উপর আস্থা রেখে অর্ডার করার জন্য অসংখ্য ধন্যবাদ!
         </div>

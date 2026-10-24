@@ -61,9 +61,6 @@ const TermsConditions = lazyRetry(() => import("./pages/TermsConditions.tsx"));
 const ReturnPolicy = lazyRetry(() => import("./pages/ReturnPolicy.tsx"));
 const CultivationGuide = lazyRetry(() => import("./pages/CultivationGuide.tsx"));
 const NotFound = lazyRetry(() => import("./pages/NotFound.tsx"));
-const MintLeafLanding = lazyRetry(() => import("./pages/lp/MintLeafLanding.tsx"));
-const CosmosLanding = lazyRetry(() => import("./pages/lp/CosmosLanding.tsx"));
-const PudinaLanding = lazyRetry(() => import("./pages/lp/PudinaLanding.tsx"));
 
 
 // Admin
@@ -94,7 +91,6 @@ const ImportExport = lazyRetry(() => import("./pages/admin/ImportExport.tsx"));
 
 const OrderNotifications = lazyRetry(() => import("./pages/admin/Notifications.tsx"));
 const HelpSupport = lazyRetry(() => import("./pages/admin/HelpSupport.tsx"));
-const LandingPagesList = lazyRetry(() => import("./pages/admin/LandingPagesList.tsx"));
 const OrderControl = lazyRetry(() => import("./pages/admin/OrderControl.tsx"));
 const PromoPopupSettings = lazyRetry(() => import("./pages/admin/PromoPopupSettings.tsx"));
 const FreeGiftSettings = lazyRetry(() => import("./pages/admin/FreeGiftSettings.tsx"));
@@ -233,11 +229,6 @@ const App = () => {
                 <Route path="/return-policy" element={<ReturnPolicy />} />
                 <Route path="/cultivation-guide" element={<CultivationGuide />} />
                 <Route path="/u/:username" element={<Navigate to="/profile" replace />} />
-                <Route path="/lp/mint-leaf-seeds" element={<MintLeafLanding />} />
-                <Route path="/lp/cosmos" element={<CosmosLanding />} />
-            <Route path="/lp/pudina" element={<PudinaLanding />} />
-            <Route path="/lp/pudina-pata" element={<PudinaLanding />} />
-                <Route path="/mint-leaf-seeds" element={<Navigate to="/lp/mint-leaf-seeds" replace />} />
 
                 {/* Admin */}
                 <Route path="/admin">
@@ -271,9 +262,6 @@ const App = () => {
                     <Route path="website/api" element={<ApiManagement />} />
                     <Route path="website/media" element={<MediaManagement />} />
                     <Route path="website/import-export" element={<ImportExport />} />
-
-                    <Route path="website/landing-pages" element={<LandingPagesList />} />
-                    <Route path="landing-pages" element={<LandingPagesList />} />
 
                     <Route path="settings/theme" element={<ThemeSettings />} />
                     <Route path="settings/language" element={<LanguageSettings />} />

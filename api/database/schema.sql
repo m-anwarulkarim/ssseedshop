@@ -250,14 +250,6 @@ CREATE TABLE IF NOT EXISTS `fraud_cache` (
   `updated_at` VARCHAR(50) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- 14. OTPs Table
-CREATE TABLE IF NOT EXISTS `otps` (
-  `phone` VARCHAR(30) NOT NULL PRIMARY KEY,
-  `otp` VARCHAR(10) NOT NULL,
-  `expires_at` VARCHAR(50) NOT NULL,
-  `created_at` VARCHAR(50) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
 -- 16. Order Status History Table
 CREATE TABLE IF NOT EXISTS `order_status_history` (
   `id` VARCHAR(64) NOT NULL PRIMARY KEY,

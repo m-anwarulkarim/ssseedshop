@@ -114,11 +114,11 @@ export default function ActionButtonsRow() {
               )}
             </p>
             <a
-              href="tel:01805080556"
+              href="tel:01933819799"
               className="flex items-center justify-center gap-2 w-full py-2.5 rounded-full bg-primary text-primary-foreground font-medium text-sm hover:bg-primary/90 transition-colors"
             >
               <Phone className="w-4 h-4" />
-              01805080556
+              01933819799
             </a>
           </div>
         </DialogContent>

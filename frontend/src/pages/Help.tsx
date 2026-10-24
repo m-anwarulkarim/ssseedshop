@@ -9,15 +9,15 @@ const helpSections = [
     icon: Phone,
     title: "ফোনে যোগাযোগ",
     description: "সকাল ৯টা থেকে রাত ১১টা পর্যন্ত সরাসরি কল করুন।",
-    action: "01805080556",
-    href: "tel:01805080556",
+    action: "01933819799",
+    href: "tel:01933819799",
   },
   {
     icon: MessageCircle,
     title: "WhatsApp",
     description: "যেকোনো প্রশ্ন বা সমস্যায় WhatsApp-এ মেসেজ দিন।",
     action: "WhatsApp করুন",
-    href: "https://wa.me/8801805080556?text=Assalamu%20Alaikum",
+    href: "https://wa.me/8801933819799?text=Assalamu%20Alaikum",
   },
   {
     icon: Facebook,
@@ -44,8 +44,8 @@ const helpSections = [
     icon: Mail,
     title: "Email",
     description: "বিস্তারিত তথ্য বা ব্যবসায়িক যোগাযোগের জন্য ইমেইল করুন।",
-    action: "info@ssseedshop.com",
-    href: "mailto:info@ssseedshop.com",
+    action: "ssseedshop220@gmail.com",
+    href: "mailto:ssseedshop220@gmail.com",
   },
 ];
 

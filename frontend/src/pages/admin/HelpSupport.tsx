@@ -67,7 +67,7 @@ const CATEGORIES = [
   { value: "invoice", labelBn: "ইনভয়েস ও প্রিন্টার ফরম্যাট সমস্যা", labelEn: "Invoices & Printing" },
   { value: "users", labelBn: "অ্যাডমিন ইউজার ও পারমিশন কন্ট্রোল", labelEn: "Admin & Permissions" },
   { value: "products", labelBn: "প্রোডাক্ট, স্টক ও ক্যাটাগরি ম্যানেজমেন্ট", labelEn: "Products & Stock" },
-  { value: "website", labelBn: "ওয়েবসাইট, ব্যানার বা ল্যান্ডিং পেজ", labelEn: "Landing Pages & UI" },
+  { value: "website", labelBn: "ওয়েবসাইট ব্যানার বা ডিজাইন সমস্যা", labelEn: "Website Banner & UI" },
   { value: "sms", labelBn: "এসএমএস বা নোটিফিকেশন ইস্যু", labelEn: "SMS & Notifications" },
   { value: "bug", labelBn: "সিস্টেম এরর বা বাগ রিপোর্ট", labelEn: "System Error / Bug" },
   { value: "feature", labelBn: "নতুন ফিচার বা পরিবর্তন রিকোয়েস্ট", labelEn: "Feature Request" },

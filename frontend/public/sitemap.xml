@@ -26,25 +26,6 @@
     <priority>0.8</priority>
   </url>
 
-  <!-- Special Landing Pages -->
-  <url>
-    <loc>https://ssseedshop.com/lp/mint-leaf-seeds</loc>
-    <lastmod>2026-10-18</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://ssseedshop.com/lp/cosmos</loc>
-    <lastmod>2026-10-18</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://ssseedshop.com/lp/pudina</loc>
-    <lastmod>2026-10-18</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
 
   <!-- Informational & Help Guides -->
   <url>

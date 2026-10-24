@@ -65,6 +65,11 @@ if ($pdo) {
             }
         }
         log_msg('success', "বেস স্কিমা সফলভাবে এক্সিকিউট হয়েছে। ($tbl_count টি টেবিল ভেরিফাইড)");
+
+        // Drop legacy OTPs table if present
+        try {
+            $pdo->exec("DROP TABLE IF EXISTS `otps`");
+        } catch (Exception $e) {}
     }
 
     // 3. Helper to add column if not exists

@@ -128,7 +128,7 @@ export default function ProductDetail() {
   useProductViewTracker(product);
 
   const [activeTab, setActiveTab] = useState<"description" | "policy" | "reviews">("description");
-  const SUPPORT_PHONE = "01805080556";
+  const SUPPORT_PHONE = "01933819799";
 
   const categoryName: string | null = (product as any)?.category || null;
   const { data: categoryInfo } = useQuery({

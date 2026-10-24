@@ -97,7 +97,7 @@ if ($matched_customer_idx !== -1) {
         file_put_contents($customers_file, json_encode($customers, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
     }
 } elseif (!empty($clean_phone)) {
-    // Auto-create customer profile (phone_verified = false until they login via OTP)
+    // Auto-create customer profile for order delivery tracking
     $profile_id = 'cust_' . substr(md5(uniqid($clean_phone . mt_rand(), true)), 0, 12);
     $new_cust = [
         'id'             => $profile_id,
@@ -113,8 +113,8 @@ if ($matched_customer_idx !== -1) {
         'gender'         => null,
         'age'            => null,
         'bio'            => null,
-        'username'       => 'user_' . substr($clean_phone, -4),
-        'auth_provider'  => 'phone',
+        'username'       => 'guest_' . substr($clean_phone, -4),
+        'auth_provider'  => 'guest',
         'created_at'     => date('c'),
         'updated_at'     => date('c'),
         'last_login'     => null

@@ -33,7 +33,6 @@ $tables = [
     'settings'          => [__DIR__ . '/settings.json', []],
     'sms_logs'          => [__DIR__ . '/sms_logs.json', ['gateway']],
     'fraud_cache'       => [__DIR__ . '/fraud_cache.json', []],
-    'otps'              => [__DIR__ . '/otps.json', []],
     'order_status_history' => [__DIR__ . '/order_status_history.json', []],
     'visitor_profiles'  => [__DIR__ . '/visitor_profiles.json', []],
 ];
@@ -50,8 +49,6 @@ foreach ($tables as $table => $config) {
         foreach ($raw as $k => $v) {
             if ($table === 'fraud_cache') {
                 $items[] = ['phone' => (string)$k, 'data' => is_array($v) ? json_encode($v, JSON_UNESCAPED_UNICODE) : (string)$v, 'updated_at' => date('c')];
-            } elseif ($table === 'otps') {
-                $items[] = ['phone' => (string)$k, 'otp' => (string)($v['otp'] ?? ''), 'expires_at' => (string)($v['expires_at'] ?? ''), 'created_at' => (string)($v['created_at'] ?? '')];
             }
         }
     } else {
@@ -75,7 +72,7 @@ foreach ($tables as $table => $config) {
         $sql = "INSERT INTO `$table` (`" . implode('`, `', $cols) . "`) VALUES (" . implode(', ', $vals) . ") ON DUPLICATE KEY UPDATE `id`=`id`;\n";
         if ($table === 'settings') {
             $sql = "INSERT INTO `$table` (`" . implode('`, `', $cols) . "`) VALUES (" . implode(', ', $vals) . ") ON DUPLICATE KEY UPDATE `key`=`key`;\n";
-        } elseif ($table === 'fraud_cache' || $table === 'otps') {
+        } elseif ($table === 'fraud_cache') {
             $sql = "INSERT INTO `$table` (`" . implode('`, `', $cols) . "`) VALUES (" . implode(', ', $vals) . ") ON DUPLICATE KEY UPDATE `phone`=`phone`;\n";
         }
         fwrite($fp, $sql);

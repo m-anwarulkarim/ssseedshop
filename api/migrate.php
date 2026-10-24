@@ -123,8 +123,6 @@ function migrate_table_data($pdo, $table, $json_file, $key_col, $json_cols = [])
         foreach ($raw as $k => $v) {
             if ($table === 'fraud_cache') {
                 $items[] = ['phone' => (string)$k, 'data' => is_array($v) ? json_encode($v, JSON_UNESCAPED_UNICODE) : (string)$v, 'updated_at' => date('c')];
-            } elseif ($table === 'otps') {
-                $items[] = ['phone' => (string)$k, 'otp' => (string)($v['otp'] ?? ''), 'expires_at' => (string)($v['expires_at'] ?? ''), 'created_at' => (string)($v['created_at'] ?? '')];
             }
         }
     } else {
@@ -250,7 +248,6 @@ $migrations = [
     'settings'          => [__DIR__ . '/database/settings.json', 'key', []],
     'sms_logs'          => [__DIR__ . '/database/sms_logs.json', 'id', ['gateway']],
     'fraud_cache'       => [__DIR__ . '/database/fraud_cache.json', 'phone', []],
-    'otps'              => [__DIR__ . '/database/otps.json', 'phone', []],
     'order_status_history' => [__DIR__ . '/database/order_status_history.json', 'id', []],
     'visitor_profiles'  => [__DIR__ . '/database/visitor_profiles.json', 'id', []],
 ];

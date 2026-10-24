@@ -173,7 +173,7 @@ export default function Index() {
         </main>
       )}
       <FeaturesSection />
-      <Footer showDevelopedBy={false} />
+      <Footer showDevelopedBy={true} />
     </div>
   );
 }

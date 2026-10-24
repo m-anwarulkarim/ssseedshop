@@ -3,16 +3,31 @@ import { useCallback, useEffect, useRef, useState, Suspense } from "react";
 import { Outlet, useNavigate, useLocation } from "react-router-dom";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AdminSidebar } from "./AdminSidebar";
-import { Loader2, AlertTriangle, X, ShieldAlert, Plus, Search, List, Globe, CalendarClock, Package, Layers, Tag, BarChart3, Users, ShieldCheck, Settings, Palette, Languages, MousePointer2, MessageSquare, FileText, Image, ArrowDownUp, Bell, MessageCircle, Share2, DollarSign, ArrowRightLeft } from "lucide-react";
+import { AdminBottomNav } from "./AdminBottomNav";
+import ssseedshopLogo from "@/assets/ssseedshop-logo.png";
+import { Loader2, AlertTriangle, X, ShieldAlert, Plus, Search, List, Globe, CalendarClock, Package, Layers, Tag, BarChart3, Users, ShieldCheck, Settings, Palette, Languages, MousePointer2, MessageSquare, FileText, Image, ArrowDownUp, Bell, MessageCircle, Share2, DollarSign, ArrowRightLeft, Headphones, Activity, LogOut } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { CursorProvider } from "@/contexts/CursorContext";
 import { CustomCursor } from "./CustomCursor";
 import { WhatsNewPopup } from "./WhatsNewPopup";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 
 import { useQuery } from "@tanstack/react-query";
 import { useWebCounts } from "@/stores/orderCountsStore";
-import { getCurrentAdminAccess } from "@/lib/adminAccess";
+import { getCurrentAdminAccess, getActiveAdminUser } from "@/lib/adminAccess";
 import { useKeyboardShortcuts } from "@/hooks/useKeyboardShortcuts";
 import { savePageState, restoreScroll } from "@/lib/adminPageState";
 import { useAuthReady } from "@/hooks/useAuthReady";
@@ -170,11 +185,37 @@ function getShortcutsForPath(pathname: string): Shortcut[] {
 }
 
 function AdminHeader() {
-  const { t } = useLanguage();
+  const { lang, setLang, t } = useLanguage();
   const location = useLocation();
   const navigate = useNavigate();
   const pathname = location.pathname;
   const count = usePageCounts(pathname);
+
+  const activeAdmin = getActiveAdminUser();
+  const adminName = activeAdmin?.name || "Admin";
+  const adminEmail = activeAdmin?.email || "admin@ssseedshop.com";
+  const adminRole = activeAdmin?.is_super_admin
+    ? "Super Admin"
+    : activeAdmin?.role === "admin"
+    ? "Admin"
+    : "Moderator";
+  const adminInitials =
+    adminName
+      .split(" ")
+      .map((w: string) => w[0])
+      .filter(Boolean)
+      .slice(0, 2)
+      .join("")
+      .toUpperCase() || "SS";
+
+  const handleLogout = () => {
+    localStorage.removeItem("admin_session");
+    localStorage.removeItem("admin_token");
+    localStorage.removeItem("admin_dev_bypass");
+    sessionStorage.removeItem("admin_session");
+    sessionStorage.removeItem("admin_dev_bypass");
+    navigate("/admin", { replace: true });
+  };
 
   // Find matching route title (exact match first, then check for dynamic routes)
   let titleInfo = routeTitles[pathname];
@@ -192,20 +233,40 @@ function AdminHeader() {
   const shortcuts = getShortcutsForPath(pathname).filter((s) => s.to !== pathname);
 
   return (
-    <header className="h-14 flex items-center gap-4 border-b border-border bg-background px-4 sticky top-0 z-20">
-      <SidebarTrigger />
-      <div className="flex items-center gap-2 min-w-0">
-        <h1 className="font-display text-lg font-semibold text-foreground truncate">{title}</h1>
-        {(subtitle || count !== undefined) && (
-          <p className="text-xs text-muted-foreground truncate hidden sm:block">
-            {subtitle}{count !== undefined ? ` (${count})` : ""}
-          </p>
-        )}
+    <header className="h-16 flex items-center justify-between gap-2 sm:gap-4 border-b border-border bg-background/95 backdrop-blur-md px-3 sm:px-4 sticky top-0 z-30">
+      {/* Left: Sidebar trigger, Logo, and Title */}
+      <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+        <SidebarTrigger className="text-muted-foreground hover:text-foreground shrink-0" />
+        <div
+          onClick={() => navigate("/admin/overview")}
+          className="flex items-center gap-2 cursor-pointer select-none shrink-0 group"
+          title="SS Seed Shop Dashboard"
+        >
+          <img
+            src={ssseedshopLogo}
+            alt="SS Seed Shop"
+            className="h-8 sm:h-9 w-auto object-contain rounded transition-transform group-hover:scale-105"
+          />
+        </div>
+
+        <div className="min-w-0 hidden md:block">
+          <h1 className="font-display text-sm sm:text-base font-semibold text-foreground truncate leading-tight">
+            {title}
+          </h1>
+          {(subtitle || count !== undefined) && (
+            <p className="text-[11px] text-muted-foreground truncate leading-tight">
+              {subtitle}
+              {count !== undefined ? ` (${count})` : ""}
+            </p>
+          )}
+        </div>
         {/* Portal target for page-specific header actions */}
         <div id="admin-header-actions" className="flex items-center" />
       </div>
+
+      {/* Middle: Section shortcuts on large screens */}
       {shortcuts.length > 0 && (
-        <div className="ml-auto flex items-center gap-1.5">
+        <div className="hidden xl:flex items-center gap-1.5 ml-auto mr-2">
           {shortcuts.map((s) => (
             <button
               key={s.to}
@@ -213,11 +274,133 @@ function AdminHeader() {
               className="inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
             >
               <s.icon className="w-3.5 h-3.5" />
-              <span className="hidden sm:inline">{t(s.labelBn, s.label)}</span>
+              <span>{t(s.labelBn, s.label)}</span>
             </button>
           ))}
         </div>
       )}
+
+      {/* Right: Quick Action Controls matching mobile SaaS dashboard standard */}
+      <div className="flex items-center gap-1.5 sm:gap-2.5 shrink-0 ml-auto xl:ml-0">
+        <TooltipProvider delayDuration={200}>
+          {/* 1. Support / Help (Purple rounded button with Headset icon matching user screenshot) */}
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <button
+                type="button"
+                onClick={() => navigate("/admin/help-support")}
+                className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-gradient-to-tr from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white flex items-center justify-center transition-all shadow-sm shadow-purple-500/25 active:scale-95"
+                aria-label="Support & Help"
+              >
+                <Headphones className="w-4 h-4 sm:w-[18px] sm:h-[18px] stroke-[2.2]" />
+              </button>
+            </TooltipTrigger>
+            <TooltipContent side="bottom">
+              <p>{t("হেল্প ও সাপোর্ট", "Help & Support")}</p>
+            </TooltipContent>
+          </Tooltip>
+
+          {/* 2. Live Website (Circular bordered button with Globe icon) */}
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <button
+                type="button"
+                onClick={() => window.open("/", "_blank")}
+                className="w-8 h-8 sm:w-9 sm:h-9 rounded-full border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 flex items-center justify-center transition-colors shadow-2xs active:scale-95"
+                aria-label="Live Website"
+              >
+                <Globe className="w-4 h-4 sm:w-[17px] sm:h-[17px]" />
+              </button>
+            </TooltipTrigger>
+            <TooltipContent side="bottom">
+              <p>{t("ওয়েবসাইট দেখুন", "View Live Store")}</p>
+            </TooltipContent>
+          </Tooltip>
+
+          {/* 3. Language Switcher (Circular bordered button with Languages icon & badge) */}
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <button
+                type="button"
+                onClick={() => setLang(lang === "bn" ? "en" : "bn")}
+                className="w-8 h-8 sm:w-9 sm:h-9 rounded-full border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 flex items-center justify-center transition-colors shadow-2xs active:scale-95 relative"
+                aria-label="Toggle Language"
+              >
+                <Languages className="w-4 h-4 sm:w-[17px] sm:h-[17px]" />
+                <span className="absolute -bottom-1 -right-0.5 px-1 py-0.2 bg-purple-600 text-white font-bold text-[8.5px] rounded-full leading-tight shadow-2xs">
+                  {lang === "bn" ? "বাং" : "EN"}
+                </span>
+              </button>
+            </TooltipTrigger>
+            <TooltipContent side="bottom">
+              <p>{lang === "bn" ? "Switch to English" : "বাংলা ভাষায় পরিবর্তন করুন"}</p>
+            </TooltipContent>
+          </Tooltip>
+
+          {/* 4. Search (Circular bordered button with Search icon) */}
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <button
+                type="button"
+                onClick={() => navigate("/admin/orders/search")}
+                className="w-8 h-8 sm:w-9 sm:h-9 rounded-full border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 flex items-center justify-center transition-colors shadow-2xs active:scale-95"
+                aria-label="Order Search"
+              >
+                <Search className="w-4 h-4 sm:w-[17px] sm:h-[17px]" />
+              </button>
+            </TooltipTrigger>
+            <TooltipContent side="bottom">
+              <p>{t("অর্ডার সার্চ", "Order Search")}</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+
+        {/* 5. User Profile Avatar with Dropdown */}
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <button
+              type="button"
+              className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-gradient-to-tr from-slate-900 via-purple-950 to-slate-800 text-white flex items-center justify-center font-bold text-xs ring-2 ring-purple-500/30 hover:ring-purple-500 ring-offset-2 ring-offset-background transition-all shadow-xs cursor-pointer select-none active:scale-95"
+              aria-label="Admin Profile Menu"
+            >
+              {adminInitials}
+            </button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-56 p-1.5 z-50">
+            <div className="px-2.5 py-2 border-b border-border/80 mb-1">
+              <p className="text-xs font-semibold text-foreground truncate">{adminName}</p>
+              <p className="text-[11px] text-muted-foreground truncate">{adminEmail}</p>
+              <span className="inline-block mt-1 px-1.5 py-0.5 rounded text-[10px] font-semibold bg-purple-100 dark:bg-purple-950 text-purple-700 dark:text-purple-300">
+                {adminRole}
+              </span>
+            </div>
+            <DropdownMenuItem onClick={() => navigate("/admin/my-activity")} className="cursor-pointer">
+              <Activity className="w-4 h-4 mr-2 text-rose-500" />
+              <span>{t("আমার অ্যাক্টিভিটি", "My Activity")}</span>
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => navigate("/admin/settings/theme")} className="cursor-pointer">
+              <Palette className="w-4 h-4 mr-2 text-indigo-500" />
+              <span>{t("থিম সেটিংস", "Theme Settings")}</span>
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => navigate("/admin/help-support")} className="cursor-pointer">
+              <Headphones className="w-4 h-4 mr-2 text-purple-500" />
+              <span>{t("হেল্প ও সাপোর্ট", "Help & Support")}</span>
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => window.open("/", "_blank")} className="cursor-pointer">
+              <Globe className="w-4 h-4 mr-2 text-emerald-500" />
+              <span>{t("লাইভ ওয়েবসাইট", "Live Website")}</span>
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem
+              onClick={handleLogout}
+              className="cursor-pointer text-destructive focus:text-destructive focus:bg-destructive/10"
+            >
+              <LogOut className="w-4 h-4 mr-2" />
+              <span>{t("লগআউট", "Logout")}</span>
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
     </header>
   );
 }
@@ -393,13 +576,13 @@ export function AdminLayout() {
         <div className="flex-1 flex flex-col min-w-0">
           <AdminHeader />
           
-          <main className="flex-1 overflow-auto p-4 md:p-6">
+          <main className="flex-1 overflow-auto p-3 sm:p-4 md:p-6 pb-24 md:pb-6">
             <Suspense fallback={<div className="flex items-center justify-center h-full py-20"><Loader2 className="w-6 h-6 animate-spin text-primary" /></div>}>
               {routeAllowed ? <Outlet /> : <AccessDeniedRedirect />}
             </Suspense>
           </main>
           
-          
+          <AdminBottomNav />
         </div>
       </div>
     </SidebarProvider>

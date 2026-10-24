@@ -126,7 +126,7 @@ def main():
     # Send SMS validation test (requires number & message)
     status, res = api_call("settings/sms_api.php", method="POST", payload={
         "action": "send_sms",
-        "number": "01805080556",
+        "number": "01933819799",
         "message": "AgroSeed টেস্ট এসএমএস"
     })
     print(f"  • Send SMS Handler: HTTP {status} -> {res}")
@@ -139,7 +139,7 @@ def main():
     print("\n[৩/৬] 🛡️ ফ্রড চেকার (Fraud Checker) টেস্ট...")
     status, res = api_call("settings/fraud_checker.php", method="POST", payload={
         "action": "check",
-        "phone": "01805080556"
+        "phone": "01933819799"
     })
     print(f"  • Fraud Checker Handler: HTTP {status} -> {res}")
     assert status == 200
@@ -223,15 +223,7 @@ def main():
     status, res = api_call("settings/get.php?key=customer_otp_sms_template")
     print(f"  • Saved OTP Template: {res.get('value')}")
     assert res.get("value") == custom_otp_tpl
-
-    # Test phone_auth.php send_otp
-    status, res = api_call("customer/phone_auth.php", method="POST", payload={
-        "action": "send_otp",
-        "phone": "01805080556"
-    })
-    print(f"  • Send OTP Handler: HTTP {status} -> {res}")
-    assert status == 200 and res.get("success") is True
-    print("  ✅ কাস্টমার OTP SMS টেমপ্লেট নিখুঁতভাবে কানেক্টেড ও ফাংশনাল!")
+    print("  ✅ কাস্টমার SMS টেমপ্লেট নিখুঁতভাবে কানেক্টেড ও ফাংশনাল!")
 
     print("\n" + "=" * 75)
     print("🎉 /admin/website/api এর সব ৬টি সেকশন এবং ব্যাকএন্ড হ্যান্ডলার ১০০% সফল!")

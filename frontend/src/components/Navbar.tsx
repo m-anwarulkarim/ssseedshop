@@ -1,7 +1,6 @@
 import { API_URL } from "@/config/env";
-import { ShoppingCart, Search, Menu, Home, LayoutGrid, ClipboardList, Sprout, UserRoundCog, ArrowRight, Palette, Check, HelpCircle, Image as ImageIcon, Languages, LogIn, LogOut, User } from "lucide-react";
+import { ShoppingCart, Search, Menu, Home, LayoutGrid, ClipboardList, Sprout, UserRoundCog, ArrowRight, HelpCircle, Languages, LogIn, LogOut, User } from "lucide-react";
 import { useState, useEffect } from "react";
-import { useTheme, ThemeMode } from "@/contexts/ThemeContext";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { cn } from "@/lib/utils";
 import { Link, useLocation, useNavigate } from "react-router-dom";
@@ -12,7 +11,6 @@ import DesktopSearchBar from "@/components/DesktopSearchBar";
 import { getCustomerSession, clearCustomerSession } from "@/components/CustomerLogin";
 import { useQuery } from "@tanstack/react-query";
 import { NAVBAR_ICONS, DEFAULT_NAVBAR_ITEMS } from "@/lib/navbarIcons";
-import woodTexture from "@/assets/wood-texture.webp";
 
 
 
@@ -139,9 +137,8 @@ const Navbar = () => {
                 </span>
               </button>
 
-              {/* Theme & Language Controls */}
+              {/* Language Controls */}
               <div className="flex items-center gap-1 border-l border-gray-200 pl-2">
-                <DesktopThemeButton />
                 <DesktopLangButton />
               </div>
             </div>
@@ -193,9 +190,6 @@ const Navbar = () => {
             </div>
             <nav className="flex-1 overflow-y-auto py-2 text-sm">
               <NavMenuItems onNavigate={(to) => { setMenuOpen(false); navigate(to); }} />
-
-
-              <ThemePicker />
 
               {/* Login / Logout */}
               {session ? (
@@ -256,60 +250,6 @@ const Navbar = () => {
   );
 };
 
-function DesktopThemeButton() {
-  const [open, setOpen] = useState(false);
-  const { publicTheme, setPublicTheme } = useTheme();
-  const { lang } = useLanguage();
-  return (
-    <div className="relative">
-      <button
-        onClick={() => setOpen((v) => !v)}
-        aria-label="Theme"
-        className="inline-flex items-center justify-center w-9 h-9 rounded-full text-gray-700 hover:bg-gray-100 transition-colors"
-      >
-        <Palette className="w-5 h-5" />
-      </button>
-      {open && (
-        <>
-          <div className="fixed inset-0 z-40" onClick={() => setOpen(false)} />
-          <div className="absolute right-0 mt-2 w-64 bg-white rounded-xl shadow-lg border border-gray-100 p-3 z-50">
-            <div className="flex items-center gap-2 mb-2 text-xs font-semibold text-gray-700">
-              <Palette className="w-3.5 h-3.5" />
-              {lang === "en" ? "Select Theme" : "থিম নির্বাচন করুন"}
-            </div>
-            <div className="grid grid-cols-3 gap-2">
-              {THEME_OPTIONS.map((th) => {
-                const active = publicTheme === th.value;
-                return (
-                  <button
-                    key={th.value}
-                    onClick={() => { setPublicTheme(th.value); setOpen(false); }}
-                    className={cn(
-                      "relative rounded-lg border-2 p-2 text-center transition-all",
-                      active ? "border-primary ring-2 ring-primary/20" : "border-gray-200 hover:border-gray-300"
-                    )}
-                  >
-                    {active && (
-                      <div className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-primary flex items-center justify-center">
-                        <Check className="w-2.5 h-2.5 text-white" />
-                      </div>
-                    )}
-                    <div className="flex gap-0.5 justify-center mb-1">
-                      {th.colors.map((c, i) => (
-                        <div key={i} className={cn("w-3 h-3 rounded-full border border-gray-200", c)} />
-                      ))}
-                    </div>
-                    <p className="text-[10px] font-medium text-gray-700">{th.label}</p>
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-        </>
-      )}
-    </div>
-  );
-}
 
 function DesktopLangButton() {
   const [open, setOpen] = useState(false);
@@ -443,10 +383,9 @@ function BottomNav({ pathname }: { pathname: string }) {
   const { lang } = useLanguage();
   const { openCart, totalItems } = useCart();
 
-  // Hide mobile bottom tab bar on desktop, and on product details / checkout / landing pages
+  // Hide mobile bottom tab bar on desktop, and on product details / checkout
   if (
     pathname.startsWith("/product/") ||
-    pathname.startsWith("/lp/") ||
     pathname.startsWith("/checkout") ||
     pathname.startsWith("/order-confirmed") ||
     pathname.startsWith("/invoice/")
@@ -525,123 +464,5 @@ function BottomNav({ pathname }: { pathname: string }) {
   );
 }
 
-const THEME_OPTIONS: { value: ThemeMode; label: string; colors: string[] }[] = [
-  { value: "light", label: "লাইট", colors: ["bg-white", "bg-green-700", "bg-amber-500"] },
-  { value: "leaf", label: "লিফ", colors: ["bg-green-50", "bg-green-700", "bg-lime-600"] },
-  { value: "sky", label: "স্কাই", colors: ["bg-sky-50", "bg-sky-500", "bg-indigo-500"] },
-  { value: "ocean", label: "ওশান", colors: ["bg-blue-50", "bg-blue-600", "bg-purple-500"] },
-  { value: "sunset", label: "সানসেট", colors: ["bg-orange-50", "bg-pink-600", "bg-orange-500"] },
-  { value: "rose", label: "রোজ", colors: ["bg-pink-50", "bg-pink-500", "bg-orange-400"] },
-  { value: "doodle", label: "ডুডল", colors: ["bg-amber-50", "bg-amber-600", "bg-orange-600"] },
-  { value: "dark", label: "ডার্ক", colors: ["bg-slate-800", "bg-green-500", "bg-amber-500"] },
-  { value: "midnight", label: "মিডনাইট", colors: ["bg-slate-900", "bg-blue-500", "bg-purple-500"] },
-  { value: "silver", label: "সিলভার", colors: ["bg-gray-900", "bg-gray-600", "bg-gray-300"] },
-];
-
-function ThemePicker() {
-  const { publicTheme, setPublicTheme } = useTheme();
-  const { lang } = useLanguage();
-  return (
-    <div className="px-4 py-3 border-t border-gray-100 mt-2">
-      <div className="flex items-center gap-2 mb-2.5 text-xs font-semibold text-gray-700">
-        <Palette className="w-3.5 h-3.5" />
-        {lang === "en" ? "Select Theme" : "থিম নির্বাচন করুন"}
-      </div>
-      <div className="grid grid-cols-3 gap-2">
-        {THEME_OPTIONS.map((th) => {
-          const active = publicTheme === th.value;
-          return (
-            <button
-              key={th.value}
-              onClick={() => setPublicTheme(th.value)}
-              className={cn(
-                "relative rounded-lg border-2 p-2 text-center transition-all",
-                active ? "border-primary ring-2 ring-primary/20" : "border-gray-200 hover:border-gray-300"
-              )}
-            >
-              {active && (
-                <div className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-primary flex items-center justify-center">
-                  <Check className="w-2.5 h-2.5 text-white" />
-                </div>
-              )}
-              <div className="flex gap-0.5 justify-center mb-1">
-                {th.colors.map((c, i) => (
-                  <div key={i} className={cn("w-3 h-3 rounded-full border border-gray-200", c)} />
-                ))}
-              </div>
-              <p className="text-[10px] font-medium text-gray-700">{th.label}</p>
-            </button>
-          );
-        })}
-      </div>
-      <TexturePicker />
-    </div>
-  );
-}
-
-const TEXTURE_OPTIONS: { value: "bamboo" | "tropical" | "golden" | "shadow" | "wood"; label: string; preview: string }[] = [
-  { value: "bamboo", label: "বাঁশপাতা", preview: "linear-gradient(135deg,#dcfce7,#86efac)" },
-  { value: "tropical", label: "ট্রপিক্যাল", preview: "linear-gradient(135deg,#d1fae5,#10b981)" },
-  { value: "golden", label: "গোল্ডেন", preview: "linear-gradient(135deg,#fef3c7,#f59e0b)" },
-  { value: "shadow", label: "শ্যাডো", preview: "linear-gradient(135deg,#e2e8f0,#475569)" },
-  { value: "wood", label: "উড গ্রেইন", preview: `url(${woodTexture}) center/cover` },
-];
-
-function TexturePicker() {
-  const { texture, setTexture, textureEnabled, setTextureEnabled } = useTheme();
-  const { lang } = useLanguage();
-  return (
-    <div className="mt-3 pt-3 border-t border-gray-100">
-      <div className="flex items-center justify-between mb-2.5">
-        <div className="flex items-center gap-2 text-xs font-semibold text-gray-700">
-          <ImageIcon className="w-3.5 h-3.5" />
-          {lang === "en" ? "Texture" : "টেক্সচার"}
-        </div>
-        <button
-          onClick={() => setTextureEnabled(!textureEnabled)}
-          className={cn(
-            "relative w-9 h-5 rounded-full transition-colors",
-            textureEnabled ? "bg-primary" : "bg-gray-300"
-          )}
-          aria-label="Toggle texture"
-        >
-          <span
-            className={cn(
-               "absolute left-0.5 top-0.5 w-4 h-4 rounded-full bg-white shadow transition-transform",
-               textureEnabled ? "translate-x-4" : "translate-x-0"
-            )}
-          />
-        </button>
-      </div>
-      {textureEnabled && (
-      <div className="grid grid-cols-2 gap-2">
-
-        {TEXTURE_OPTIONS.map((tx) => {
-          const active = texture === tx.value;
-          return (
-            <button
-              key={tx.value}
-              onClick={() => setTexture(tx.value)}
-              className={cn(
-                "relative rounded-lg border-2 p-2 text-center transition-all",
-                active ? "border-primary ring-2 ring-primary/20" : "border-gray-200 hover:border-gray-300"
-              )}
-            >
-              {active && (
-                <div className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-primary flex items-center justify-center z-10 shadow">
-                  <Check className="w-2.5 h-2.5 text-white" />
-                </div>
-              )}
-              <div className="h-8 rounded-md mb-1 overflow-hidden" style={{ background: tx.preview }} />
-              <p className="text-[10px] font-medium text-gray-700">{tx.label}</p>
-            </button>
-          );
-        })}
-      </div>
-      )}
-    </div>
-
-  );
-}
 
 export default Navbar;

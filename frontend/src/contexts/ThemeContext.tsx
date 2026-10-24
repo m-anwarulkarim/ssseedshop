@@ -68,35 +68,27 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     return (localStorage.getItem(THEME_KEY) as ThemeMode) || "leaf";
   });
 
-  const [publicTheme, setPublicThemeState] = useState<ThemeMode>(() => {
-    if (typeof localStorage === "undefined") return "leaf";
-    return (localStorage.getItem(PUBLIC_THEME_KEY) as ThemeMode) || "leaf";
-  });
-
-  const [texture, setTextureState] = useState<TextureOption>(() => {
-    if (typeof localStorage === "undefined") return "none";
-    return (localStorage.getItem(TEXTURE_KEY) as TextureOption) || "none";
-  });
-
-  const [textureEnabled, setTextureEnabledState] = useState<boolean>(() => {
-    if (typeof localStorage === "undefined") return false;
-    return localStorage.getItem(TEXTURE_ENABLED_KEY) === "1";
-  });
+  const [publicTheme] = useState<ThemeMode>("leaf");
 
   const location = useLocation();
   const isAdmin = location.pathname.startsWith("/admin");
 
+  // Clean up any legacy public theme/texture keys from storage
+  useEffect(() => {
+    try {
+      localStorage.removeItem(TEXTURE_KEY);
+      localStorage.removeItem(TEXTURE_ENABLED_KEY);
+      localStorage.removeItem(PUBLIC_THEME_KEY);
+    } catch {}
+  }, []);
+
   const applyTheme = useCallback(() => {
     if (typeof document === "undefined") return;
     clearAllClasses();
-    const active = isAdmin ? theme : publicTheme;
+    const active = isAdmin ? theme : "leaf";
     const tc = themeClasses[active];
     if (tc) document.documentElement.classList.add(tc);
-    if (!isAdmin && textureEnabled && texture !== "none") {
-      const txc = textureClasses[texture];
-      if (txc) document.documentElement.classList.add(txc);
-    }
-  }, [theme, publicTheme, isAdmin, texture, textureEnabled]);
+  }, [theme, isAdmin]);
 
   useEffect(() => {
     applyTheme();
@@ -107,20 +99,9 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     localStorage.setItem(THEME_KEY, t);
   };
 
-  const setPublicTheme = (t: ThemeMode) => {
-    setPublicThemeState(t);
-    localStorage.setItem(PUBLIC_THEME_KEY, t);
-  };
-
-  const setTexture = (t: TextureOption) => {
-    setTextureState(t);
-    localStorage.setItem(TEXTURE_KEY, t);
-  };
-
-  const setTextureEnabled = (v: boolean) => {
-    setTextureEnabledState(v);
-    localStorage.setItem(TEXTURE_ENABLED_KEY, v ? "1" : "0");
-  };
+  const setPublicTheme = () => {};
+  const setTexture = () => {};
+  const setTextureEnabled = () => {};
 
   return (
     <ThemeContext.Provider
@@ -129,9 +110,9 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
         setTheme,
         publicTheme,
         setPublicTheme,
-        texture,
+        texture: "none",
         setTexture,
-        textureEnabled,
+        textureEnabled: false,
         setTextureEnabled,
       }}
     >

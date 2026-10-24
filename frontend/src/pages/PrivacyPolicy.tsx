@@ -66,10 +66,10 @@ const sections: Section[] = [
         <p>
           ইমেইল:{" "}
           <a
-            href="mailto:info@ssseedshop.com"
+            href="mailto:ssseedshop220@gmail.com"
             className="text-primary hover:underline"
           >
-            info@ssseedshop.com
+            ssseedshop220@gmail.com
           </a>
         </p>
       </div>

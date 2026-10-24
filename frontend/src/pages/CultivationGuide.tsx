@@ -718,11 +718,11 @@ export default function CultivationGuide() {
                   <span>Ss Seed Shop</span>
                 </a>
                 <a
-                  href="tel:01805080556"
+                  href="tel:01933819799"
                   className="flex items-center gap-2 text-emerald-900 dark:text-emerald-100 hover:text-emerald-600 dark:hover:text-emerald-300 transition-colors"
                 >
                   <Phone className="w-4 h-4" />
-                  <span>01805080556</span>
+                  <span>01933819799</span>
                 </a>
               </div>
             </div>

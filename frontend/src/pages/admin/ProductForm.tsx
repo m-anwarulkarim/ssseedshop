@@ -887,14 +887,14 @@ export default function ProductForm() {
             }}
           />
 
-          {/* Bagan Bari Style Landing Funnel & Package Tiers */}
+          {/* Package Tiers & Special Offers */}
           <Card className="border-amber-500/30 shadow-sm">
             <CardHeader className="bg-gradient-to-r from-amber-500/10 via-emerald-500/5 to-transparent pb-4">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <div>
                   <CardTitle className="text-lg flex items-center gap-2 text-foreground font-bold">
                     <span>🌱</span>
-                    <span>{t("বাগান বাড়ি স্টাইল ল্যান্ডিং পেজ ও প্যাকেজ সেটিংস", "Landing Funnel & Package Offers")}</span>
+                    <span>{t("প্যাকেজ অফার ও বান্ডেল টিয়ার সেটিংস", "Package Offers & Bundle Tiers")}</span>
                   </CardTitle>
                   <p className="text-xs text-muted-foreground mt-1">
                     {t(

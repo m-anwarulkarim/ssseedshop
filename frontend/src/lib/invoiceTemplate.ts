@@ -69,7 +69,7 @@ export function buildInvoiceHtml(ordersList: any[]): string {
               <div style="font-size:11px;color:#4b5563;margin-bottom:4px">Sender</div>
               <div style="font-size:14px;font-weight:700;color:#0f172a">Ss Seed Shop</div>
               <div style="font-size:11px;color:#374151;margin-top:3px;line-height:1.55">Poran Mondol Tak, Boro Dewra, Tongi, Gazipur-1711</div>
-              <div style="font-size:11px;color:#374151;margin-top:2px">Phone: <span style="font-family:'Roboto Mono','Courier New',monospace;font-weight:700;color:#0f172a;letter-spacing:0.5px">01805080556</span></div>
+              <div style="font-size:11px;color:#374151;margin-top:2px">Phone: <span style="font-family:'Roboto Mono','Courier New',monospace;font-weight:700;color:#0f172a;letter-spacing:0.5px">01933819799</span></div>
               <div style="font-size:11px;color:#374151;margin-top:2px">Help: ssseedshop.com/help</div>
             </div>
             <div style="flex:1;background:#eef6ea;border:1px solid #d4ead0;border-radius:10px;padding:12px 14px">
@@ -116,7 +116,7 @@ export function buildInvoiceHtml(ordersList: any[]): string {
           <div style="margin-top:18px;padding-top:12px;border-top:1px dashed #cbd5e1;text-align:center;page-break-inside:avoid;flex-shrink:0">
             <div style="font-size:14px;font-weight:700;color:#0f172a">আমাদের সাথে থাকার জন্য আন্তরিক ধন্যবাদ! 🪴</div>
             <div style="font-size:11px;color:#4b5563;margin-top:3px">আপনার বাগান সবুজ ও সতেজ হোক — Ss Seed Shop সবসময় আপনার পাশে।</div>
-            <div style="font-size:10px;color:#6b7280;margin-top:8px">এটি একটি কম্পিউটার-জেনারেটেড চালান। যেকোনো জিজ্ঞাসার জন্য যোগাযোগ করুন: <span style="font-family:'Roboto Mono','Courier New',monospace;font-weight:700;font-size:12px;color:#0f172a;letter-spacing:0.5px">01805080556</span> / <span style="font-family:'Roboto Mono','Courier New',monospace;font-weight:600;color:#0f172a">ssseedshop@gmail.com</span></div>
+            <div style="font-size:10px;color:#6b7280;margin-top:8px">এটি একটি কম্পিউটার-জেনারেটেড চালান। যেকোনো জিজ্ঞাসার জন্য যোগাযোগ করুন: <span style="font-family:'Roboto Mono','Courier New',monospace;font-weight:700;font-size:12px;color:#0f172a;letter-spacing:0.5px">01933819799</span> / <span style="font-family:'Roboto Mono','Courier New',monospace;font-weight:600;color:#0f172a">ssseedshop220@gmail.com</span></div>
           </div>
         </div>`;
     }).join("");

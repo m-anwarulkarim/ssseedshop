@@ -389,20 +389,22 @@ export default function Profile() {
             <div className="space-y-0.5">
               <div className="flex items-center gap-2 flex-wrap">
                 <p className="font-bold text-lg text-foreground">{displayName}</p>
-                {profile?.phone_verified && (
-                  <Badge variant="secondary" className="bg-green-100 text-green-800 border-0 text-[11px]">
-                    <CheckCircle2 className="w-3 h-3 mr-1" /> {t("ভেরিফাইড", "Verified")}
-                  </Badge>
-                )}
+                <Badge variant="secondary" className="bg-emerald-100 text-emerald-800 border-0 text-[11px]">
+                  <CheckCircle2 className="w-3 h-3 mr-1" /> Google {t("ভেরিফাইড", "Verified")}
+                </Badge>
               </div>
-              {profile?.username && <p className="text-xs text-muted-foreground">@{profile.username}</p>}
+              {(profile?.email || session?.email) && (
+                <p className="text-xs text-muted-foreground flex items-center gap-1 font-medium">
+                  <Mail className="w-3.5 h-3.5 text-emerald-600" /> {profile?.email || session?.email}
+                </p>
+              )}
               {displayPhone ? (
                 <p className="text-sm text-muted-foreground flex items-center gap-1">
                   <Phone className="w-3.5 h-3.5" /> {displayPhone}
                 </p>
               ) : (
                 <p className="text-xs text-amber-600 font-medium flex items-center gap-1">
-                  <Phone className="w-3.5 h-3.5" /> {t("ফোন নম্বর যুক্ত করা নেই", "No phone number added")}
+                  <Phone className="w-3.5 h-3.5" /> {t("ডেলিভারি ফোন নম্বর যুক্ত করা নেই", "No delivery phone number added")}
                 </p>
               )}
               {location && (

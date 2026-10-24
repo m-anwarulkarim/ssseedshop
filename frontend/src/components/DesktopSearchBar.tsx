@@ -43,6 +43,36 @@ interface SearchBarProps {
   isMobile?: boolean;
 }
 
+/**
+ * Highlights matching search substring within text with a clean pink badge
+ */
+function highlightMatch(text: string, query: string) {
+  if (!query.trim() || !text) return text;
+  const trimmed = query.trim();
+  try {
+    const escaped = trimmed.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    const regex = new RegExp(`(${escaped})`, "gi");
+    const testRegex = new RegExp(`^${escaped}$`, "i");
+    const parts = text.split(regex);
+    if (parts.length === 1) return text;
+
+    return parts.map((part, i) =>
+      testRegex.test(part) ? (
+        <mark
+          key={i}
+          className="bg-pink-100 text-[#e41d56] font-bold px-1 py-0.5 rounded not-italic inline-block"
+        >
+          {part}
+        </mark>
+      ) : (
+        part
+      )
+    );
+  } catch {
+    return text;
+  }
+}
+
 export default function DesktopSearchBar({ className = "", isMobile = false }: SearchBarProps) {
   const navigate = useNavigate();
   const { lang } = useLanguage();
@@ -50,6 +80,7 @@ export default function DesktopSearchBar({ className = "", isMobile = false }: S
 
   const [query, setQuery] = useState("");
   const [isOpen, setIsOpen] = useState(false);
+  const [isFocused, setIsFocused] = useState(false);
   const [presetIndex, setPresetIndex] = useState(0);
   const [isSpinning, setIsSpinning] = useState(false);
 
@@ -69,6 +100,7 @@ export default function DesktopSearchBar({ className = "", isMobile = false }: S
     const handleClickOutside = (e: MouseEvent) => {
       if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
         setIsOpen(false);
+        setIsFocused(false);
       }
     };
     document.addEventListener("mousedown", handleClickOutside);
@@ -79,6 +111,7 @@ export default function DesktopSearchBar({ className = "", isMobile = false }: S
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Escape") {
       setIsOpen(false);
+      setIsFocused(false);
       inputRef.current?.blur();
     } else if (e.key === "Enter") {
       e.preventDefault();
@@ -90,6 +123,7 @@ export default function DesktopSearchBar({ className = "", isMobile = false }: S
     const target = overrideQuery !== undefined ? overrideQuery : query;
     const trimmed = target.trim();
     setIsOpen(false);
+    setIsFocused(false);
     if (trimmed) {
       navigate(`/products?search=${encodeURIComponent(trimmed)}`);
     } else {
@@ -102,21 +136,30 @@ export default function DesktopSearchBar({ className = "", isMobile = false }: S
     handleSubmit(tag);
   };
 
-  // Instant live search results (< 1ms)
+  // Instant live search results sorted by relevance (< 1ms)
   const filteredProducts = useMemo(() => {
     const trimmed = query.trim().toLowerCase();
     if (!trimmed || !allProducts) return [];
 
-    return allProducts
-      .filter((p: Product) => {
-        const nameMatch = p.name && p.name.toLowerCase().includes(trimmed);
-        const skuMatch = p.sku && p.sku.toLowerCase().includes(trimmed);
-        const catMatch =
-          (p.category && p.category.toLowerCase().includes(trimmed)) ||
-          (Array.isArray(p.categories) && p.categories.some((c) => String(c).toLowerCase().includes(trimmed)));
-        return nameMatch || skuMatch || catMatch;
-      })
-      .slice(0, 6);
+    const matches = allProducts.filter((p: Product) => {
+      const nameMatch = p.name && p.name.toLowerCase().includes(trimmed);
+      const skuMatch = p.sku && p.sku.toLowerCase().includes(trimmed);
+      const catMatch =
+        (p.category && p.category.toLowerCase().includes(trimmed)) ||
+        (Array.isArray(p.categories) && p.categories.some((c) => String(c).toLowerCase().includes(trimmed)));
+      return nameMatch || skuMatch || catMatch;
+    });
+
+    // Sort: Product name contains query first
+    matches.sort((a, b) => {
+      const aName = (a.name || "").toLowerCase();
+      const bName = (b.name || "").toLowerCase();
+      const aStarts = aName.startsWith(trimmed) ? 3 : aName.includes(trimmed) ? 2 : 0;
+      const bStarts = bName.startsWith(trimmed) ? 3 : bName.includes(trimmed) ? 2 : 0;
+      return bStarts - aStarts;
+    });
+
+    return matches.slice(0, 6);
   }, [query, allProducts]);
 
   const activePresets = POPULAR_PRESETS[presetIndex];
@@ -126,14 +169,15 @@ export default function DesktopSearchBar({ className = "", isMobile = false }: S
       ref={containerRef}
       className={`relative w-full ${isMobile ? "max-w-full" : "max-w-xl lg:max-w-2xl"} ${className}`}
     >
-      {/* Search Bar Input Container */}
+      {/* Search Bar Input Container with High-Visibility Focus State */}
       <div
-        className={`flex items-center ${isMobile ? "h-10 pl-3 pr-1.5" : "h-11 pl-4 pr-1.5"} rounded-xl bg-white border-2 transition-all shadow-sm ${
-          isOpen
-            ? "border-pink-300 ring-4 ring-pink-50/80 shadow-md"
-            : "border-gray-200/90 hover:border-pink-200"
+        className={`flex items-center h-11 pl-3.5 pr-1.5 gap-1.5 rounded-xl bg-white border-2 transition-all shadow-sm ${
+          isOpen || isFocused
+            ? "border-[#e41d56] ring-4 ring-pink-100 shadow-md bg-white"
+            : "border-gray-200/90 hover:border-pink-300"
         }`}
       >
+        {/* Main Search Text Input */}
         <input
           ref={inputRef}
           type="text"
@@ -142,13 +186,17 @@ export default function DesktopSearchBar({ className = "", isMobile = false }: S
             setQuery(e.target.value);
             if (!isOpen) setIsOpen(true);
           }}
-          onFocus={() => setIsOpen(true)}
+          onFocus={() => {
+            setIsOpen(true);
+            setIsFocused(true);
+          }}
+          onBlur={() => setIsFocused(false)}
           onKeyDown={handleKeyDown}
-          placeholder={lang === "en" ? "Search seeds, plants & gardening..." : "বীজ বা পছন্দের পণ্য খুঁজুন..."}
-          className={`flex-1 bg-transparent ${isMobile ? "text-xs" : "text-sm"} text-gray-800 placeholder:text-gray-400 focus:outline-none`}
+          placeholder={lang === "en" ? "Search seeds & gardening..." : "বীজ বা পছন্দের পণ্য খুঁজুন..."}
+          className="flex-1 min-w-0 h-full py-0 bg-transparent text-[15px] sm:text-sm font-semibold text-gray-900 placeholder:text-gray-400 placeholder:font-normal focus:outline-none leading-normal caret-[#e41d56]"
         />
 
-        {/* Clear query button */}
+        {/* Clear query button (X) */}
         {query && (
           <button
             type="button"
@@ -156,48 +204,49 @@ export default function DesktopSearchBar({ className = "", isMobile = false }: S
               setQuery("");
               inputRef.current?.focus();
             }}
-            className="p-1 mr-1 text-gray-400 hover:text-gray-600 rounded-full transition-colors"
+            className="w-6 h-6 flex items-center justify-center text-gray-400 hover:text-gray-700 hover:bg-gray-100 rounded-full transition-colors shrink-0"
             aria-label="Clear"
           >
             <X className="w-3.5 h-3.5" />
           </button>
         )}
 
-        {/* Pink Search Action Button */}
+        {/* Pink Search Action Button (Icon will never clip) */}
         <button
           type="button"
           onClick={() => handleSubmit()}
-          className="flex items-center justify-center w-8 h-8 rounded-lg bg-pink-50 text-[#e41d56] hover:bg-pink-100 active:scale-95 transition-all shrink-0 cursor-pointer"
+          className="flex items-center justify-center w-8 h-8 rounded-lg bg-pink-100/90 text-[#e41d56] hover:bg-pink-200 active:scale-95 transition-all shrink-0 cursor-pointer"
           aria-label="Search"
         >
           <Search className="w-4 h-4 stroke-[2.5]" />
         </button>
       </div>
 
-      {/* Floating Dropdown Attached Directly Underneath */}
+      {/* Floating Dropdown Attached Directly Underneath — NEVER Overlaps Input */}
       {isOpen && (
         <>
-          {/* Mobile backdrop for easy dismissal */}
+          {/* Subtle backdrop on mobile for dismissal */}
           {isMobile && (
             <div
-              className="fixed inset-0 z-40 bg-black/25 md:hidden"
-              onClick={() => setIsOpen(false)}
+              className="fixed inset-0 z-40 bg-black/20 md:hidden"
+              onClick={() => {
+                setIsOpen(false);
+                setIsFocused(false);
+              }}
             />
           )}
 
           <div
-            className={`${
-              isMobile
-                ? "fixed inset-x-2.5 top-[60px] max-h-[75vh] overflow-y-auto"
-                : "absolute top-full left-0 right-0 mt-2 overflow-hidden"
-            } z-50 bg-white rounded-2xl shadow-2xl border border-gray-100 p-3.5 md:p-4 animate-in fade-in-50 zoom-in-95 duration-150`}
+            className={`absolute top-[calc(100%+8px)] left-0 right-0 ${
+              isMobile ? "max-h-[72vh]" : "max-h-[80vh]"
+            } z-50 bg-white rounded-2xl shadow-2xl border border-gray-100 p-3.5 md:p-4 overflow-y-auto animate-in fade-in-50 zoom-in-95 duration-150`}
           >
             {/* STATE 1: Empty Query - Show "Popular Right Now" */}
             {!query.trim() ? (
               <div>
                 {/* Header: Popular Right Now + Refresh button */}
                 <div className="flex items-center justify-between mb-3 pb-2 border-b border-gray-50">
-                  <span className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
+                  <span className="text-xs font-bold text-gray-500 uppercase tracking-wide">
                     {lang === "en" ? "Popular Right Now" : "জনপ্রিয় অনুসন্ধান"}
                   </span>
                   <button
@@ -222,7 +271,7 @@ export default function DesktopSearchBar({ className = "", isMobile = false }: S
                       key={`${item.tag}-${idx}`}
                       type="button"
                       onClick={() => handleSelectTag(item.tag)}
-                      className="group flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-gray-200 bg-white hover:bg-pink-50/70 hover:border-pink-300 hover:text-[#e41d56] text-gray-700 text-xs font-medium transition-all active:scale-95"
+                      className="group flex items-center gap-1.5 px-3.5 py-1.5 rounded-full border border-gray-200 bg-white hover:bg-pink-50/70 hover:border-pink-300 hover:text-[#e41d56] text-gray-700 text-xs font-medium transition-all active:scale-95"
                     >
                       {item.isHot && <span className="text-xs leading-none">🔥</span>}
                       <span className="group-hover:translate-x-0.5 transition-transform">{item.tag}</span>
@@ -231,16 +280,17 @@ export default function DesktopSearchBar({ className = "", isMobile = false }: S
                 </div>
               </div>
             ) : (
-              /* STATE 2: User is Typing - Live Instant Product Results */
+              /* STATE 2: User is Typing - Live Instant Product Results with Highlighted Matches */
               <div>
                 <div className="flex items-center justify-between mb-2 pb-1.5 border-b border-gray-50 text-xs text-gray-500">
-                  <span className="font-semibold text-gray-600">
-                    {lang === "en" ? "Search Results" : "পণ্য ফলাফল"} ({filteredProducts.length}টি)
+                  <span className="font-semibold text-gray-700">
+                    "{query}" {lang === "en" ? "results" : "দিয়ে পণ্য ফলাফল"} (
+                    <span className="text-[#e41d56] font-bold">{filteredProducts.length}</span>টি)
                   </span>
                   <button
                     type="button"
                     onClick={() => handleSubmit()}
-                    className="text-xs font-medium text-[#e41d56] hover:underline flex items-center gap-1"
+                    className="text-xs font-semibold text-[#e41d56] hover:underline flex items-center gap-1"
                   >
                     <span>{lang === "en" ? "View all" : "সবগুলো দেখুন"}</span>
                     <ArrowRight className="w-3 h-3" />
@@ -249,11 +299,13 @@ export default function DesktopSearchBar({ className = "", isMobile = false }: S
 
                 {filteredProducts.length === 0 ? (
                   <div className="text-center py-6">
-                    <p className="text-sm font-medium text-gray-700">
+                    <p className="text-sm font-semibold text-gray-800">
                       "{query}" {lang === "en" ? "not found" : "দিয়ে কোনো পণ্য পাওয়া যায়নি"}
                     </p>
                     <p className="text-xs text-gray-400 mt-1">
-                      {lang === "en" ? "Try another keyword or seed name" : "অন্য কোনো বীজ বা শাকসবজির নাম লিখে খুঁজুন"}
+                      {lang === "en"
+                        ? "Try another keyword or seed name"
+                        : "অন্য কোনো বীজ বা শাকসবজির নাম লিখে খুঁজুন"}
                     </p>
                   </div>
                 ) : (
@@ -269,9 +321,9 @@ export default function DesktopSearchBar({ className = "", isMobile = false }: S
                             setIsOpen(false);
                             navigate(`/product/${p.slug || p.id}`);
                           }}
-                          className="flex items-center gap-3 p-2 rounded-xl hover:bg-pink-50/40 cursor-pointer transition-colors group"
+                          className="flex items-center gap-3 p-2.5 rounded-xl hover:bg-pink-50/50 cursor-pointer transition-colors group"
                         >
-                          <div className="w-11 h-11 rounded-lg bg-gray-50 border border-gray-100 overflow-hidden shrink-0">
+                          <div className="w-12 h-12 rounded-lg bg-gray-50 border border-gray-100 overflow-hidden shrink-0">
                             <img
                               src={imgUrl}
                               alt={p.name}
@@ -281,23 +333,26 @@ export default function DesktopSearchBar({ className = "", isMobile = false }: S
                           </div>
 
                           <div className="flex-1 min-w-0">
-                            <p className="text-xs font-semibold text-gray-800 truncate group-hover:text-[#e41d56] transition-colors">
-                              {p.name}
+                            {/* Product name with highlighted match */}
+                            <p className="text-xs sm:text-[13px] font-semibold text-gray-800 line-clamp-2 leading-snug group-hover:text-[#e41d56] transition-colors">
+                              {highlightMatch(p.name, query)}
                             </p>
-                            <div className="flex items-center gap-2 mt-0.5">
+                            <div className="flex items-center gap-2 mt-1">
                               {p.category && (
-                                <span className="text-[10px] text-gray-400 font-medium">
-                                  {p.category}
+                                <span className="text-[10px] text-gray-500 font-medium bg-gray-100 px-1.5 py-0.5 rounded">
+                                  {highlightMatch(p.category, query)}
                                 </span>
                               )}
                               {p.in_stock === false && (
-                                <span className="text-[10px] text-red-500 font-semibold">স্টক আউট</span>
+                                <span className="text-[10px] text-red-500 font-bold bg-red-50 px-1.5 py-0.5 rounded">
+                                  স্টক আউট
+                                </span>
                               )}
                             </div>
                           </div>
 
                           <div className="text-right shrink-0">
-                            <div className="text-xs font-bold text-emerald-700 tabular-nums">
+                            <div className="text-xs sm:text-sm font-bold text-emerald-700 tabular-nums">
                               ৳{price}
                             </div>
                             {oldPrice && (
@@ -313,11 +368,11 @@ export default function DesktopSearchBar({ className = "", isMobile = false }: S
                 )}
 
                 {/* Bottom Quick Action */}
-                <div className="pt-2 mt-2 border-t border-gray-100 flex items-center justify-between">
+                <div className="pt-2 mt-2 border-t border-gray-100">
                   <button
                     type="button"
                     onClick={() => handleSubmit()}
-                    className="w-full py-2 px-3 rounded-xl bg-gray-50 hover:bg-pink-50 text-xs font-semibold text-gray-700 hover:text-[#e41d56] flex items-center justify-center gap-1.5 transition-colors"
+                    className="w-full py-2.5 px-3 rounded-xl bg-gray-50 hover:bg-pink-50 text-xs font-bold text-gray-700 hover:text-[#e41d56] flex items-center justify-center gap-1.5 transition-colors"
                   >
                     <Sparkles className="w-3.5 h-3.5 text-amber-500" />
                     <span>
