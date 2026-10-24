@@ -38,6 +38,17 @@ const productSchema = z.object({
 
 type ProductFormValues = z.infer<typeof productSchema>;
 
+export interface PackageTier {
+  id: string;
+  name: string;
+  quantity: number;
+  regular_price: number;
+  offer_price: number;
+  delivery_charge: number;
+  is_free_delivery: boolean;
+  badge?: string;
+}
+
 interface Variation {
   id?: string;
   name: string;
@@ -70,6 +81,14 @@ export default function ProductForm() {
   const [newSubName, setNewSubName] = useState("");
 
   const [variations, setVariations] = useState<Variation[]>([]);
+
+  // Bagan Bari Style Landing & Package Tiers
+  const [highlightFeatures, setHighlightFeatures] = useState("");
+  const [packageTiers, setPackageTiers] = useState<PackageTier[]>([]);
+  const [trustCard1Title, setTrustCard1Title] = useState("");
+  const [trustCard1Text, setTrustCard1Text] = useState("");
+  const [trustCard2Title, setTrustCard2Title] = useState("");
+  const [trustCard2Text, setTrustCard2Text] = useState("");
 
   const { data: availableTags = [] } = useQuery({
     queryKey: ["all-tags-admin"],
@@ -177,6 +196,14 @@ export default function ProductForm() {
 
       // Load variations
       setVariations(data.variations || []);
+
+      // Load landing features & package tiers
+      setPackageTiers(Array.isArray(data.package_tiers) ? data.package_tiers : []);
+      setHighlightFeatures(data.highlight_features || "");
+      setTrustCard1Title(data.trust_card_1_title || "");
+      setTrustCard1Text(data.trust_card_1_text || "");
+      setTrustCard2Title(data.trust_card_2_title || "");
+      setTrustCard2Text(data.trust_card_2_text || "");
     }
     } catch (err) {
       toast.error("পণ্য লোড করতে সমস্যা হয়েছে");
@@ -270,6 +297,12 @@ export default function ProductForm() {
       is_hidden: isHidden,
       tags: selectedTags,
       variations: variations, // Send variations to PHP API
+      package_tiers: packageTiers,
+      highlight_features: highlightFeatures.trim() || null,
+      trust_card_1_title: trustCard1Title.trim() || null,
+      trust_card_1_text: trustCard1Text.trim() || null,
+      trust_card_2_title: trustCard2Title.trim() || null,
+      trust_card_2_text: trustCard2Text.trim() || null,
     };
 
     let error;
@@ -853,6 +886,344 @@ export default function ProductForm() {
               setVariationPickerIdx(null);
             }}
           />
+
+          {/* Bagan Bari Style Landing Funnel & Package Tiers */}
+          <Card className="border-amber-500/30 shadow-sm">
+            <CardHeader className="bg-gradient-to-r from-amber-500/10 via-emerald-500/5 to-transparent pb-4">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div>
+                  <CardTitle className="text-lg flex items-center gap-2 text-foreground font-bold">
+                    <span>🌱</span>
+                    <span>{t("বাগান বাড়ি স্টাইল ল্যান্ডিং পেজ ও প্যাকেজ সেটিংস", "Landing Funnel & Package Offers")}</span>
+                  </CardTitle>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    {t(
+                      "এখানে প্যাকেজ (১ প্যাকেট, ২ প্যাকেট, ৫ প্যাকেট), অফার মূল্য, ফ্রি ডেলিভারি ও কাস্টমার ট্রাস্ট কার্ড নিয়ন্ত্রণ করুন।",
+                      "Manage package tiers (1 pack, 2 pack, 5 pack), offer price, free delivery, and trust assurance cards."
+                    )}
+                  </p>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    className="border-emerald-500/50 text-emerald-700 hover:bg-emerald-50 text-xs font-semibold"
+                    onClick={() => {
+                      const reg = Number(form.getValues("regular_price")) || 0;
+                      const off = Number(form.getValues("offer_price")) || reg;
+                      if (reg <= 0 && off <= 0) {
+                        toast.error("অনুগ্রহ করে আগে উপরে পণ্যের নিয়মিত বা অফার মূল্য লিখুন");
+                        return;
+                      }
+                      const basePrice = off > 0 ? off : reg;
+                      const baseRegular = reg > 0 ? reg : off;
+
+                      const generated: PackageTier[] = [
+                        {
+                          id: "tier-" + Date.now() + "-1",
+                          name: "১ প্যাকেট",
+                          quantity: 1,
+                          regular_price: baseRegular,
+                          offer_price: basePrice,
+                          delivery_charge: 50,
+                          is_free_delivery: false,
+                          badge: "",
+                        },
+                        {
+                          id: "tier-" + Date.now() + "-2",
+                          name: "২ প্যাকেট",
+                          quantity: 2,
+                          regular_price: baseRegular * 2,
+                          offer_price: Math.round(basePrice * 1.8),
+                          delivery_charge: 0,
+                          is_free_delivery: true,
+                          badge: "জনপ্রিয়",
+                        },
+                        {
+                          id: "tier-" + Date.now() + "-5",
+                          name: "৫ প্যাকেট",
+                          quantity: 5,
+                          regular_price: baseRegular * 5,
+                          offer_price: Math.round(basePrice * 4.0),
+                          delivery_charge: 0,
+                          is_free_delivery: true,
+                          badge: "মেগা সেভার",
+                        },
+                      ];
+                      setPackageTiers(generated);
+                      toast.success("৩টি প্যাকেজ অফার তৈরি হয়েছে!");
+                    }}
+                  >
+                    ⚡ {t("অটো ৩টি প্যাকেজ তৈরি করুন", "Auto 3 Tiers")}
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    size="sm"
+                    className="text-xs"
+                    onClick={() => {
+                      const nextNum = packageTiers.length === 0 ? 1 : packageTiers.length === 1 ? 2 : packageTiers.length === 2 ? 5 : packageTiers.length + 1;
+                      const reg = Number(form.getValues("regular_price")) || 0;
+                      const off = Number(form.getValues("offer_price")) || reg;
+                      setPackageTiers((prev) => [
+                        ...prev,
+                        {
+                          id: "tier-" + Date.now(),
+                          name: `${nextNum} প্যাকেট`,
+                          quantity: nextNum,
+                          regular_price: reg * nextNum,
+                          offer_price: off * nextNum,
+                          delivery_charge: nextNum >= 2 ? 0 : 50,
+                          is_free_delivery: nextNum >= 2,
+                          badge: nextNum === 2 ? "জনপ্রিয়" : "",
+                        },
+                      ]);
+                    }}
+                  >
+                    <Plus className="w-3.5 h-3.5 mr-1" />
+                    {t("প্যাকেজ যোগ", "Add Tier")}
+                  </Button>
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent className="space-y-5 pt-4">
+              {/* Highlight Subtitle / Bullet Features */}
+              <div className="space-y-1.5">
+                <Label className="text-xs font-bold text-foreground">
+                  {t("হাইলাইট বুলেট / স্পেশাল ফিচার লাইন (টাইটেলের নিচে শো করবে)", "Highlight Subtitle / Bullet Bar")}
+                </Label>
+                <Input
+                  placeholder={t(
+                    "যেমন: শিমের সেরা একটি জাত, ১০ গ্রাম প্যাকেট (২৫-২৭ পিচ) বীজ ( উচ্চফলনশীল আগাম জাত, মাত্র ৪০ দিনে ফলন ) খাটো গাছ",
+                    "e.g. Premium seed, 10g packet, harvest in 40 days, high yield"
+                  )}
+                  value={highlightFeatures}
+                  onChange={(e) => setHighlightFeatures(e.target.value)}
+                  className="text-sm font-medium"
+                />
+                <p className="text-[11px] text-muted-foreground">
+                  {t(
+                    "ফাঁকা রাখলে সাধারণ প্রোডাক্ট ডেসক্রিপশন অনুযায়ী স্বাভাবিকভাবে দেখাবে।",
+                    "Leave blank to fallback to short description."
+                  )}
+                </p>
+              </div>
+
+              {/* Package Tiers List */}
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <Label className="text-xs font-bold text-foreground">
+                    {t("প্যাকেজ ও বান্ডেল অফারসমূহ (Package Tiers)", "Package Tiers")} ({packageTiers.length})
+                  </Label>
+                </div>
+
+                {packageTiers.length === 0 ? (
+                  <div className="text-center py-6 px-4 border border-dashed rounded-xl bg-muted/20">
+                    <p className="text-xs text-muted-foreground mb-3">
+                      {t(
+                        "এখনো কোনো কাস্টম প্যাকেজ যোগ করা হয়নি। আপনি চাইলে 'অটো ৩টি প্যাকেজ তৈরি করুন' বাটনে ক্লিক করতে পারেন অথবা নিজে যোগ করতে পারেন। (কাস্টম প্যাকেজ না থাকলে পণ্যের মূল দাম থেকে স্বয়ংক্রিয়ভাবে ১, ২ ও ৫ প্যাকেট তৈরি হবে)",
+                        "No custom package tiers yet. Click 'Auto 3 Tiers' or add manually. If empty, default 1, 2, 5 packs will be calculated automatically."
+                      )}
+                    </p>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                    {packageTiers.map((tier, idx) => (
+                      <div
+                        key={tier.id || idx}
+                        className="relative rounded-xl border border-border bg-card p-3 shadow-xs space-y-2.5"
+                      >
+                        <div className="flex items-center justify-between gap-1">
+                          <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-primary/10 text-primary">
+                            প্যাকেজ #{idx + 1}
+                          </span>
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="icon"
+                            className="h-7 w-7 text-destructive hover:bg-destructive/10"
+                            onClick={() => setPackageTiers((prev) => prev.filter((_, i) => i !== idx))}
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </Button>
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-2">
+                          <div>
+                            <Label className="text-[11px]">{t("প্যাকেজের নাম", "Name")}</Label>
+                            <Input
+                              value={tier.name}
+                              placeholder="১ প্যাকেট"
+                              className="h-8 text-xs"
+                              onChange={(e) => {
+                                const next = [...packageTiers];
+                                next[idx] = { ...next[idx], name: e.target.value };
+                                setPackageTiers(next);
+                              }}
+                            />
+                          </div>
+                          <div>
+                            <Label className="text-[11px]">{t("বীজ/প্যাকেটের সংখ্যা", "Quantity")}</Label>
+                            <Input
+                              type="number"
+                              min={1}
+                              value={tier.quantity}
+                              className="h-8 text-xs"
+                              onChange={(e) => {
+                                const next = [...packageTiers];
+                                next[idx] = { ...next[idx], quantity: Math.max(1, Number(e.target.value) || 1) };
+                                setPackageTiers(next);
+                              }}
+                            />
+                          </div>
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-2">
+                          <div>
+                            <Label className="text-[11px]">{t("রেগুলার মূল্য (৳)", "Regular")}</Label>
+                            <Input
+                              type="number"
+                              min={0}
+                              value={tier.regular_price}
+                              className="h-8 text-xs"
+                              onChange={(e) => {
+                                const next = [...packageTiers];
+                                next[idx] = { ...next[idx], regular_price: Number(e.target.value) || 0 };
+                                setPackageTiers(next);
+                              }}
+                            />
+                          </div>
+                          <div>
+                            <Label className="text-[11px] font-bold text-primary">{t("অফার মূল্য (৳)", "Offer")}</Label>
+                            <Input
+                              type="number"
+                              min={0}
+                              value={tier.offer_price}
+                              className="h-8 text-xs font-bold text-primary"
+                              onChange={(e) => {
+                                const next = [...packageTiers];
+                                next[idx] = { ...next[idx], offer_price: Number(e.target.value) || 0 };
+                                setPackageTiers(next);
+                              }}
+                            />
+                          </div>
+                        </div>
+
+                        <div className="pt-1 border-t border-border/60 space-y-1.5">
+                          <div className="flex items-center justify-between">
+                            <label className="text-xs font-semibold flex items-center gap-1.5 cursor-pointer">
+                              <input
+                                type="checkbox"
+                                checked={tier.is_free_delivery}
+                                className="rounded text-primary focus:ring-primary h-3.5 w-3.5"
+                                onChange={(e) => {
+                                  const next = [...packageTiers];
+                                  next[idx] = {
+                                    ...next[idx],
+                                    is_free_delivery: e.target.checked,
+                                    delivery_charge: e.target.checked ? 0 : 50,
+                                  };
+                                  setPackageTiers(next);
+                                }}
+                              />
+                              <span className="text-emerald-600 font-bold">ফ্রি ডেলিভারি</span>
+                            </label>
+
+                            {!tier.is_free_delivery && (
+                              <div className="flex items-center gap-1">
+                                <span className="text-[10px] text-muted-foreground">চার্জ: ৳</span>
+                                <Input
+                                  type="number"
+                                  min={0}
+                                  value={tier.delivery_charge}
+                                  className="h-7 w-16 text-xs text-right"
+                                  onChange={(e) => {
+                                    const next = [...packageTiers];
+                                    next[idx] = { ...next[idx], delivery_charge: Number(e.target.value) || 0 };
+                                    setPackageTiers(next);
+                                  }}
+                                />
+                              </div>
+                            )}
+                          </div>
+
+                          <div>
+                            <Label className="text-[10px] text-muted-foreground">{t("ব্যাজ (যেমন: জনপ্রিয় / মেগা সেভার)", "Badge (Optional)")}</Label>
+                            <Input
+                              value={tier.badge || ""}
+                              placeholder="যেমন: জনপ্রিয়"
+                              className="h-7 text-xs"
+                              onChange={(e) => {
+                                const next = [...packageTiers];
+                                next[idx] = { ...next[idx], badge: e.target.value };
+                                setPackageTiers(next);
+                              }}
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Trust Cards Customization */}
+              <div className="pt-3 border-t border-border space-y-4">
+                <Label className="text-xs font-bold text-foreground">
+                  {t("কাস্টমার ট্রাস্ট ও প্রতিশ্রুতি কার্ড কাস্টমাইজেশন (Trust Assurance Cards)", "Trust Cards")}
+                </Label>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {/* Card 1: Green Card */}
+                  <div className="p-3.5 rounded-xl border border-emerald-300 bg-emerald-50/40 space-y-2">
+                    <div className="flex items-center gap-2">
+                      <span className="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
+                      <Label className="text-xs font-bold text-emerald-950">
+                        {t("কার্ড ১ (সবুজ কার্ড - নিশ্চিন্তে অর্ডার)", "Card 1 (Green)")}
+                      </Label>
+                    </div>
+                    <Input
+                      placeholder="ডিফল্ট: নিশ্চিন্তে অর্ডার করুন"
+                      value={trustCard1Title}
+                      onChange={(e) => setTrustCard1Title(e.target.value)}
+                      className="h-8 text-xs bg-white"
+                    />
+                    <Textarea
+                      placeholder="ডিফল্ট: অর্ডার দেওয়ার পর আমাদের প্রতিনিধি আপনাকে কল করে বিস্তারিত আলোচনা করবেন এবং তারপরই অর্ডারটি কনফার্ম করা হবে। কোনো প্রশ্ন বা জিজ্ঞাসা থাকলে তখনই জেনে নিতে পারবেন।"
+                      value={trustCard1Text}
+                      onChange={(e) => setTrustCard1Text(e.target.value)}
+                      rows={3}
+                      className="text-xs bg-white"
+                    />
+                  </div>
+
+                  {/* Card 2: Amber Card */}
+                  <div className="p-3.5 rounded-xl border border-amber-300 bg-amber-50/40 space-y-2">
+                    <div className="flex items-center gap-2">
+                      <span className="w-2.5 h-2.5 rounded-full bg-amber-500"></span>
+                      <Label className="text-xs font-bold text-amber-950">
+                        {t("কার্ড ২ (অ্যাম্বার কার্ড - আমাদের প্রতিশ্রুতি)", "Card 2 (Amber)")}
+                      </Label>
+                    </div>
+                    <Input
+                      placeholder="ডিফল্ট: 🤝 আমাদের প্রতিশ্রুতি"
+                      value={trustCard2Title}
+                      onChange={(e) => setTrustCard2Title(e.target.value)}
+                      className="h-8 text-xs bg-white"
+                    />
+                    <Textarea
+                      placeholder="ডিফল্ট: আমরা বাংলাদেশের সবচেয়ে কম দামে সেরা বীজ দিচ্ছি — আমাদের লক্ষ্য কম লাভে বেশি বিক্রি। তাই অনুরোধ থাকবে, আন্তরিকতার সাথে পার্সেলটি রিসিভ করবেন। ইনশাআল্লাহ আমরা কথা দিচ্ছি, আপনাকে সেরা মানের পণ্যটিই পৌঁছে দেব।"
+                      value={trustCard2Text}
+                      onChange={(e) => setTrustCard2Text(e.target.value)}
+                      rows={3}
+                      className="text-xs bg-white"
+                    />
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
 
           <Card>
             <CardHeader>

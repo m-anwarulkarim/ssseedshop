@@ -598,3 +598,12 @@ html.texture-wood body {
 .rte-content p, .blog-content p { margin: 0.45rem 0; }
 .rte-content b, .rte-content strong, .blog-content b, .blog-content strong { font-weight: 700; }
 .blog-content img { max-width: 100%; border-radius: 0.75rem; }
+
+/* Conversion Landing Shimmer Animations */
+@keyframes inner-glow-sweep {
+  0% { transform: translateX(-150%); }
+  45%, 100% { transform: translateX(350%); }
+}
+.animate-shimmer-sweep {
+  animation: inner-glow-sweep 2.6s ease-in-out infinite;
+}

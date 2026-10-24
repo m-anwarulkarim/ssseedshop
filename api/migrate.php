@@ -81,6 +81,21 @@ try {
     $pdo->exec("DROP TABLE IF EXISTS `blogs`");
     $pdo->exec("DROP TABLE IF EXISTS `ledger_entries`");
 } catch (Exception $e) {}
+
+// Auto-upgrade products table columns if missing
+$prodNewCols = [
+    'package_tiers'      => 'LONGTEXT DEFAULT NULL',
+    'highlight_features' => 'TEXT DEFAULT NULL',
+    'trust_card_1_title' => 'VARCHAR(255) DEFAULT NULL',
+    'trust_card_1_text'  => 'TEXT DEFAULT NULL',
+    'trust_card_2_title' => 'VARCHAR(255) DEFAULT NULL',
+    'trust_card_2_text'  => 'TEXT DEFAULT NULL',
+];
+foreach ($prodNewCols as $col => $def) {
+    try {
+        $pdo->exec("ALTER TABLE `products` ADD COLUMN `$col` $def");
+    } catch (Exception $e) {}
+}
 function migrate_table_data($pdo, $table, $json_file, $key_col, $json_cols = []) {
     if (!file_exists($json_file)) {
         return 0;
@@ -224,7 +239,7 @@ function migrate_table_data($pdo, $table, $json_file, $key_col, $json_cols = [])
 // 2. Migrate each dataset
 $migrations = [
     'admins'            => [__DIR__ . '/database/admins.json', 'id', ['permissions']],
-    'products'          => [__DIR__ . '/database/products.json', 'id', ['categories', 'tags', 'image_gallery', 'variations']],
+    'products'          => [__DIR__ . '/database/products.json', 'id', ['categories', 'tags', 'image_gallery', 'variations', 'package_tiers']],
     'categories'        => [__DIR__ . '/database/categories.json', 'id', []],
     'subcategories'     => [__DIR__ . '/database/subcategories.json', 'id', []],
     'tags'              => [__DIR__ . '/database/tags.json', 'id', []],

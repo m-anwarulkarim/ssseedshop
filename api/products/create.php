@@ -42,6 +42,12 @@ $new_product = array_merge([
     'image_gallery'     => [],
     'is_hidden'         => false,
     'variations'        => [],
+    'package_tiers'     => [],
+    'highlight_features'=> null,
+    'trust_card_1_title'=> null,
+    'trust_card_1_text' => null,
+    'trust_card_2_title'=> null,
+    'trust_card_2_text' => null,
     'created_at'        => date('c')
 ], $input);
 
