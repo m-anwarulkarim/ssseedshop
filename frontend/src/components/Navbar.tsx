@@ -8,6 +8,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useCart } from "@/contexts/CartContext";
 import shikderLogo from "@/assets/ssseedshop-logo.png";
 import SearchPopup from "@/components/SearchPopup";
+import DesktopSearchBar from "@/components/DesktopSearchBar";
 import { getCustomerSession, clearCustomerSession } from "@/components/CustomerLogin";
 import { useQuery } from "@tanstack/react-query";
 import { NAVBAR_ICONS, DEFAULT_NAVBAR_ITEMS } from "@/lib/navbarIcons";
@@ -83,52 +84,99 @@ const Navbar = () => {
           </button>
         </div>
 
-        {/* Desktop Header: Unchanged full layout */}
-        <div className="hidden md:flex items-center gap-2 h-14 px-2.5 max-w-screen-2xl mx-auto w-full">
-          {/* Logo */}
-          <Link to="/" className="shrink-0">
-            <img
-              src={shikderLogo}
-              alt="Ss Seed Shop"
-              className="w-9 h-9 rounded-full object-contain ring-2 ring-primary/30"
-            />
-          </Link>
+        {/* Desktop Header: 2-Tier Modern Layout Matching Reference Screenshot */}
+        <div className="hidden md:block w-full">
+          {/* Tier 1: Main Header (Logo | Centered Search Bar with Popup | Account & Cart) */}
+          <div className="flex items-center justify-between gap-4 h-16 px-4 max-w-screen-2xl mx-auto w-full">
+            {/* Logo */}
+            <Link to="/" className="flex items-center gap-2.5 shrink-0 group">
+              <img
+                src={shikderLogo}
+                alt="Ss Seed Shop"
+                className="w-10 h-10 rounded-full object-contain ring-2 ring-primary/30 group-hover:scale-105 transition-transform"
+              />
+              <div className="hidden lg:block text-left">
+                <div className="font-extrabold text-base text-primary leading-tight flex items-center gap-1">
+                  <span>Ss Seed Shop</span>
+                </div>
+                <div className="text-[10px] text-gray-400 font-medium leading-none mt-0.5">
+                  {lang === "en" ? "Trusted Seed Brand" : "সেরা বীজের বিশ্বস্ত ঠিকানা"}
+                </div>
+              </div>
+            </Link>
 
-          {/* Desktop centered nav menu */}
-          <nav className="flex flex-1 items-center justify-center gap-1">
-            <DesktopNavItems />
-          </nav>
+            {/* Centered Search Bar with Attached Popup (Matches Screenshot) */}
+            <div className="flex-1 flex justify-center max-w-2xl px-2">
+              <DesktopSearchBar />
+            </div>
 
-          {/* Desktop search icon + theme + language */}
-          <div className="flex items-center gap-1">
-            <button
-              onClick={() => setSearchOpen(true)}
-              aria-label="Search"
-              className="inline-flex items-center justify-center w-9 h-9 rounded-full text-gray-700 hover:bg-gray-100 transition-colors"
-            >
-              <Search className="w-5 h-5" />
-            </button>
-            <DesktopThemeButton />
-            <DesktopLangButton />
+            {/* Right Controls: Account, Cart, Theme, Lang */}
+            <div className="flex items-center gap-2.5 shrink-0">
+              {/* Account / Profile (Matches Screenshot: Hello, ... / Account & Lists) */}
+              <Link
+                to="/profile"
+                className="flex items-center gap-2 px-2.5 py-1.5 rounded-xl hover:bg-gray-50 border border-transparent hover:border-gray-200 transition-all text-left"
+              >
+                <div className="w-8 h-8 rounded-full bg-pink-50 text-[#e41d56] flex items-center justify-center shrink-0">
+                  <User className="w-4 h-4 stroke-[2]" />
+                </div>
+                <div className="hidden xl:block">
+                  <div className="text-[10px] text-gray-500 font-medium leading-none">
+                    {session ? `Hello, ${session.name || "Customer"}` : (lang === "en" ? "Hello, Sign In" : "লগইন করুন")}
+                  </div>
+                  <div className="text-xs font-bold text-gray-800 leading-tight mt-0.5">
+                    {lang === "en" ? "Account & Lists" : "একাউন্ট ও অর্ডার"}
+                  </div>
+                </div>
+              </Link>
+
+              {/* Cart Button with Total Count Badge */}
+              <button
+                onClick={openCart}
+                className="relative flex items-center gap-2 px-3 py-2 rounded-xl bg-pink-50/70 hover:bg-pink-100/80 border border-pink-200/60 text-[#e41d56] font-bold text-xs transition-all active:scale-95"
+                aria-label="Open cart"
+              >
+                <div className="relative flex items-center justify-center">
+                  <ShoppingCart className="w-4 h-4 stroke-[2.2]" />
+                  {totalItems > 0 && (
+                    <span className="absolute -top-2 -right-2.5 flex items-center justify-center min-w-[16px] h-[16px] px-1 rounded-full bg-[#e41d56] text-white text-[9px] font-extrabold ring-1 ring-white">
+                      {totalItems}
+                    </span>
+                  )}
+                </div>
+                <span className="hidden sm:inline font-bold">
+                  {lang === "en" ? "Cart" : "কার্ট"}
+                </span>
+              </button>
+
+              {/* Theme & Language Controls */}
+              <div className="flex items-center gap-1 border-l border-gray-200 pl-2">
+                <DesktopThemeButton />
+                <DesktopLangButton />
+              </div>
+            </div>
           </div>
 
-          {/* Order button + cart */}
-          <button
-            onClick={openCart}
-            className="relative flex items-center gap-1 pl-2.5 pr-1.5 h-9 rounded-full bg-[#fff7e6] text-[#1b5e20] font-bold text-[12px] border border-amber-200"
-            aria-label="Open cart"
-          >
-            <span>{lang === "en" ? "Order" : "অর্ডার"}</span>
-            <ArrowRight className="w-3.5 h-3.5" />
-            <span className="relative flex items-center justify-center w-7 h-7 rounded-full bg-[#ffe0a3]">
-              <ShoppingCart className="w-3.5 h-3.5 text-[#1b5e20]" />
-              {totalItems > 0 && (
-                <span className="absolute -top-1 -right-1 flex items-center justify-center min-w-[16px] h-[16px] px-1 rounded-full bg-emerald-600 text-white text-[9px] font-extrabold ring-2 ring-white">
-                  {totalItems}
-                </span>
-              )}
-            </span>
-          </button>
+          {/* Tier 2: Sub-Nav Bar (All Categories | Menu Items) */}
+          <div className="border-t border-gray-100 bg-gray-50/60">
+            <div className="flex items-center gap-2 h-10 px-4 max-w-screen-2xl mx-auto w-full">
+              {/* All Categories shortcut */}
+              <Link
+                to="/categories"
+                className="flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-bold text-gray-800 hover:text-[#e41d56] hover:bg-white transition-colors border border-transparent hover:border-gray-200"
+              >
+                <LayoutGrid className="w-3.5 h-3.5 text-[#e41d56]" />
+                <span>{lang === "en" ? "All Categories" : "সকল ক্যাটাগরি"}</span>
+              </Link>
+
+              <div className="h-4 w-px bg-gray-200 mx-1" />
+
+              {/* Menu items */}
+              <nav className="flex items-center gap-1">
+                <DesktopNavItems />
+              </nav>
+            </div>
+          </div>
         </div>
       </header>
       </div>
