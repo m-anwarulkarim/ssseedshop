@@ -35,8 +35,8 @@ cPanel ফাইল ম্যানেজারে গিয়ে নিশ্চ�
 
 ```ini
 DB_HOST="localhost"
-DB_NAME="jjcelcf_ssseedshop"
-DB_USER="jjcelcf_ssseedshop"
+DB_NAME="jjcceicf_ssseedshop"
+DB_USER="jjcceicf_ssseedshop"
 DB_PASS="8.GdFreD&XPEWzC."
 ```
 
