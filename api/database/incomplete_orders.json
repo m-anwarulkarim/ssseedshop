@@ -1,0 +1,21 @@
+[
+    {
+        "id": "inc_b76752880e1c",
+        "customer_name": "Part 10 Test Dropoff",
+        "phone": "01999887766",
+        "address": null,
+        "visitor_id": "vis_part10_test",
+        "reason": "checkout_abandoned",
+        "cart_snapshot": [
+            {
+                "id": "1",
+                "name": "টেস্ট বীজ",
+                "price": 250,
+                "quantity": 1
+            }
+        ],
+        "attempt_count": 2,
+        "created_at": "2026-10-12T04:49:21+00:00",
+        "updated_at": "2026-10-12T04:50:54+00:00"
+    }
+]

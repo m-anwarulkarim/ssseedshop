@@ -1,0 +1,47 @@
+# Dependencies
+**/node_modules/
+node_modules/
+
+# Production build outputs
+dist/
+frontend/dist/
+dist-ssr/
+
+# Environment files
+.env
+.env.local
+.env.*.local
+frontend/.env
+api/.env
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+
+# Archives
+*.zip
+yarn-debug.log*
+
+# Test Screenshots & temporary files
+tests/screenshots/
+.temp/
+*.tmp
+
+# Uploaded files
+api/uploads/*
+!api/uploads/.htaccess
+
+# System & IDE files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swp
+*.zip
+
+# Old Supabase project directory (keep local only, do not track)
+AgroSeed/
+AgroSeed
+api/database/backup_pre_supabase_migration/
+ssseedshop/
