@@ -12,6 +12,7 @@ import { useNavigate } from "react-router-dom";
 import { trackInitiateCheckout, trackAddToCart, trackViewContent } from "@/components/TrackingScripts";
 import { trackCatalogPurchase } from "@/lib/metaPurchase";
 import { DevelopedByHaqPlus } from "@/components/DevelopedByHaqPlus";
+import { handleImageError } from "@/lib/imageFallback";
 
 // ==== Theme ====
 const PRIMARY = "#d63384";
@@ -188,7 +189,7 @@ function HeroCarousel({ images }: { images: string[] }) {
               className="w-full h-64 md:h-[420px] lg:h-[500px] object-cover flex-shrink-0 snap-center"
               style={{ width: "100%" }}
               loading={i === 0 ? "eager" : "lazy"}
-              onError={(e) => { const img = e.currentTarget; img.onerror = null; img.src = "/placeholder.svg"; }}
+              onError={handleImageError}
             />
           ))}
         </div>

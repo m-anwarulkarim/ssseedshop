@@ -8,7 +8,7 @@ import { toast } from "sonner";
 import { useNavigate, Link } from "react-router-dom";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { trackViewContent } from "@/components/TrackingScripts";
-import { handleImageError, PLACEHOLDER_IMAGE } from "@/lib/imageFallback";
+import { handleImageError, PLACEHOLDER_IMAGE, resolveImageUrl } from "@/lib/imageFallback";
 
 interface ProductDetailPopupProps {
   product: {
@@ -91,7 +91,7 @@ export default function ProductDetailPopup({ product, open, onOpenChange }: Prod
 
         <div className="px-4 pb-4">
           <div className="aspect-[4/3] rounded-xl overflow-hidden bg-muted mt-3 mb-3">
-            <img src={product.product_image || product.image_url || PLACEHOLDER_IMAGE} alt={product.name} className="w-full h-full object-cover" onError={handleImageError} />
+            <img src={resolveImageUrl(product.product_image || product.image_url)} alt={product.name} className="w-full h-full object-cover" onError={handleImageError} />
           </div>
 
 

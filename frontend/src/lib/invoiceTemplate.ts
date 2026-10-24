@@ -1,4 +1,5 @@
 import ssseedshopLogo from "@/assets/ssseedshop-logo.png";
+import { resolveImageUrl, PLACEHOLDER_IMAGE } from "@/lib/imageFallback";
 
 /** Builds the same A4 invoice HTML used in the admin order list. */
 export function buildInvoiceHtml(ordersList: any[]): string {
@@ -17,11 +18,11 @@ export function buildInvoiceHtml(ordersList: any[]): string {
         const displayUnit = hasDiscount ? regPrice : price;
         const lineTotal = displayUnit * qty;
         const name = esc(i.product_name || "");
-        const img = esc(i.product_image || i.image_url || "/placeholder.svg");
+        const img = esc(resolveImageUrl(i.product_image || i.image_url));
         const zebra = idx % 2 === 1 ? "background:#f1f8ef" : "background:#ffffff";
         return `<tr style="${zebra};border-bottom:1px solid #e7f0e2">
           <td style="padding:14px 10px;text-align:center;color:#1f2937;font-size:13px;vertical-align:middle;width:38px">${toBn(idx + 1)}</td>
-          <td style="padding:10px;vertical-align:middle;width:64px"><div style="width:48px;height:48px;border-radius:8px;background:#eef6ea;overflow:hidden;display:flex;align-items:center;justify-content:center"><img src="${img}" onerror="this.onerror=null;this.src='/placeholder.svg'" style="width:100%;height:100%;object-fit:cover" alt=""/></div></td>
+          <td style="padding:10px;vertical-align:middle;width:64px"><div style="width:48px;height:48px;border-radius:8px;background:#eef6ea;overflow:hidden;display:flex;align-items:center;justify-content:center"><img src="${img}" onerror="this.onerror=null;this.src='${PLACEHOLDER_IMAGE}'" style="width:100%;height:100%;object-fit:cover" alt=""/></div></td>
           <td style="padding:10px;vertical-align:middle;color:#0f172a;font-size:13px;line-height:1.45"><div style="font-weight:700">${name}</div>${(i.products?.short_description || i.short_description) ? `<div style="color:#6b7280;font-size:11px;margin-top:2px;line-height:1.4;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;max-height:2.8em">${esc(String(i.products?.short_description || i.short_description).replace(/<[^>]*>/g, ''))}</div>` : ''}</td>
           <td style="padding:10px;text-align:center;color:#1f2937;font-size:13px;vertical-align:middle;white-space:nowrap">${toBn(qty)} প্যাকেট</td>
           <td style="padding:10px;text-align:center;vertical-align:middle;white-space:nowrap"><div style="color:#0f172a;font-size:14px;font-weight:700;line-height:1.2">৳ ${toBn(displayUnit.toFixed(0))}</div></td>

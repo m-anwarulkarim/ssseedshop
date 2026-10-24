@@ -16,6 +16,7 @@ import { DevelopedByHaqPlus } from "@/components/DevelopedByHaqPlus";
 import LandingOrderForm from "@/components/lp/LandingOrderForm";
 import ProductBadges from "@/components/ProductBadges";
 import { trackInitiateCheckout, trackAddToCart, trackViewContent } from "@/components/TrackingScripts";
+import { resolveImageUrl, PLACEHOLDER_IMAGE } from "@/lib/imageFallback";
 
 
 export default function MintLeafLanding() {
@@ -55,7 +56,7 @@ export default function MintLeafLanding() {
       name: product.name,
       price: product.offer_price || product.regular_price,
       oldPrice: product.offer_price ? product.regular_price : null,
-      image: product.product_image || "/placeholder.svg",
+      image: resolveImageUrl(product.product_image),
       shortDescription: product.short_description,
       sku: product.sku,
       maxStock: product.available_stock,
@@ -345,7 +346,7 @@ export default function MintLeafLanding() {
       {/* Floating Checkout CTA - Cloned Home Order Style */}
       <section className="py-12 px-4 bg-emerald-900 text-white overflow-hidden relative">
         <div className="absolute top-0 left-0 w-full h-full opacity-5 pointer-events-none">
-          <img src="/placeholder.svg" className="w-full h-full object-cover" alt="" />
+          <img src={PLACEHOLDER_IMAGE} className="w-full h-full object-cover" alt="" />
         </div>
         <div className="max-w-2xl mx-auto text-center space-y-6 relative z-10">
           <h2 className="text-2xl md:text-4xl font-display font-black leading-tight">

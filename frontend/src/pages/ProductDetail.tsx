@@ -43,7 +43,7 @@ import SEOHead from "@/components/SEOHead";
 import { useProductViewTracker } from "@/hooks/useAnalyticsTracker";
 import ProductComments from "@/components/ProductComments";
 import ProductBadges from "@/components/ProductBadges";
-import { handleImageError, PLACEHOLDER_IMAGE } from "@/lib/imageFallback";
+import { handleImageError, PLACEHOLDER_IMAGE, resolveImageUrl } from "@/lib/imageFallback";
 import { dispatchOrderNotification } from "@/lib/orderNotifications";
 
 const VISITOR_ID_KEY = "visitor-id";
@@ -595,7 +595,13 @@ export default function ProductDetail() {
   };
 
   const scrollToOrderForm = () => {
-    const el = document.getElementById("order-form");
+    const el =
+      (typeof window !== "undefined" && window.innerWidth >= 1024
+        ? document.getElementById("order-form-desktop")
+        : document.getElementById("order-form-mobile")) ||
+      document.getElementById("order-form-desktop") ||
+      document.getElementById("order-form-mobile") ||
+      document.getElementById("order-form");
     if (el) {
       el.scrollIntoView({ behavior: "smooth", block: "start" });
       const firstInput = el.querySelector("input");
@@ -603,6 +609,671 @@ export default function ProductDetail() {
         setTimeout(() => firstInput.focus(), 350);
       }
     }
+  };
+
+  // --- Modular Sub-Renderers for Responsive PC & Mobile Composition ---
+  const renderBreadcrumb = () => (
+    <nav className="flex items-center gap-1.5 text-[11px] sm:text-xs text-muted-foreground mb-3 sm:mb-4 overflow-x-auto whitespace-nowrap">
+      <Link to="/" className="flex items-center gap-1 hover:text-primary transition-colors">
+        <HomeIcon className="w-3 h-3" /> হোম
+      </Link>
+      <ChevronRight className="w-3 h-3 shrink-0" />
+      {categoryInfo ? (
+        <>
+          <Link
+            to={`/category/${encodeURIComponent((categoryInfo as any).name || categoryName!)}`}
+            className="hover:text-primary transition-colors"
+          >
+            {(categoryInfo as any).display_name || (categoryInfo as any).name}
+          </Link>
+          <ChevronRight className="w-3 h-3 shrink-0" />
+        </>
+      ) : categoryName ? (
+        <>
+          <Link to={`/category/${categoryName}`} className="hover:text-primary transition-colors">
+            {categoryName}
+          </Link>
+          <ChevronRight className="w-3 h-3 shrink-0" />
+        </>
+      ) : null}
+      <span className="text-foreground font-semibold truncate">{product?.name}</span>
+    </nav>
+  );
+
+  const renderTitleAndBadges = (isDesktop = false) => (
+    <div className="space-y-2.5">
+      <div className="space-y-1.5">
+        <h1 className={`${isDesktop ? "text-2xl xl:text-3xl" : "text-xl sm:text-2xl"} font-extrabold text-zinc-900 dark:text-zinc-100 leading-tight tracking-tight`}>
+          {product?.name}
+        </h1>
+        <div className="flex items-center gap-2 flex-wrap">
+          <ProductBadges tagNames={(product as any)?.tags} size="md" />
+          {isOutOfStock ? (
+            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-rose-100 dark:bg-rose-950/60 text-rose-700 dark:text-rose-300 text-xs font-bold">
+              স্টক শেষ
+            </span>
+          ) : (
+            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 text-xs font-bold">
+              ✓ স্টকে আছে
+            </span>
+          )}
+        </div>
+      </div>
+
+      {highlightFeatures && (
+        <div className="p-3 rounded-xl bg-gradient-to-r from-amber-500/10 via-amber-500/5 to-emerald-500/10 border border-amber-500/25 text-amber-950 dark:text-amber-200 text-xs sm:text-[13px] font-semibold leading-relaxed shadow-xs flex items-start gap-2">
+          <Sparkles className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+          <span>{highlightFeatures}</span>
+        </div>
+      )}
+    </div>
+  );
+
+  const renderGallery = () => (
+    <div className="space-y-3">
+      <div className="relative rounded-2xl overflow-hidden border border-border bg-white shadow-sm">
+        <div className="relative aspect-square max-h-[480px] lg:max-h-[520px] w-full bg-white" ref={emblaRef}>
+          <div className="flex h-full">
+            {allImages.map((img, i) => (
+              <div key={i} className="flex-[0_0_100%] min-w-0 h-full aspect-square bg-white flex items-center justify-center p-2">
+                <img
+                  src={resolveImageUrl(img)}
+                  alt={product?.name || ""}
+                  className="w-full h-full object-contain"
+                  loading={i === 0 ? "eager" : "lazy"}
+                  onError={handleImageError}
+                />
+              </div>
+            ))}
+          </div>
+
+          {/* Floating Discount Badge */}
+          {discountPercent > 0 && (
+            <div className="absolute top-3 left-3 z-10">
+              <span className="px-2.5 py-1 rounded-full bg-rose-600 text-white font-extrabold text-xs shadow-md tracking-wider">
+                −{discountPercent}%
+              </span>
+            </div>
+          )}
+
+          {/* Verified Brand Badge */}
+          <div className="absolute top-3 right-3 z-10">
+            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-emerald-950/80 backdrop-blur-xs text-emerald-200 font-bold text-[10px] shadow-md tracking-wide">
+              <ShieldCheck className="w-3 h-3 text-emerald-400" />
+              SS SEED SHOP
+            </span>
+          </div>
+
+          {/* Carousel Arrows */}
+          {allImages.length > 1 && (
+            <>
+              <button
+                type="button"
+                onClick={() => emblaApi?.scrollPrev()}
+                aria-label="Previous"
+                className="absolute left-2.5 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-white/90 border border-border shadow-md flex items-center justify-center hover:bg-white text-zinc-800 transition-transform active:scale-95"
+              >
+                <ChevronLeft className="w-4 h-4" />
+              </button>
+              <button
+                type="button"
+                onClick={() => emblaApi?.scrollNext()}
+                aria-label="Next"
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-white/90 border border-border shadow-md flex items-center justify-center hover:bg-white text-zinc-800 transition-transform active:scale-95"
+              >
+                <ChevronRight className="w-4 h-4" />
+              </button>
+              <div className="absolute bottom-2.5 inset-x-0 flex justify-center gap-1.5 z-10">
+                {allImages.map((_, i) => (
+                  <button
+                    key={i}
+                    type="button"
+                    onClick={() => emblaApi?.scrollTo(i)}
+                    className={`h-1.5 rounded-full transition-all ${
+                      activeSlide === i ? "w-6 bg-primary" : "w-1.5 bg-zinc-300"
+                    }`}
+                  />
+                ))}
+              </div>
+            </>
+          )}
+        </div>
+      </div>
+
+      {/* Thumbnails row (Both Desktop & Mobile) */}
+      {allImages.length > 1 && (
+        <div className="flex items-center gap-2 overflow-x-auto pb-1">
+          {allImages.map((img, i) => (
+            <button
+              key={i}
+              type="button"
+              onClick={() => emblaApi?.scrollTo(i)}
+              className={`relative w-16 h-16 sm:w-20 sm:h-20 rounded-xl overflow-hidden border-2 transition-all shrink-0 bg-white cursor-pointer ${
+                activeSlide === i
+                  ? "border-primary ring-2 ring-primary/20 scale-102 shadow-sm"
+                  : "border-border hover:border-zinc-400 opacity-75 hover:opacity-100"
+              }`}
+            >
+              <img
+                src={resolveImageUrl(img)}
+                alt=""
+                className="w-full h-full object-contain p-1"
+                onError={handleImageError}
+              />
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+
+  const renderVariations = () => {
+    if (variations.length === 0) return null;
+    return (
+      <div className="p-3 rounded-xl border border-border bg-card space-y-1.5 shadow-xs">
+        <p className="text-xs font-bold text-muted-foreground">ভ্যারিয়েন্ট নির্বাচন করুন:</p>
+        <div className="flex flex-wrap gap-1.5">
+          <button
+            type="button"
+            onClick={() => setSelectedVariation(null)}
+            className={`text-xs px-3 py-1.5 rounded-lg border font-semibold transition-all ${
+              !selectedVariation
+                ? "border-primary bg-primary/10 text-primary font-bold shadow-xs"
+                : "border-border hover:border-primary/50 text-foreground"
+            }`}
+          >
+            {product?.name}
+          </button>
+          {variations.map((v) => (
+            <button
+              key={v.id || v.name}
+              type="button"
+              onClick={() => setSelectedVariation(v)}
+              className={`text-xs px-3 py-1.5 rounded-lg border font-semibold transition-all ${
+                selectedVariation?.id === v.id
+                  ? "border-primary bg-primary/10 text-primary font-bold shadow-xs"
+                  : "border-border hover:border-primary/50 text-foreground"
+              }`}
+            >
+              {v.name}
+            </button>
+          ))}
+        </div>
+      </div>
+    );
+  };
+
+  const renderPackageSelector = () => (
+    <div className="relative rounded-2xl p-3 sm:p-3.5 bg-white dark:bg-card border border-zinc-200 dark:border-zinc-800 shadow-[0_10px_30px_-15px_rgba(0,0,0,0.1)]">
+      <div className="flex items-center justify-between mb-3 px-1">
+        <div className="flex items-center gap-2">
+          <span
+            className="inline-block w-1 h-5 rounded-full"
+            style={{ background: "linear-gradient(rgb(251, 191, 36), rgb(180, 83, 9))" }}
+          />
+          <h3 className="text-base font-extrabold text-zinc-900 dark:text-zinc-100 tracking-tight">
+            প্যাকেজ সিলেক্ট করুন
+          </h3>
+        </div>
+        <span className="text-[11px] font-semibold text-zinc-500 bg-zinc-100 dark:bg-zinc-800 px-2 py-0.5 rounded-full">
+          ১টি বেছে নিন
+        </span>
+      </div>
+
+      {/* 3-Card Grid */}
+      <div className="grid grid-cols-3 gap-2 sm:gap-2.5">
+        {packageTiers.map((tier) => {
+          const isSelected = activeTier?.id === tier.id;
+          return (
+            <button
+              key={tier.id}
+              type="button"
+              onClick={() => setSelectedTierId(tier.id)}
+              className={`relative rounded-xl bg-white dark:bg-zinc-900 text-left transition-all active:scale-[0.98] overflow-hidden flex flex-col justify-between cursor-pointer ${
+                isSelected
+                  ? "ring-2 ring-rose-500 shadow-[0_8px_20px_-8px_rgba(244,63,94,0.4)] -translate-y-0.5"
+                  : "ring-1 ring-zinc-200 dark:ring-zinc-800 hover:ring-rose-300 shadow-xs"
+              }`}
+            >
+              {isSelected && (
+                <div className="absolute top-1.5 right-1.5 w-5 h-5 rounded-full bg-emerald-500 flex items-center justify-center shadow z-10 ring-2 ring-white">
+                  <Check className="w-3 h-3 text-white stroke-[3.5]" />
+                </div>
+              )}
+
+              {tier.badge && (
+                <span className="absolute -top-px left-0 bg-gradient-to-r from-amber-500 to-rose-500 text-white text-[9px] font-extrabold px-1.5 py-0.5 rounded-br-md shadow-xs z-10">
+                  {tier.badge}
+                </span>
+              )}
+
+              <div className={`p-2 sm:p-2.5 text-center border-b border-zinc-100 dark:border-zinc-800 ${isSelected ? "bg-rose-50/50 dark:bg-rose-950/20" : "bg-zinc-50/50 dark:bg-zinc-900/50"}`}>
+                <div className="text-[13px] sm:text-sm font-extrabold text-zinc-900 dark:text-zinc-100 leading-tight">
+                  {tier.name}
+                </div>
+                <div className="flex items-baseline justify-center gap-1 mt-1">
+                  {tier.regular_price > tier.offer_price && (
+                    <span className="text-[11px] text-zinc-400 line-through">
+                      ৳{tier.regular_price}
+                    </span>
+                  )}
+                  <span className="text-sm sm:text-base font-extrabold text-rose-600 dark:text-rose-400">
+                    ৳{tier.offer_price}
+                  </span>
+                </div>
+              </div>
+
+              <div className="p-1.5 sm:p-2 text-center bg-white dark:bg-zinc-900">
+                <div className="text-[10px] text-zinc-500 font-medium">ডেলিভারি চার্জ</div>
+                <div className="mt-0.5">
+                  {tier.is_free_delivery || Number(tier.delivery_charge) === 0 ? (
+                    <span className="inline-block text-[11px] font-extrabold text-emerald-600 bg-emerald-50 dark:bg-emerald-950/40 dark:text-emerald-400 px-1.5 py-0.2 rounded">
+                      ফ্রি
+                    </span>
+                  ) : (
+                    <span className="text-[11px] font-bold text-zinc-700 dark:text-zinc-300">
+                      ৳{tier.delivery_charge}
+                    </span>
+                  )}
+                </div>
+              </div>
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+
+  const renderTrustCards = (isDesktop = false) => (
+    <div className={isDesktop ? "grid grid-cols-1 sm:grid-cols-2 gap-3.5" : "space-y-3"}>
+      {/* Trust Card 1: Emerald Theme */}
+      <div className="relative rounded-2xl overflow-hidden bg-gradient-to-br from-emerald-50 via-white to-emerald-50/60 dark:from-emerald-950/30 dark:via-zinc-900 dark:to-emerald-950/20 border border-emerald-200/80 dark:border-emerald-800/40 p-3.5 sm:p-4 shadow-xs">
+        <div className="flex items-start gap-3">
+          <div className="w-9 h-9 rounded-xl bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 flex items-center justify-center shrink-0">
+            <PhoneCall className="w-5 h-5" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <h4 className="text-[14px] font-extrabold text-emerald-950 dark:text-emerald-200 mb-1 leading-tight">
+              {trustCard1Title}
+            </h4>
+            <p className="text-xs text-emerald-900/85 dark:text-emerald-300/85 leading-relaxed">
+              {trustCard1Text}
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* Trust Card 2: Amber/Rose Theme */}
+      <div className="relative rounded-2xl overflow-hidden bg-gradient-to-br from-amber-50 via-white to-rose-50/50 dark:from-amber-950/30 dark:via-zinc-900 dark:to-rose-950/20 border border-amber-200/80 dark:border-amber-800/40 p-3.5 sm:p-4 shadow-xs">
+        <div className="flex items-start gap-3">
+          <div className="w-9 h-9 rounded-xl bg-amber-500/15 text-amber-700 dark:text-amber-400 flex items-center justify-center shrink-0">
+            <Star className="w-5 h-5 fill-amber-500 text-amber-500" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <h4 className="text-[14px] font-extrabold text-amber-950 dark:text-amber-200 mb-1 leading-tight">
+              {trustCard2Title}
+            </h4>
+            <p className="text-xs text-amber-900/85 dark:text-amber-300/85 leading-relaxed">
+              {trustCard2Text}
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
+  const renderOrderForm = (formId: string) => (
+    <div
+      id={formId}
+      className="rounded-2xl border-2 border-emerald-600/35 bg-card shadow-lg overflow-hidden scroll-mt-4"
+    >
+      {/* Header */}
+      <div className="bg-gradient-to-r from-emerald-800 via-emerald-700 to-teal-800 text-white p-4">
+        <div className="flex items-center justify-between flex-wrap gap-2 mb-3">
+          <div className="flex items-center gap-2.5">
+            <div className="w-9 h-9 rounded-xl bg-white/20 flex items-center justify-center">
+              <ShoppingCart className="w-5 h-5 text-white" />
+            </div>
+            <div>
+              <h2 className="text-base sm:text-lg font-extrabold leading-tight">দ্রুত অর্ডার ফর্ম</h2>
+              <p className="text-[11px] text-emerald-100/90">৩০ সেকেন্ডে সম্পন্ন · ক্যাশ অন ডেলিভারি</p>
+            </div>
+          </div>
+          <span className="text-[11px] font-bold bg-white/20 backdrop-blur-xs px-2.5 py-1 rounded-full text-white">
+            ক্যাশ অন ডেলিভারি
+          </span>
+        </div>
+
+        {/* Stepper Header: 1 নাম | 2 ফোন | 3 ঠিকানা */}
+        <div className="grid grid-cols-3 gap-2 pt-2.5 border-t border-white/20 text-xs font-bold">
+          <div className="flex items-center gap-1.5 text-white">
+            <span className="w-4 h-4 rounded-full bg-white text-emerald-800 flex items-center justify-center text-[10px] font-extrabold">
+              1
+            </span>
+            <span>নাম</span>
+          </div>
+          <div className="flex items-center gap-1.5 text-white">
+            <span className="w-4 h-4 rounded-full bg-white text-emerald-800 flex items-center justify-center text-[10px] font-extrabold">
+              2
+            </span>
+            <span>ফোন</span>
+          </div>
+          <div className="flex items-center gap-1.5 text-white">
+            <span className="w-4 h-4 rounded-full bg-white text-emerald-800 flex items-center justify-center text-[10px] font-extrabold">
+              3
+            </span>
+            <span>ঠিকানা</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Form Inputs */}
+      <form onSubmit={handleDirectOrder} className="p-4 sm:p-5 space-y-4">
+        {/* Name */}
+        <div className="space-y-1.5">
+          <Label className="text-xs font-bold text-foreground flex items-center gap-1.5">
+            <User className="w-3.5 h-3.5 text-primary" />
+            আপনার নাম <span className="text-rose-500">*</span>
+          </Label>
+          <Input
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            placeholder="আপনার সম্পূর্ণ নাম লিখুন"
+            required
+            className="h-11 text-sm bg-muted/20 border-border focus:border-primary"
+          />
+        </div>
+
+        {/* Mobile with +88 */}
+        <div className="space-y-1.5">
+          <Label className="text-xs font-bold text-foreground flex items-center gap-1.5">
+            <Phone className="w-3.5 h-3.5 text-primary" />
+            মোবাইল নম্বর <span className="text-rose-500">*</span>
+          </Label>
+          <div className="flex items-center rounded-md border border-border bg-muted/20 overflow-hidden focus-within:ring-2 focus-within:ring-primary focus-within:border-primary">
+            <span className="px-3 py-2.5 bg-muted text-xs font-bold text-muted-foreground border-r border-border select-none">
+              +88
+            </span>
+            <input
+              type="tel"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value.replace(/[^0-9]/g, ""))}
+              onBlur={() => {
+                if (phone.length >= 11) {
+                  saveIncompleteOrder("অর্ডার ফর্মে ফোন নম্বর পূরণ করে রেখে দিয়েছেন");
+                }
+              }}
+              placeholder="01XXXXXXXXX"
+              required
+              maxLength={11}
+              className="flex-1 h-11 px-3 text-sm bg-transparent outline-none font-semibold text-foreground placeholder:text-muted-foreground/60"
+            />
+          </div>
+        </div>
+
+        {/* Address */}
+        <div className="space-y-1.5">
+          <Label className="text-xs font-bold text-foreground flex items-center gap-1.5">
+            <MapPin className="w-3.5 h-3.5 text-primary" />
+            ডেলিভারি ঠিকানা <span className="text-rose-500">*</span>
+          </Label>
+          <Textarea
+            value={address}
+            onChange={(e) => setAddress(e.target.value)}
+            placeholder="গ্রাম/রোড, এলাকা/ইউনিয়ন, থানা ও জেলার নাম লিখুন"
+            required
+            rows={2}
+            className="text-sm bg-muted/20 border-border focus:border-primary resize-none"
+          />
+          <p className="text-[11px] text-muted-foreground leading-normal">
+            সঠিক তথ্য দিন। অর্ডার কনফার্ম করতে আমাদের প্রতিনিধি আপনাকে কল করবেন।
+          </p>
+        </div>
+
+        {/* Optional Note */}
+        <div>
+          {!showNote ? (
+            <button
+              type="button"
+              onClick={() => setShowNote(true)}
+              className="text-xs text-primary font-semibold hover:underline flex items-center gap-1 cursor-pointer"
+            >
+              <StickyNote className="w-3 h-3" /> কোনো বিশেষ নির্দেশনা থাকলে লিখুন (ঐচ্ছিক)
+            </button>
+          ) : (
+            <div className="space-y-1 mt-2">
+              <Label className="text-xs font-semibold text-muted-foreground">বিশেষ নির্দেশনা:</Label>
+              <Input
+                value={note}
+                onChange={(e) => setNote(e.target.value)}
+                placeholder="যেমন: বিকেলে ডেলিভারি দিলে ভালো হয়"
+                className="h-9 text-xs bg-muted/20"
+              />
+            </div>
+          )}
+        </div>
+
+        {/* Live Order Summary Breakdown */}
+        <div className="p-3.5 rounded-xl bg-muted/40 border border-border space-y-2 text-xs">
+          <div className="flex items-center justify-between text-muted-foreground">
+            <span>নির্বাচিত প্যাকেজ:</span>
+            <span className="font-bold text-foreground">{product?.name} ({activeTier?.name})</span>
+          </div>
+          <div className="flex items-center justify-between text-muted-foreground">
+            <span>মূল্য ({activeTier?.name}):</span>
+            <span className="font-bold text-foreground">৳{activeTierPrice}</span>
+          </div>
+          <div className="flex items-center justify-between text-muted-foreground">
+            <span>ডেলিভারি চার্জ:</span>
+            {activeTierDelivery === 0 ? (
+              <span className="font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded">ফ্রি</span>
+            ) : (
+              <span className="font-bold text-foreground">৳{activeTierDelivery}</span>
+            )}
+          </div>
+          <div className="pt-2 border-t border-border flex items-center justify-between text-sm sm:text-base font-extrabold text-foreground">
+            <span>সর্বমোট:</span>
+            <span className="text-lg font-extrabold text-amber-700 dark:text-amber-400">৳{activeGrandTotal}</span>
+          </div>
+        </div>
+
+        {/* Shimmer Glowing Confirm CTA Button */}
+        <button
+          type="submit"
+          disabled={loading || isOutOfStock}
+          className="relative w-full h-12 rounded-xl text-zinc-950 font-extrabold text-base tracking-wide flex items-center justify-center gap-2 overflow-hidden shadow-lg shadow-amber-500/25 active:scale-[0.99] transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+          style={{
+            background: "linear-gradient(to right, rgb(251, 191, 36), rgb(245, 158, 11))",
+          }}
+        >
+          <span className="pointer-events-none absolute inset-y-0 -left-1/3 w-1/3 bg-gradient-to-r from-transparent via-white/70 to-transparent animate-shimmer-sweep" />
+          <span className="relative z-10 flex items-center gap-2">
+            {loading ? (
+              <>
+                <Loader2 className="w-5 h-5 animate-spin" />
+                <span>অর্ডার প্রসেস হচ্ছে...</span>
+              </>
+            ) : (
+              <>
+                <Zap className="w-5 h-5 fill-current" />
+                <span>অর্ডার কনফার্ম করুন — ৳{activeGrandTotal}</span>
+              </>
+            )}
+          </span>
+        </button>
+
+        {/* Direct Call to Order Button */}
+        <div className="text-center pt-1 border-t border-border/60">
+          <a
+            href={`tel:${SUPPORT_PHONE}`}
+            className="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-700 dark:text-emerald-400 hover:underline"
+          >
+            <PhoneCall className="w-3.5 h-3.5" />
+            সরাসরি কল করে অর্ডার করুন: {SUPPORT_PHONE}
+          </a>
+        </div>
+
+        {/* Security Reassurance */}
+        <div className="text-center">
+          <p className="text-xs font-semibold text-emerald-800 dark:text-emerald-300 flex items-center justify-center gap-1.5">
+            <span>🔒</span> পণ্য হাতে পেয়ে টাকা পরিশোধ করুন • ক্যাশ অন ডেলিভারি
+          </p>
+        </div>
+      </form>
+    </div>
+  );
+
+  const renderDescriptionTabs = () => (
+    <div id="product-tabs" className="bg-card rounded-2xl border border-border shadow-sm overflow-hidden">
+      <div className="flex border-b border-border overflow-x-auto">
+        {[
+          { id: "description" as const, label: "বিস্তারিত বিবরণ" },
+          { id: "policy" as const, label: "অর্ডার পলিসি" },
+          { id: "reviews" as const, label: `রিভিউ (${reviewsCount})` },
+        ].map((tab) => (
+          <button
+            key={tab.id}
+            type="button"
+            onClick={() => setActiveTab(tab.id)}
+            className={`flex-1 min-w-[110px] px-4 py-3 text-xs sm:text-sm font-semibold whitespace-nowrap transition-colors border-b-2 cursor-pointer ${
+              activeTab === tab.id
+                ? "border-primary text-primary bg-primary/5 font-bold"
+                : "border-transparent text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            {tab.label}
+          </button>
+        ))}
+      </div>
+
+      <div className="p-4 sm:p-6">
+        {activeTab === "description" && (
+          <div className="space-y-4">
+            {product?.short_description && (
+              <p className="text-sm sm:text-base text-foreground/90 leading-relaxed font-medium">
+                {product.short_description}
+              </p>
+            )}
+            {product?.full_description ? (
+              /<[a-z][\s\S]*>/i.test(product.full_description) ? (
+                <div
+                  className="rte-content text-[13.5px] sm:text-sm text-foreground/80 leading-relaxed space-y-3"
+                  dangerouslySetInnerHTML={{
+                    __html:
+                      typeof DOMPurify !== "undefined" && DOMPurify && typeof (DOMPurify as any).sanitize === "function"
+                        ? (DOMPurify as any).sanitize(product.full_description)
+                        : product.full_description,
+                  }}
+                />
+              ) : (
+                typeof product.full_description === "string" &&
+                product.full_description
+                  .split("\n")
+                  .filter((p: string) => p.trim())
+                  .map((para: string, idx: number) => (
+                    <p key={idx} className="text-[13.5px] sm:text-sm text-foreground/80 leading-relaxed">
+                      {para}
+                    </p>
+                  ))
+              )
+            ) : !product?.short_description ? (
+              <p className="text-sm text-muted-foreground italic">কোনো বিবরণ পাওয়া যায়নি।</p>
+            ) : null}
+          </div>
+        )}
+
+        {activeTab === "policy" && (
+          <div className="space-y-2.5 text-sm text-foreground/85 leading-relaxed">
+            <p>✓ সারাদেশে দ্রুত হোম ডেলিভারি সুবিধা।</p>
+            <p>✓ ক্যাশ অন ডেলিভারি (পণ্য হাতে পেয়ে মূল্য পরিশোধ)।</p>
+            <p>✓ অর্ডার কনফার্ম করার ২৪-৪৮ ঘণ্টার মধ্যে পার্সেল পাঠানো হয়।</p>
+            <p>✓ পণ্য বুঝে পেয়ে ডেলিভারিম্যানের সামনে চেক করে নিন।</p>
+            <p>
+              ✓ যেকোনো জিজ্ঞাসায় সরাসরি কল করুন:{" "}
+              <a href={`tel:${SUPPORT_PHONE}`} className="text-primary font-bold hover:underline">
+                {SUPPORT_PHONE}
+              </a>
+            </p>
+          </div>
+        )}
+
+        {activeTab === "reviews" && product?.id && <ProductComments productId={product.id} />}
+      </div>
+    </div>
+  );
+
+  const renderRelatedProducts = () => {
+    if (relatedProducts.length === 0) return null;
+    return (
+      <div className="bg-card rounded-2xl border border-border shadow-sm p-4 sm:p-6">
+        <h2 className="text-lg sm:text-xl font-bold text-foreground mb-4">সম্পর্কিত বীজ ও পণ্য</h2>
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-5 gap-3.5">
+          {relatedProducts.slice(0, 10).map((rp: any) => {
+            const rPrice = rp.offer_price ?? rp.regular_price;
+            const rOld = rp.offer_price ? rp.regular_price : null;
+            const rAvail =
+              typeof rp.available_stock === "number" && rp.available_stock > 0
+                ? rp.available_stock
+                : typeof rp.stock === "number" && rp.stock > 0
+                ? rp.stock
+                : rp.available_stock ?? rp.stock ?? null;
+            const rOut = rp.in_stock === false || (rAvail !== null && rAvail <= 0);
+
+            const cardInner = (
+              <>
+                <div className="aspect-square bg-muted overflow-hidden relative">
+                  <img
+                    src={resolveImageUrl(rp.product_image)}
+                    alt={rp.name}
+                    className={`w-full h-full object-cover transition-transform ${
+                      rOut ? "grayscale opacity-60" : "group-hover:scale-105"
+                    }`}
+                    onError={handleImageError}
+                  />
+                  {rOut && (
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <span className="px-2 py-1 rounded-md bg-destructive/90 text-destructive-foreground text-[10px] font-bold">
+                        স্টক নেই
+                      </span>
+                    </div>
+                  )}
+                </div>
+                <div className="p-2.5 space-y-1">
+                  <h3 className={`text-xs sm:text-[13px] font-semibold line-clamp-2 leading-snug min-h-[2.2rem] ${rOut ? "text-muted-foreground" : "text-foreground"}`}>
+                    {rp.name}
+                  </h3>
+                  <div className="flex items-baseline gap-1.5">
+                    <span className={`text-sm sm:text-base font-bold ${rOut ? "text-muted-foreground line-through" : "text-primary"}`}>
+                      ৳{rPrice}
+                    </span>
+                    {rOld && !rOut && (
+                      <span className="text-[11px] text-muted-foreground line-through">৳{rOld}</span>
+                    )}
+                  </div>
+                </div>
+              </>
+            );
+
+            if (rOut) {
+              return (
+                <div key={rp.id} aria-disabled className="group block rounded-xl border border-border bg-muted/40 overflow-hidden cursor-not-allowed opacity-70">
+                  {cardInner}
+                </div>
+              );
+            }
+            return (
+              <Link
+                key={rp.id}
+                to={`/product/${rp.slug || rp.id}`}
+                className="group block rounded-xl border border-border bg-card overflow-hidden hover:border-primary/50 hover:shadow-md transition-all"
+              >
+                {cardInner}
+              </Link>
+            );
+          })}
+        </div>
+      </div>
+    );
   };
 
   if (isLoading) {
@@ -650,7 +1321,7 @@ export default function ProductDetail() {
   };
 
   return (
-    <div className="min-h-screen bg-background flex flex-col pb-20 md:pb-8">
+    <div className="min-h-screen bg-background flex flex-col pb-20 lg:pb-8">
       <SEOHead
         title={product.name || "পণ্য"}
         description={product.short_description || `${product.name} — মূল্য ৳${activeTierPrice}`}
@@ -662,627 +1333,49 @@ export default function ProductDetail() {
       <SideCart />
 
       <main className="flex-1 bg-muted/20">
-        <div className="max-w-2xl mx-auto px-3.5 sm:px-4 py-3 sm:py-5">
+        <div className="max-w-7xl mx-auto px-3.5 sm:px-6 lg:px-8 py-3 sm:py-6">
+          {renderBreadcrumb()}
 
-          {/* Breadcrumb */}
-          <nav className="flex items-center gap-1.5 text-[11px] sm:text-xs text-muted-foreground mb-3 overflow-x-auto whitespace-nowrap">
-            <Link to="/" className="flex items-center gap-1 hover:text-primary transition-colors">
-              <HomeIcon className="w-3 h-3" /> হোম
-            </Link>
-            <ChevronRight className="w-3 h-3 shrink-0" />
-            {categoryInfo ? (
-              <>
-                <Link
-                  to={`/category/${encodeURIComponent((categoryInfo as any).name || categoryName!)}`}
-                  className="hover:text-primary transition-colors"
-                >
-                  {(categoryInfo as any).display_name || (categoryInfo as any).name}
-                </Link>
-                <ChevronRight className="w-3 h-3 shrink-0" />
-              </>
-            ) : categoryName ? (
-              <>
-                <Link to={`/category/${categoryName}`} className="hover:text-primary transition-colors">
-                  {categoryName}
-                </Link>
-                <ChevronRight className="w-3 h-3 shrink-0" />
-              </>
-            ) : null}
-            <span className="text-foreground font-semibold truncate">{product.name}</span>
-          </nav>
+          {/* Desktop Responsive Layout (>= 1024px) */}
+          <div className="hidden lg:grid lg:grid-cols-12 lg:gap-8 items-start">
+            {/* Left Column (7 cols): Gallery, Thumbnails, Trust Cards, Description Tabs */}
+            <div className="lg:col-span-7 space-y-6">
+              {renderGallery()}
+              {renderTrustCards(true)}
+              {renderDescriptionTabs()}
+            </div>
 
-          {/* Product Title */}
-          <div className="mb-2.5">
-            <h1 className="text-xl sm:text-2xl md:text-3xl font-extrabold text-zinc-900 dark:text-zinc-100 leading-tight tracking-tight">
-              {product.name}
-            </h1>
-            <div className="mt-1.5">
-              <ProductBadges tagNames={(product as any).tags} size="md" />
+            {/* Right Column (5 cols, sticky): Title, Badges, Variations, Package Tiers, Fast Order Form */}
+            <div className="lg:col-span-5 space-y-5 lg:sticky lg:top-24">
+              {renderTitleAndBadges(true)}
+              {renderVariations()}
+              {renderPackageSelector()}
+              {renderOrderForm("order-form-desktop")}
             </div>
           </div>
 
-          {/* Highlight Subtitle / Bullet Features Bar */}
-          {highlightFeatures && (
-            <div className="mb-3.5 p-3 rounded-xl bg-gradient-to-r from-amber-500/10 via-amber-500/5 to-emerald-500/10 border border-amber-500/25 text-amber-950 dark:text-amber-200 text-xs sm:text-[13px] font-semibold leading-relaxed shadow-xs flex items-start gap-2">
-              <Sparkles className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
-              <span>{highlightFeatures}</span>
-            </div>
-          )}
-
-          {/* Product Image Gallery with Floating Discount Badge */}
-          <div className="relative rounded-2xl overflow-hidden border border-border bg-white shadow-sm mb-4">
-            <div className="relative aspect-square max-h-[480px] w-full bg-white" ref={emblaRef}>
-              <div className="flex h-full">
-                {allImages.map((img, i) => (
-                  <div key={i} className="flex-[0_0_100%] min-w-0 h-full aspect-square bg-white flex items-center justify-center p-2">
-                    <img
-                      src={img || PLACEHOLDER_IMAGE}
-                      alt={product.name || ""}
-                      className="w-full h-full object-contain"
-                      loading={i === 0 ? "eager" : "lazy"}
-                      onError={handleImageError}
-                    />
-                  </div>
-                ))}
-              </div>
-
-              {/* Floating Discount Badge */}
-              {discountPercent > 0 && (
-                <div className="absolute top-3 left-3 z-10">
-                  <span className="px-2.5 py-1 rounded-full bg-rose-600 text-white font-extrabold text-xs shadow-md tracking-wider">
-                    −{discountPercent}%
-                  </span>
-                </div>
-              )}
-
-              {/* Verified Brand Badge */}
-              <div className="absolute top-3 right-3 z-10">
-                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-emerald-950/80 backdrop-blur-xs text-emerald-200 font-bold text-[10px] shadow-md tracking-wide">
-                  <ShieldCheck className="w-3 h-3 text-emerald-400" />
-                  SS SEED SHOP
-                </span>
-              </div>
-
-              {/* Carousel Arrows */}
-              {allImages.length > 1 && (
-                <>
-                  <button
-                    type="button"
-                    onClick={() => emblaApi?.scrollPrev()}
-                    aria-label="Previous"
-                    className="absolute left-2.5 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-white/90 border border-border shadow-md flex items-center justify-center hover:bg-white text-zinc-800 transition-transform active:scale-95"
-                  >
-                    <ChevronLeft className="w-4 h-4" />
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => emblaApi?.scrollNext()}
-                    aria-label="Next"
-                    className="absolute right-2.5 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-white/90 border border-border shadow-md flex items-center justify-center hover:bg-white text-zinc-800 transition-transform active:scale-95"
-                  >
-                    <ChevronRight className="w-4 h-4" />
-                  </button>
-                  <div className="absolute bottom-2.5 inset-x-0 flex justify-center gap-1.5 z-10">
-                    {allImages.map((_, i) => (
-                      <button
-                        key={i}
-                        type="button"
-                        onClick={() => emblaApi?.scrollTo(i)}
-                        className={`h-1.5 rounded-full transition-all ${
-                          activeSlide === i ? "w-6 bg-primary" : "w-1.5 bg-zinc-300"
-                        }`}
-                      />
-                    ))}
-                  </div>
-                </>
-              )}
-            </div>
+          {/* Mobile Responsive Layout (< 1024px) */}
+          <div className="lg:hidden space-y-4">
+            {renderTitleAndBadges(false)}
+            {renderGallery()}
+            {renderVariations()}
+            {renderPackageSelector()}
+            {renderTrustCards(false)}
+            {renderOrderForm("order-form-mobile")}
+            {renderDescriptionTabs()}
           </div>
 
-          {/* Variations (if any) */}
-          {variations.length > 0 && (
-            <div className="p-3 rounded-xl border border-border bg-card mb-4 space-y-1.5 shadow-xs">
-              <p className="text-xs font-bold text-muted-foreground">ভ্যারিয়েন্ট নির্বাচন করুন:</p>
-              <div className="flex flex-wrap gap-1.5">
-                <button
-                  type="button"
-                  onClick={() => setSelectedVariation(null)}
-                  className={`text-xs px-3 py-1.5 rounded-lg border font-semibold transition-all ${
-                    !selectedVariation
-                      ? "border-primary bg-primary/10 text-primary font-bold shadow-xs"
-                      : "border-border hover:border-primary/50 text-foreground"
-                  }`}
-                >
-                  {product.name}
-                </button>
-                {variations.map((v) => (
-                  <button
-                    key={v.id || v.name}
-                    type="button"
-                    onClick={() => setSelectedVariation(v)}
-                    className={`text-xs px-3 py-1.5 rounded-lg border font-semibold transition-all ${
-                      selectedVariation?.id === v.id
-                        ? "border-primary bg-primary/10 text-primary font-bold shadow-xs"
-                        : "border-border hover:border-primary/50 text-foreground"
-                    }`}
-                  >
-                    {v.name}
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Interactive Package / Bundle Selector */}
-          <div className="mb-4 relative rounded-2xl p-3 sm:p-3.5 bg-white dark:bg-card border border-zinc-200 dark:border-zinc-800 shadow-[0_10px_30px_-15px_rgba(0,0,0,0.1)]">
-            <div className="flex items-center justify-between mb-3 px-1">
-              <div className="flex items-center gap-2">
-                <span
-                  className="inline-block w-1 h-5 rounded-full"
-                  style={{ background: "linear-gradient(rgb(251, 191, 36), rgb(180, 83, 9))" }}
-                />
-                <h3 className="text-base font-extrabold text-zinc-900 dark:text-zinc-100 tracking-tight">
-                  প্যাকেজ সিলেক্ট করুন
-                </h3>
-              </div>
-              <span className="text-[11px] font-semibold text-zinc-500 bg-zinc-100 dark:bg-zinc-800 px-2 py-0.5 rounded-full">
-                ১টি বেছে নিন
-              </span>
-            </div>
-
-            {/* 3-Card Grid */}
-            <div className="grid grid-cols-3 gap-2 sm:gap-2.5">
-              {packageTiers.map((tier) => {
-                const isSelected = activeTier?.id === tier.id;
-                return (
-                  <button
-                    key={tier.id}
-                    type="button"
-                    onClick={() => {
-                      setSelectedTierId(tier.id);
-                      // On mobile, keep it visible or scroll smoothly if needed
-                    }}
-                    className={`relative rounded-xl bg-white dark:bg-zinc-900 text-left transition-all active:scale-[0.98] overflow-hidden flex flex-col justify-between ${
-                      isSelected
-                        ? "ring-2 ring-rose-500 shadow-[0_8px_20px_-8px_rgba(244,63,94,0.4)] -translate-y-0.5"
-                        : "ring-1 ring-zinc-200 dark:ring-zinc-800 hover:ring-rose-300 shadow-xs"
-                    }`}
-                  >
-                    {/* Active Checkmark Pill */}
-                    {isSelected && (
-                      <div className="absolute top-1.5 right-1.5 w-5 h-5 rounded-full bg-emerald-500 flex items-center justify-center shadow z-10 ring-2 ring-white">
-                        <Check className="w-3 h-3 text-white stroke-[3.5]" />
-                      </div>
-                    )}
-
-                    {/* Optional Badge */}
-                    {tier.badge && (
-                      <span className="absolute -top-px left-0 bg-gradient-to-r from-amber-500 to-rose-500 text-white text-[9px] font-extrabold px-1.5 py-0.5 rounded-br-md shadow-xs z-10">
-                        {tier.badge}
-                      </span>
-                    )}
-
-                    {/* Tier Title & Price */}
-                    <div className={`p-2 sm:p-2.5 text-center border-b border-zinc-100 dark:border-zinc-800 ${isSelected ? "bg-rose-50/50 dark:bg-rose-950/20" : "bg-zinc-50/50 dark:bg-zinc-900/50"}`}>
-                      <div className="text-[13px] sm:text-sm font-extrabold text-zinc-900 dark:text-zinc-100 leading-tight">
-                        {tier.name}
-                      </div>
-                      <div className="flex items-baseline justify-center gap-1 mt-1">
-                        {tier.regular_price > tier.offer_price && (
-                          <span className="text-[11px] text-zinc-400 line-through">
-                            ৳{tier.regular_price}
-                          </span>
-                        )}
-                        <span className="text-sm sm:text-base font-extrabold text-rose-600 dark:text-rose-400">
-                          ৳{tier.offer_price}
-                        </span>
-                      </div>
-                    </div>
-
-                    {/* Delivery Charge Info */}
-                    <div className="p-1.5 sm:p-2 text-center bg-white dark:bg-zinc-900">
-                      <div className="text-[10px] text-zinc-500 font-medium">ডেলিভারি চার্জ</div>
-                      <div className="mt-0.5">
-                        {tier.is_free_delivery || Number(tier.delivery_charge) === 0 ? (
-                          <span className="inline-block text-[11px] font-extrabold text-emerald-600 bg-emerald-50 dark:bg-emerald-950/40 dark:text-emerald-400 px-1.5 py-0.2 rounded">
-                            ফ্রি
-                          </span>
-                        ) : (
-                          <span className="text-[11px] font-bold text-zinc-700 dark:text-zinc-300">
-                            ৳{tier.delivery_charge}
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                  </button>
-                );
-              })}
-            </div>
+          {/* Full-width Related Products (both PC and Mobile) */}
+          <div className="mt-10 sm:mt-14">
+            {renderRelatedProducts()}
           </div>
-
-          {/* 2 Trust & Assurance Cards */}
-          <div className="space-y-3 mb-5">
-            {/* Trust Card 1: Emerald Theme */}
-            <div className="relative rounded-2xl overflow-hidden bg-gradient-to-br from-emerald-50 via-white to-emerald-50/60 dark:from-emerald-950/30 dark:via-zinc-900 dark:to-emerald-950/20 border border-emerald-200/80 dark:border-emerald-800/40 p-3.5 sm:p-4 shadow-xs">
-              <div className="flex items-start gap-3">
-                <div className="w-9 h-9 rounded-xl bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 flex items-center justify-center shrink-0">
-                  <PhoneCall className="w-5 h-5" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <h4 className="text-[14px] font-extrabold text-emerald-950 dark:text-emerald-200 mb-1 leading-tight">
-                    {trustCard1Title}
-                  </h4>
-                  <p className="text-xs text-emerald-900/85 dark:text-emerald-300/85 leading-relaxed">
-                    {trustCard1Text}
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            {/* Trust Card 2: Amber/Rose Theme */}
-            <div className="relative rounded-2xl overflow-hidden bg-gradient-to-br from-amber-50 via-white to-rose-50/50 dark:from-amber-950/30 dark:via-zinc-900 dark:to-rose-950/20 border border-amber-200/80 dark:border-amber-800/40 p-3.5 sm:p-4 shadow-xs">
-              <div className="flex items-start gap-3">
-                <div className="w-9 h-9 rounded-xl bg-amber-500/15 text-amber-700 dark:text-amber-400 flex items-center justify-center shrink-0">
-                  <Star className="w-5 h-5 fill-amber-500 text-amber-500" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <h4 className="text-[14px] font-extrabold text-amber-950 dark:text-amber-200 mb-1 leading-tight">
-                    {trustCard2Title}
-                  </h4>
-                  <p className="text-xs text-amber-900/85 dark:text-amber-300/85 leading-relaxed">
-                    {trustCard2Text}
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Integrated 1-Page Express Checkout Form */}
-          <div
-            id="order-form"
-            className="rounded-2xl border-2 border-emerald-600/35 bg-card shadow-lg overflow-hidden mb-6 scroll-mt-4"
-          >
-            {/* Header */}
-            <div className="bg-gradient-to-r from-emerald-800 via-emerald-700 to-teal-800 text-white p-4">
-              <div className="flex items-center justify-between flex-wrap gap-2 mb-3">
-                <div className="flex items-center gap-2.5">
-                  <div className="w-9 h-9 rounded-xl bg-white/20 flex items-center justify-center">
-                    <ShoppingCart className="w-5 h-5 text-white" />
-                  </div>
-                  <div>
-                    <h2 className="text-base sm:text-lg font-extrabold leading-tight">দ্রুত অর্ডার ফর্ম</h2>
-                    <p className="text-[11px] text-emerald-100/90">৩০ সেকেন্ডে সম্পন্ন · ক্যাশ অন ডেলিভারি</p>
-                  </div>
-                </div>
-                <span className="text-[11px] font-bold bg-white/20 backdrop-blur-xs px-2.5 py-1 rounded-full text-white">
-                  ক্যাশ অন ডেলিভারি
-                </span>
-              </div>
-
-              {/* Stepper Header: 1 নাম | 2 ফোন | 3 ঠিকানা */}
-              <div className="grid grid-cols-3 gap-2 pt-2.5 border-t border-white/20 text-xs font-bold">
-                <div className="flex items-center gap-1.5 text-white">
-                  <span className="w-4 h-4 rounded-full bg-white text-emerald-800 flex items-center justify-center text-[10px] font-extrabold">
-                    1
-                  </span>
-                  <span>নাম</span>
-                </div>
-                <div className="flex items-center gap-1.5 text-white">
-                  <span className="w-4 h-4 rounded-full bg-white text-emerald-800 flex items-center justify-center text-[10px] font-extrabold">
-                    2
-                  </span>
-                  <span>ফোন</span>
-                </div>
-                <div className="flex items-center gap-1.5 text-white">
-                  <span className="w-4 h-4 rounded-full bg-white text-emerald-800 flex items-center justify-center text-[10px] font-extrabold">
-                    3
-                  </span>
-                  <span>ঠিকানা</span>
-                </div>
-              </div>
-            </div>
-
-            {/* Form Inputs */}
-            <form onSubmit={handleDirectOrder} className="p-4 sm:p-5 space-y-4">
-              {/* Name */}
-              <div className="space-y-1.5">
-                <Label className="text-xs font-bold text-foreground flex items-center gap-1.5">
-                  <User className="w-3.5 h-3.5 text-primary" />
-                  আপনার নাম <span className="text-rose-500">*</span>
-                </Label>
-                <Input
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  placeholder="আপনার সম্পূর্ণ নাম লিখুন"
-                  required
-                  className="h-11 text-sm bg-muted/20 border-border focus:border-primary"
-                />
-              </div>
-
-              {/* Mobile with +88 */}
-              <div className="space-y-1.5">
-                <Label className="text-xs font-bold text-foreground flex items-center gap-1.5">
-                  <Phone className="w-3.5 h-3.5 text-primary" />
-                  মোবাইল নম্বর <span className="text-rose-500">*</span>
-                </Label>
-                <div className="flex items-center rounded-md border border-border bg-muted/20 overflow-hidden focus-within:ring-2 focus-within:ring-primary focus-within:border-primary">
-                  <span className="px-3 py-2.5 bg-muted text-xs font-bold text-muted-foreground border-r border-border select-none">
-                    +88
-                  </span>
-                  <input
-                    type="tel"
-                    value={phone}
-                    onChange={(e) => setPhone(e.target.value.replace(/[^0-9]/g, ""))}
-                    onBlur={() => {
-                      if (phone.length >= 11) {
-                        saveIncompleteOrder("অর্ডার ফর্মে ফোন নম্বর পূরণ করে রেখে দিয়েছেন");
-                      }
-                    }}
-                    placeholder="01XXXXXXXXX"
-                    required
-                    maxLength={11}
-                    className="flex-1 h-11 px-3 text-sm bg-transparent outline-none font-semibold text-foreground placeholder:text-muted-foreground/60"
-                  />
-                </div>
-              </div>
-
-              {/* Address */}
-              <div className="space-y-1.5">
-                <Label className="text-xs font-bold text-foreground flex items-center gap-1.5">
-                  <MapPin className="w-3.5 h-3.5 text-primary" />
-                  ডেলিভারি ঠিকানা <span className="text-rose-500">*</span>
-                </Label>
-                <Textarea
-                  value={address}
-                  onChange={(e) => setAddress(e.target.value)}
-                  placeholder="গ্রাম/রোড, এলাকা/ইউনিয়ন, থানা ও জেলার নাম লিখুন"
-                  required
-                  rows={2}
-                  className="text-sm bg-muted/20 border-border focus:border-primary resize-none"
-                />
-                <p className="text-[11px] text-muted-foreground leading-normal">
-                  বিনামূল্যে ডেলিভারি পেতে সঠিক তথ্য দিন। অর্ডার কনফার্ম করতে আমাদের প্রতিনিধি কল করবেন।
-                </p>
-              </div>
-
-              {/* Optional Note */}
-              <div>
-                {!showNote ? (
-                  <button
-                    type="button"
-                    onClick={() => setShowNote(true)}
-                    className="text-xs text-primary font-semibold hover:underline flex items-center gap-1"
-                  >
-                    <StickyNote className="w-3 h-3" /> কোনো বিশেষ নির্দেশনা থাকলে লিখুন (ঐচ্ছিক)
-                  </button>
-                ) : (
-                  <div className="space-y-1 mt-2">
-                    <Label className="text-xs font-semibold text-muted-foreground">বিশেষ নির্দেশনা:</Label>
-                    <Input
-                      value={note}
-                      onChange={(e) => setNote(e.target.value)}
-                      placeholder="যেমন: বিকেলে ডেলিভারি দিলে ভালো হয়"
-                      className="h-9 text-xs bg-muted/20"
-                    />
-                  </div>
-                )}
-              </div>
-
-              {/* Live Order Summary Breakdown */}
-              <div className="p-3.5 rounded-xl bg-muted/40 border border-border space-y-2 text-xs">
-                <div className="flex items-center justify-between text-muted-foreground">
-                  <span>নির্বাচিত প্যাকেজ:</span>
-                  <span className="font-bold text-foreground">{product.name} ({activeTier?.name})</span>
-                </div>
-                <div className="flex items-center justify-between text-muted-foreground">
-                  <span>মূল্য ({activeTier?.name}):</span>
-                  <span className="font-bold text-foreground">৳{activeTierPrice}</span>
-                </div>
-                <div className="flex items-center justify-between text-muted-foreground">
-                  <span>ডেলিভারি চার্জ:</span>
-                  {activeTierDelivery === 0 ? (
-                    <span className="font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded">ফ্রি</span>
-                  ) : (
-                    <span className="font-bold text-foreground">৳{activeTierDelivery}</span>
-                  )}
-                </div>
-                <div className="pt-2 border-t border-border flex items-center justify-between text-sm sm:text-base font-extrabold text-foreground">
-                  <span>সর্বমোট:</span>
-                  <span className="text-lg font-extrabold text-amber-700">৳{activeGrandTotal}</span>
-                </div>
-              </div>
-
-              {/* Shimmer Glowing Confirm CTA Button */}
-              <button
-                type="submit"
-                disabled={loading || isOutOfStock}
-                className="relative w-full h-12 rounded-xl text-zinc-950 font-extrabold text-base tracking-wide flex items-center justify-center gap-2 overflow-hidden shadow-lg shadow-amber-500/25 active:scale-[0.99] transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
-                style={{
-                  background: "linear-gradient(to right, rgb(251, 191, 36), rgb(245, 158, 11))",
-                }}
-              >
-                <span className="pointer-events-none absolute inset-y-0 -left-1/3 w-1/3 bg-gradient-to-r from-transparent via-white/70 to-transparent animate-shimmer-sweep" />
-                <span className="relative z-10 flex items-center gap-2">
-                  {loading ? (
-                    <>
-                      <Loader2 className="w-5 h-5 animate-spin" />
-                      <span>অর্ডার প্রসেস হচ্ছে...</span>
-                    </>
-                  ) : (
-                    <>
-                      <Zap className="w-5 h-5 fill-current" />
-                      <span>অর্ডার কনফার্ম করুন — ৳{activeGrandTotal}</span>
-                    </>
-                  )}
-                </span>
-              </button>
-
-              {/* Security Reassurance */}
-              <div className="text-center pt-1">
-                <p className="text-xs font-semibold text-emerald-800 dark:text-emerald-300 flex items-center justify-center gap-1.5">
-                  <span>🔒</span> পণ্য হাতে পেয়ে টাকা পরিশোধ করুন
-                </p>
-              </div>
-            </form>
-          </div>
-
-          {/* Description / Policy / Reviews Tabs */}
-          <div id="product-tabs" className="bg-card rounded-2xl border border-border shadow-sm overflow-hidden mb-5">
-            <div className="flex border-b border-border overflow-x-auto">
-              {[
-                { id: "description" as const, label: "বিস্তারিত বিবরণ" },
-                { id: "policy" as const, label: "অর্ডার পলিসি" },
-                { id: "reviews" as const, label: `রিভিউ (${reviewsCount})` },
-              ].map((tab) => (
-                <button
-                  key={tab.id}
-                  type="button"
-                  onClick={() => setActiveTab(tab.id)}
-                  className={`flex-1 min-w-[110px] px-4 py-3 text-xs sm:text-sm font-semibold whitespace-nowrap transition-colors border-b-2 ${
-                    activeTab === tab.id
-                      ? "border-primary text-primary bg-primary/5 font-bold"
-                      : "border-transparent text-muted-foreground hover:text-foreground"
-                  }`}
-                >
-                  {tab.label}
-                </button>
-              ))}
-            </div>
-
-            <div className="p-4 sm:p-5">
-              {activeTab === "description" && (
-                <div className="space-y-3">
-                  {product.short_description && (
-                    <p className="text-sm text-foreground/90 leading-relaxed font-medium">
-                      {product.short_description}
-                    </p>
-                  )}
-                  {product.full_description ? (
-                    /<[a-z][\s\S]*>/i.test(product.full_description) ? (
-                      <div
-                        className="rte-content text-[13px] text-foreground/80 leading-relaxed"
-                        dangerouslySetInnerHTML={{
-                          __html:
-                            typeof DOMPurify !== "undefined" && DOMPurify && typeof (DOMPurify as any).sanitize === "function"
-                              ? (DOMPurify as any).sanitize(product.full_description)
-                              : product.full_description,
-                        }}
-                      />
-                    ) : (
-                      typeof product.full_description === "string" &&
-                      product.full_description
-                        .split("\n")
-                        .filter((p: string) => p.trim())
-                        .map((para: string, idx: number) => (
-                          <p key={idx} className="text-[13px] text-foreground/80 leading-relaxed">
-                            {para}
-                          </p>
-                        ))
-                    )
-                  ) : !product.short_description ? (
-                    <p className="text-sm text-muted-foreground italic">কোনো বিবরণ পাওয়া যায়নি।</p>
-                  ) : null}
-                </div>
-              )}
-
-              {activeTab === "policy" && (
-                <div className="space-y-2 text-[13px] text-foreground/85 leading-relaxed">
-                  <p>✓ সারাদেশে দ্রুত হোম ডেলিভারি সুবিধা।</p>
-                  <p>✓ ক্যাশ অন ডেলিভারি (পণ্য হাতে পেয়ে মূল্য পরিশোধ)।</p>
-                  <p>✓ অর্ডার কনফার্ম করার ২৪-৪৮ ঘণ্টার মধ্যে পার্সেল পাঠানো হয়।</p>
-                  <p>✓ পণ্য বুঝে পেয়ে ডেলিভারিম্যানের সামনে চেক করে নিন।</p>
-                  <p>
-                    ✓ যেকোনো জিজ্ঞাসায় কল করুন:{" "}
-                    <a href={`tel:${SUPPORT_PHONE}`} className="text-primary font-bold">
-                      {SUPPORT_PHONE}
-                    </a>
-                  </p>
-                </div>
-              )}
-
-              {activeTab === "reviews" && <ProductComments productId={product.id} />}
-            </div>
-          </div>
-
-          {/* Related Products Grid */}
-          {relatedProducts.length > 0 && (
-            <div className="bg-card rounded-2xl border border-border shadow-sm p-4 sm:p-5 mb-4">
-              <h2 className="text-base sm:text-lg font-bold text-foreground mb-3">সম্পর্কিত বীজ ও পণ্য</h2>
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
-                {relatedProducts.slice(0, 8).map((rp: any) => {
-                  const rPrice = rp.offer_price ?? rp.regular_price;
-                  const rOld = rp.offer_price ? rp.regular_price : null;
-                  const rAvail =
-                    typeof rp.available_stock === "number" && rp.available_stock > 0
-                      ? rp.available_stock
-                      : typeof rp.stock === "number" && rp.stock > 0
-                      ? rp.stock
-                      : rp.available_stock ?? rp.stock ?? null;
-                  const rOut = rp.in_stock === false || (rAvail !== null && rAvail <= 0);
-
-                  const cardInner = (
-                    <>
-                      <div className="aspect-square bg-muted overflow-hidden relative">
-                        <img
-                          src={rp.product_image || PLACEHOLDER_IMAGE}
-                          alt={rp.name}
-                          className={`w-full h-full object-cover transition-transform ${
-                            rOut ? "grayscale opacity-60" : "group-hover:scale-105"
-                          }`}
-                          onError={handleImageError}
-                        />
-                        {rOut && (
-                          <div className="absolute inset-0 flex items-center justify-center">
-                            <span className="px-2 py-1 rounded-md bg-destructive/90 text-destructive-foreground text-[10px] font-bold">
-                              স্টক নেই
-                            </span>
-                          </div>
-                        )}
-                      </div>
-                      <div className="p-2 space-y-1">
-                        <h3 className={`text-xs font-semibold line-clamp-2 leading-snug min-h-[2rem] ${rOut ? "text-muted-foreground" : "text-foreground"}`}>
-                          {rp.name}
-                        </h3>
-                        <div className="flex items-baseline gap-1.5">
-                          <span className={`text-sm font-bold ${rOut ? "text-muted-foreground line-through" : "text-primary"}`}>
-                            ৳{rPrice}
-                          </span>
-                          {rOld && !rOut && (
-                            <span className="text-[10px] text-muted-foreground line-through">৳{rOld}</span>
-                          )}
-                        </div>
-                      </div>
-                    </>
-                  );
-
-                  if (rOut) {
-                    return (
-                      <div key={rp.id} aria-disabled className="group block rounded-xl border border-border bg-muted/40 overflow-hidden cursor-not-allowed opacity-70">
-                        {cardInner}
-                      </div>
-                    );
-                  }
-                  return (
-                    <Link
-                      key={rp.id}
-                      to={`/product/${rp.slug || rp.id}`}
-                      className="group block rounded-xl border border-border bg-card overflow-hidden hover:border-primary/50 hover:shadow-md transition-all"
-                    >
-                      {cardInner}
-                    </Link>
-                  );
-                })}
-              </div>
-            </div>
-          )}
-
         </div>
       </main>
 
       <Footer />
 
-      {/* Mobile Sticky Bottom Bar */}
-      <div className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 dark:bg-zinc-950/95 backdrop-blur-md border-t border-zinc-200 dark:border-zinc-800 shadow-[0_-8px_24px_-18px_rgba(0,0,0,0.35)] px-3 py-2.5 flex items-center justify-between gap-3">
+      {/* Mobile Sticky Bottom Floating Action Bar - ONLY on Mobile (< lg) */}
+      <div className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 dark:bg-zinc-950/95 backdrop-blur-md border-t border-zinc-200 dark:border-zinc-800 shadow-[0_-8px_24px_-18px_rgba(0,0,0,0.35)] px-3 py-2.5 flex items-center justify-between gap-3">
         <div className="flex flex-col min-w-0">
           <span className="text-[10px] leading-tight uppercase tracking-wider text-zinc-500 dark:text-zinc-400 font-semibold truncate">
             {activeTier?.name}

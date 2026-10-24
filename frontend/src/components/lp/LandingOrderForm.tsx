@@ -16,6 +16,7 @@ import { trackCatalogPurchase } from "@/lib/metaPurchase";
 import { trackEvent } from "@/hooks/useAnalyticsTracker";
 import { checkOrderAllowed, formatCooldownRemaining } from "@/lib/orderGuard";
 import { dispatchOrderNotification } from "@/lib/orderNotifications";
+import { resolveImageUrl, PLACEHOLDER_IMAGE, handleImageError } from "@/lib/imageFallback";
 
 const VISITOR_ID_KEY = "visitor-id";
 
@@ -219,7 +220,7 @@ export default function LandingOrderForm({ product, title }: Props) {
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
               <div className="flex items-center gap-3">
                 {product.image && (
-                  <img src={product.image || "/placeholder.svg"} alt={product.name} className="w-16 h-16 rounded-xl object-cover border border-emerald-100 shadow-sm" />
+                  <img src={resolveImageUrl(product.image)} alt={product.name} onError={handleImageError} className="w-16 h-16 rounded-xl object-cover border border-emerald-100 shadow-sm" />
                 )}
                 <span className="text-base font-bold text-foreground">{product.name}</span>
               </div>

@@ -9,6 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
 import { Loader2, Plus, Trash2, Sparkles, Save } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { handleImageError, resolveImageUrl } from "@/lib/imageFallback";
 
 const API_BASE = API_URL;
 
@@ -206,8 +207,8 @@ export default function PromoPopupSettings() {
               <Label className="text-xs">{t("ছবির লিংক", "Image URL")}</Label>
               <Input placeholder="https://..." value={row.image_url || ""} onChange={(e) => patch(row.id, "image_url", e.target.value)} />
               {row.image_url && (
-                <img src={row.image_url} alt="" className="mt-1.5 w-28 h-20 object-cover rounded-lg border border-border"
-                  onError={(e) => { const img = e.currentTarget; img.onerror = null; img.src = "/placeholder.svg"; }} />
+                <img src={resolveImageUrl(row.image_url)} alt="" className="mt-1.5 w-28 h-20 object-cover rounded-lg border border-border"
+                  onError={handleImageError} />
               )}
             </div>
 

@@ -1,7 +1,7 @@
 import { Loader2, ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { handleImageError } from "@/lib/imageFallback";
+import { handleImageError, resolveImageUrl } from "@/lib/imageFallback";
 import { useCategories } from "@/hooks/useCatalog";
 
 const toSlug = (name: string) => name.toLowerCase().replace(/\s+/g, "-");
@@ -48,7 +48,7 @@ const CategoriesShowcase = () => {
                 <div className="aspect-[4/3] bg-muted overflow-hidden">
                   {cat.image ? (
                     <img
-                      src={cat.image}
+                      src={resolveImageUrl(cat.image)}
                       alt={cat.display_name || cat.name}
                       loading="lazy"
                       className="w-full h-full object-cover"

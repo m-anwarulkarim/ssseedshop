@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { useCart } from "@/contexts/CartContext";
 import { useFreeGiftOffer } from "@/hooks/useFreeGiftOffer";
 import { matchTier, FREE_GIFT_SUFFIX } from "@/lib/freeGiftOffer";
+import { resolveImageUrl } from "@/lib/imageFallback";
 
 /**
  * Keeps the order-value based free gift in sync with the cart:
@@ -33,7 +34,7 @@ export default function FreeGiftWatcher() {
         name: `${tier.productName} ${FREE_GIFT_SUFFIX}`,
         price: 0,
         oldPrice: null,
-        image: tier.productImage || "/placeholder.svg",
+        image: resolveImageUrl(tier.productImage),
         shortDescription: tier.note || null,
         isFreeGift: true,
       });

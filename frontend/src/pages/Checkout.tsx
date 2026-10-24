@@ -23,7 +23,7 @@ import { trackCatalogPurchase } from "@/lib/metaPurchase";
 import { trackEvent } from "@/hooks/useAnalyticsTracker";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { checkOrderAllowed, formatCooldownRemaining } from "@/lib/orderGuard";
-import { handleImageError } from "@/lib/imageFallback";
+import { handleImageError, resolveImageUrl } from "@/lib/imageFallback";
 import { dispatchOrderNotification } from "@/lib/orderNotifications";
 
 
@@ -647,7 +647,7 @@ export default function Checkout() {
                   className="px-4 py-3 flex items-center gap-3"
                 >
                   <img
-                    src={item.image}
+                    src={resolveImageUrl(item.image)}
                     alt={item.name}
                     onError={handleImageError}
                     className="w-14 h-14 rounded-xl object-cover bg-muted flex-shrink-0"

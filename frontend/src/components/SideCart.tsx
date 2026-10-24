@@ -7,7 +7,7 @@ import { getDeliveryCharge } from "@/lib/delivery";
 import { useFreeGiftOffer } from "@/hooks/useFreeGiftOffer";
 import { matchTier, nextTier } from "@/lib/freeGiftOffer";
 import { Gift } from "lucide-react";
-import { handleImageError } from "@/lib/imageFallback";
+import { handleImageError, resolveImageUrl } from "@/lib/imageFallback";
 
 export default function SideCart() {
   const navigate = useNavigate();
@@ -92,7 +92,7 @@ export default function SideCart() {
               >
                 {/* Thumb */}
                 <img
-                  src={item.image}
+                  src={resolveImageUrl(item.image)}
                   alt={item.name}
                   className="w-16 h-16 rounded-lg object-cover flex-shrink-0 bg-slate-50"
                   onError={handleImageError}

@@ -393,6 +393,18 @@ function NavMenuItems({ onNavigate }: { onNavigate: (to: string) => void }) {
 
 function BottomNav({ pathname }: { pathname: string }) {
   const { lang } = useLanguage();
+
+  // Hide mobile bottom tab bar on desktop, and on product details / checkout / landing pages
+  if (
+    pathname.startsWith("/product/") ||
+    pathname.startsWith("/lp/") ||
+    pathname.startsWith("/checkout") ||
+    pathname.startsWith("/order-confirmed") ||
+    pathname.startsWith("/invoice/")
+  ) {
+    return null;
+  }
+
   const items = [
     { label: lang === "en" ? "Home" : "হোম", icon: Home, to: "/", match: (p: string) => p === "/" },
     { label: lang === "en" ? "All Products" : "সকল পণ্য", icon: ClipboardList, to: "/products", match: (p: string) => p === "/products" || p.startsWith("/shop") },
@@ -402,7 +414,7 @@ function BottomNav({ pathname }: { pathname: string }) {
   ];
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 w-full z-40 bg-white border-t border-gray-200 shadow-[0_-4px_12px_-6px_rgba(0,0,0,0.1)]">
+    <nav className="md:hidden fixed bottom-0 left-0 right-0 w-full z-40 bg-white border-t border-gray-200 shadow-[0_-4px_12px_-6px_rgba(0,0,0,0.1)]">
       <div className="grid grid-cols-5 h-14">
         {items.map((it) => {
           const active = it.match(pathname);

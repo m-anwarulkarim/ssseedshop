@@ -9,6 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Globe, Copy, ExternalLink, Check, ArrowRight, Package } from "lucide-react";
 import { toast } from "sonner";
 import { Link } from "react-router-dom";
+import { handleImageError, resolveImageUrl } from "@/lib/imageFallback";
 
 const LANDING_PAGES = [
   {
@@ -118,10 +119,10 @@ export default function LandingPagesOverviewCard() {
               <div className="flex items-center gap-3 min-w-0">
                 {product?.product_image ? (
                   <img
-                    src={product.product_image}
+                    src={resolveImageUrl(product.product_image)}
                     alt={lp.nameBn}
                     className="w-10 h-10 rounded-lg object-cover border bg-background shrink-0"
-                    onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = "/placeholder.svg"; }}
+                    onError={handleImageError}
                   />
                 ) : (
                   <div className="w-10 h-10 rounded-lg bg-muted flex items-center justify-center shrink-0">

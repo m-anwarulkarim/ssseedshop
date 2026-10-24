@@ -1,10 +1,12 @@
-import { API_BASE } from "@/lib/apiConfig";
+import brandPlaceholderSvg from "@/assets/placeholder.svg";
+import { API_URL } from "@/config/env";
 
-export const PLACEHOLDER_IMAGE = "/placeholder.svg";
+// Hashed asset ensures browsers and CDNs never serve stale cached placeholder images
+export const PLACEHOLDER_IMAGE = brandPlaceholderSvg;
 
 /**
  * Robust image URL resolver:
- * - Fixes relative paths (e.g. /uploads/..., uploads/...) by prepending API_BASE
+ * - Fixes relative paths (e.g. /uploads/..., uploads/...) by prepending API_URL
  * - Detects and gracefully handles dead Supabase URLs
  * - Handles blob: and data: URLs
  * - Gracefully handles empty / null
@@ -19,8 +21,8 @@ export function resolveImageUrl(url: string | null | undefined): string {
     return trimmed;
   }
 
-  // Dead Supabase project links fallback
-  if (trimmed.includes("supabase.co")) {
+  // Dead Supabase project links fallback or local placeholder references
+  if (trimmed.includes("supabase.co") || trimmed.includes("placeholder")) {
     return PLACEHOLDER_IMAGE;
   }
 
@@ -31,7 +33,7 @@ export function resolveImageUrl(url: string | null | undefined): string {
 
   // Relative path starting with /uploads/ or uploads/
   const cleanPath = trimmed.replace(/^\/+/, "");
-  return `${API_BASE}/${cleanPath}`;
+  return `${API_URL}/${cleanPath}`;
 }
 
 export const handleImageError = (e: React.SyntheticEvent<HTMLImageElement>) => {

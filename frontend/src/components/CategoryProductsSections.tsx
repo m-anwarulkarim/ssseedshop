@@ -3,7 +3,7 @@ import { Loader2, ArrowRight, ChevronDown } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useLanguage } from "@/contexts/LanguageContext";
 import ProductCard from "@/components/ProductCard";
-import { handleImageError } from "@/lib/imageFallback";
+import { handleImageError, resolveImageUrl } from "@/lib/imageFallback";
 import { useCategories, useAllProducts } from "@/hooks/useCatalog";
 
 const INITIAL_PER_CATEGORY = 8;
@@ -62,7 +62,7 @@ const CategoryProductsSections = () => {
                   <div className="flex items-center gap-2.5 min-w-0">
                     {cat.image && (
                       <img
-                        src={cat.image}
+                        src={resolveImageUrl(cat.image)}
                         alt={displayName}
                         className="w-9 h-9 rounded-lg object-cover ring-1 ring-emerald-100 flex-shrink-0"
                         onError={handleImageError}

@@ -7,7 +7,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { getUserPrice, getUserType } from "@/hooks/useUserType";
 import { useLanguage } from "@/contexts/LanguageContext";
 import ProductDetailPopup from "@/components/ProductDetailPopup";
-import { handleImageError, PLACEHOLDER_IMAGE } from "@/lib/imageFallback";
+import { handleImageError, PLACEHOLDER_IMAGE, resolveImageUrl } from "@/lib/imageFallback";
 
 interface ProductCardProps {
   product: {
@@ -123,7 +123,7 @@ export default function ProductCard({ product, reviewStats, hideOrderButton = fa
             className="block w-full h-full"
           >
             <img
-              src={product.product_image || product.image_url || PLACEHOLDER_IMAGE}
+              src={resolveImageUrl(product.product_image || product.image_url)}
               alt={product.name}
               className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
               onError={handleImageError}
