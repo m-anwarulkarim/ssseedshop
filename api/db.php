@@ -1,6 +1,6 @@
 <?php
 // api/db.php
-// Dual-Engine Database Layer for Ss Seed Shop (MySQL PDO with fallback/live backup to JSON)
+// Dual-Engine Database Layer for AgroSeed (MySQL PDO with fallback/live backup to JSON)
 
 // 1. Automatic Gzip compression for ultra-fast API transfer
 if (!ob_get_level() && !headers_sent() && extension_loaded('zlib') && !ini_get('zlib.output_compression')) {
@@ -13,9 +13,6 @@ header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS");
 header("Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With, Origin, Accept");
 header("Access-Control-Max-Age: 86400");
 header('Content-Type: application/json; charset=utf-8');
-header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
-header("Pragma: no-cache");
-header("Expires: 0");
 
 // Handle preflight OPTIONS request
 if (isset($_SERVER['REQUEST_METHOD']) && $_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
@@ -39,6 +36,19 @@ $user    = $env['DB_USER'] ?? '';
 $pass    = $env['DB_PASS'] ?? '';
 $charset = 'utf8mb4';
 
+// Auto-heal common cPanel username/database typo (jjcelcf -> jjcceicf)
+if (strpos($user, 'jjcelcf') !== false || strpos($db, 'jjcelcf') !== false) {
+    $user = str_replace('jjcelcf', 'jjcceicf', $user);
+    $db   = str_replace('jjcelcf', 'jjcceicf', $db);
+    if (file_exists($env_path) && is_writable($env_path)) {
+        $env_raw = file_get_contents($env_path);
+        if (strpos($env_raw, 'jjcelcf') !== false) {
+            $env_raw = str_replace('jjcelcf', 'jjcceicf', $env_raw);
+            @file_put_contents($env_path, $env_raw);
+        }
+    }
+}
+
 $pdo = null;
 $db_error = null;
 
@@ -46,8 +56,8 @@ $is_local_host = in_array(strtolower($host), ['localhost', '127.0.0.1', '::1']);
 $can_attempt_connect = !empty($db) && $db !== 'cpanel_database_name' && !empty($user) && $user !== 'cpanel_database_user';
 
 if ($can_attempt_connect && $is_local_host) {
-    $tempFile = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'ssseedshop_db_offline';
-    if (file_exists($tempFile) && (time() - filemtime($tempFile) < 15)) {
+    $tempFile = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'agroseed_db_offline';
+    if (file_exists($tempFile) && (time() - filemtime($tempFile) < 120)) {
         $can_attempt_connect = false;
     } else {
         $sock = @fsockopen($host, (int)$port, $errno, $errstr, 0.02);
@@ -82,12 +92,12 @@ if ($can_attempt_connect) {
 }
 
 /**
- * Ss Seed Shop Dual-Engine Database Access Layer
+ * AgroSeed Dual-Engine Database Access Layer
  */
 class DB {
     private static $jsonCols = [
         'admins'            => ['permissions'],
-        'products'          => ['categories', 'tags', 'image_gallery', 'variations', 'package_tiers'],
+        'products'          => ['categories', 'tags', 'image_gallery', 'variations'],
         'orders'            => ['items'],
         'incomplete_orders' => ['cart_snapshot'],
         'sms_logs'          => ['gateway'],
@@ -266,6 +276,7 @@ class DB {
      */
     public static function insert(string $table, array $data): bool {
         $pdo = self::pdo();
+        $sql_ok = false;
         if ($pdo) {
             try {
                 $validCols = self::getTableColumns($table);
@@ -287,17 +298,21 @@ class DB {
                         $params[":$k"] = $v;
                     }
                     $stmt->execute($params);
+                    $sql_ok = true;
                 }
             } catch (Exception $e) {
                 // Fallback to json if SQL fails
+                $sql_ok = false;
             }
         }
 
-        // Always sync to JSON for live local backup
-        $file = self::getJsonFile($table);
-        $items = file_exists($file) ? json_decode(file_get_contents($file), true) ?: [] : [];
-        $items[] = $data;
-        self::atomicWriteJson($file, $items);
+        // Always sync to JSON for live local backup unless SQL succeeded on heavy write tables
+        if (!$sql_ok || !in_array($table, ['orders', 'sms_logs', 'visitors', 'fraud_cache'])) {
+            $file = self::getJsonFile($table);
+            $items = file_exists($file) ? json_decode(file_get_contents($file), true) ?: [] : [];
+            $items[] = $data;
+            self::atomicWriteJson($file, $items);
+        }
         return true;
     }
 
@@ -306,6 +321,7 @@ class DB {
      */
     public static function update(string $table, array $data, $idVal, string $idCol = 'id'): bool {
         $pdo = self::pdo();
+        $sql_ok = false;
         if ($pdo) {
             try {
                 $validCols = self::getTableColumns($table);
@@ -328,21 +344,25 @@ class DB {
                     $sql = "UPDATE `$table` SET " . implode(', ', $sets) . " WHERE `$idCol` = :_idVal";
                     $stmt = $pdo->prepare($sql);
                     $stmt->execute($params);
+                    $sql_ok = true;
                 }
             } catch (Exception $e) {
                 // Fallback
+                $sql_ok = false;
             }
         }
 
-        // Sync to JSON backup
-        $file = self::getJsonFile($table);
-        if (file_exists($file)) {
-            $items = json_decode(file_get_contents($file), true) ?: [];
-            foreach ($items as $idx => $item) {
-                if (isset($item[$idCol]) && (string)$item[$idCol] === (string)$idVal) {
-                    $items[$idx] = array_merge($item, $data);
-                    self::atomicWriteJson($file, $items);
-                    break;
+        // Sync to JSON backup unless SQL succeeded on heavy tables
+        if (!$sql_ok || !in_array($table, ['orders', 'sms_logs', 'visitors', 'fraud_cache'])) {
+            $file = self::getJsonFile($table);
+            if (file_exists($file)) {
+                $items = json_decode(file_get_contents($file), true) ?: [];
+                foreach ($items as $idx => $item) {
+                    if (isset($item[$idCol]) && (string)$item[$idCol] === (string)$idVal) {
+                        $items[$idx] = array_merge($item, $data);
+                        self::atomicWriteJson($file, $items);
+                        break;
+                    }
                 }
             }
         }

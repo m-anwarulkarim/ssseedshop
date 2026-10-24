@@ -17,6 +17,19 @@ $db   = $env['DB_NAME'] ?? '';
 $user = $env['DB_USER'] ?? '';
 $pass = $env['DB_PASS'] ?? '';
 
+// Auto-heal common typo (jjcelcf -> jjcceicf)
+if (strpos($user, 'jjcelcf') !== false || strpos($db, 'jjcelcf') !== false) {
+    $user = str_replace('jjcelcf', 'jjcceicf', $user);
+    $db   = str_replace('jjcelcf', 'jjcceicf', $db);
+    if (file_exists($env_path) && is_writable($env_path)) {
+        $env_raw = file_get_contents($env_path);
+        if (strpos($env_raw, 'jjcelcf') !== false) {
+            $env_raw = str_replace('jjcelcf', 'jjcceicf', $env_raw);
+            @file_put_contents($env_path, $env_raw);
+        }
+    }
+}
+
 $results = [];
 $error_count = 0;
 $success_count = 0;
