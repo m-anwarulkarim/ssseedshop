@@ -196,6 +196,17 @@ if ($pdo) {
         }
     }
 
+    // 7. Handle Clear Images Action (Per user request to upload clean images manually)
+    if (isset($_GET['action']) && $_GET['action'] === 'clear_images') {
+        try {
+            $pdo->exec("UPDATE `products` SET `product_image` = NULL, `image_gallery` = '[]'");
+            $pdo->exec("UPDATE `categories` SET `image` = NULL, `image_url` = NULL");
+            log_msg('success', "🧹 সফলভাবে সকল পণ্যের পুরনো ছবি ক্লিয়ার করা হয়েছে! এখন আপনি নতুন ছবি ফ্রেশভাবে আপলোড করতে পারবেন।");
+        } catch (Exception $e) {
+            log_msg('error', "ছবি ক্লিয়ার এরর: " . $e->getMessage());
+        }
+    }
+
     // 7. Live CRUD & Deletion Verification Self-Tests
     // Test A: Product DELETE
     try {
@@ -413,6 +424,7 @@ if ($pdo) {
 
     <div class="actions">
         <a href="cpanel_database_update.php" class="btn">🔄 রিফ্রেশ ও পুনরায় টেস্ট করুন</a>
+        <a href="?action=clear_images" class="btn btn-outline" onclick="return confirm('আপনি কি নিশ্চিত যে সকল পণ্যের ছবি ক্লিয়ার করতে চান?')">🧹 সব ছবি ক্লিয়ার করুন</a>
         <a href="https://ssseedshop.com/admin" class="btn btn-outline" target="_blank">🔐 অ্যাডমিন প্যানেল</a>
         <a href="https://ssseedshop.com" class="btn btn-outline" target="_blank">🌐 মূল ওয়েবসাইট</a>
     </div>
