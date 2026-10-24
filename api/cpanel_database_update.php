@@ -163,6 +163,22 @@ if ($pdo) {
         log_msg('success', "✔ অপ্রয়োজনীয় টেবিল (`blogs`, `ledger_entries`) ডাটাবেস থেকে সম্পূর্ণ মুছে ফেলা হয়েছে।");
     } catch (Exception $e) {}
 
+    // Purge legacy third-party API credentials (Meta Pixel, CAPI, demo keys)
+    try {
+        $purge_query = "DELETE FROM `settings` WHERE `key` IN ('meta_pixel_id', 'meta_capi_token', 'gtm_id') 
+            OR (`key` = 'steadfast_api_key' AND `value` = 'eqegau1wceobpc8ghbt2glt1ssxonkqp') 
+            OR (`key` = 'steadfast_secret_key' AND `value` = 'apgpewveidczs83uccjqlc7o') 
+            OR (`key` = 'ecomah_api_key' AND `value` = 'ek_YVT7Wr15ThUCrpJa')";
+        if (isset($_GET['clear_all_apis'])) {
+            $purge_query = "DELETE FROM `settings` WHERE `key` IN ('meta_pixel_id', 'meta_capi_token', 'gtm_id', 'steadfast_api_key', 'steadfast_secret_key', 'steadfast_webhook_token', 'ecomah_api_key')";
+        }
+        $purged_keys = $pdo->exec($purge_query);
+        if ($purged_keys > 0) {
+            log_msg('success', "✔ পূর্বের পুরাতন/অপ্রয়োজনীয় API ক্রেডেনশিয়াল ($purged_keys টি) ডাটাবেস থেকে মুছে ফেলা হয়েছে।");
+        }
+    } catch (Exception $e) {}
+
+
     // 6. Inspect heavy base64 product images
     try {
         $stmt = $pdo->query("SELECT `id`, `name`, LENGTH(`product_image`) as img_len FROM `products` WHERE `product_image` LIKE 'data:image%'");
@@ -381,6 +397,7 @@ if ($pdo) {
         <div class="actions">
             <a href="cpanel_database_update.php" class="btn">🔄 পুনরায় পরীক্ষা ও স্কিমা আপডেট</a>
             <a href="cpanel_database_update.php?action=sync_json" class="btn btn-outline" style="border-color: #10b981; color: #a7f3d0;">💾 MySQL থেকে JSON ব্যাকআপ সিঙ্ক</a>
+            <a href="cpanel_database_update.php?clear_all_apis=1" class="btn btn-outline" style="border-color: #ef4444; color: #fca5a5;">🗑️ সকল থার্ড-পার্টি API রিসেট</a>
             <a href="products/get.php" target="_blank" class="btn btn-outline">⚡ প্রোডাক্ট API টেস্ট করুন</a>
         </div>
     </div>

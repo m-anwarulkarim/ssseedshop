@@ -37,11 +37,13 @@ export function SmsApiDialog({ open, onOpenChange }: { open: boolean; onOpenChan
   const { data: savedKey, isLoading } = useQuery({
     queryKey: ["app-settings-ecomah"],
     enabled: open,
+    staleTime: 0,
     queryFn: async () => {
-      const url = import.meta.env.VITE_API_URL || "http://localhost:8005";
-      const res = await fetch(`${url}/settings/get.php?keys=${ECOMAH_SETTING_KEY}`);
+      const url = import.meta.env.VITE_API_URL || "http://localhost:8000";
+      const res = await fetch(`${url}/settings/get.php?keys=${ECOMAH_SETTING_KEY}&_t=${Date.now()}`, { cache: "no-store" });
       const data = await res.json();
-      return data?.[0]?.value || "";
+      const val = data?.[0]?.value;
+      return val && typeof val === "string" ? val.trim() : "";
     },
   });
 
@@ -83,6 +85,8 @@ export function SmsApiDialog({ open, onOpenChange }: { open: boolean; onOpenChan
   const handleDeleteKeys = async () => {
     try {
       await deleteEcomahApiKey();
+      queryClient.removeQueries({ queryKey: ["app-settings-ecomah"] });
+      queryClient.removeQueries({ queryKey: ["ecomah-status"] });
       queryClient.invalidateQueries({ queryKey: ["app-settings-ecomah"] });
       queryClient.invalidateQueries({ queryKey: ["ecomah-status"] });
       toast.success(t("API Key ডিলিট হয়েছে", "API Key deleted"));

@@ -16,7 +16,7 @@ const LEGACY_ECOMAH_KEYS = [
 
 export async function saveEcomahApiKey(apiKey: string) {
   const trimmedKey = apiKey.trim();
-  const url = import.meta.env.VITE_API_URL || "http://localhost:8005";
+  const url = import.meta.env.VITE_API_URL || "http://localhost:8000";
 
   await fetch(`${url}/settings/update.php`, {
     method: "POST",
@@ -36,7 +36,7 @@ export async function saveEcomahApiKey(apiKey: string) {
 }
 
 export async function deleteEcomahApiKey() {
-  const url = import.meta.env.VITE_API_URL || "http://localhost:8005";
+  const url = import.meta.env.VITE_API_URL || "http://localhost:8000";
   await fetch(`${url}/settings/delete.php`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },

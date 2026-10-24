@@ -25,6 +25,10 @@ function useTrackingSave() {
       });
     },
     onSuccess: () => {
+      queryClient.removeQueries({ queryKey: ["pixel-settings"] });
+      queryClient.removeQueries({ queryKey: ["gtm-settings"] });
+      queryClient.removeQueries({ queryKey: ["pixel-status"] });
+      queryClient.removeQueries({ queryKey: ["gtm-status"] });
       queryClient.invalidateQueries({ queryKey: ["pixel-settings"] });
       queryClient.invalidateQueries({ queryKey: ["gtm-settings"] });
       queryClient.invalidateQueries({ queryKey: ["pixel-status"] });
@@ -44,6 +48,10 @@ function useTrackingSave() {
       });
     },
     onSuccess: () => {
+      queryClient.removeQueries({ queryKey: ["pixel-settings"] });
+      queryClient.removeQueries({ queryKey: ["gtm-settings"] });
+      queryClient.removeQueries({ queryKey: ["pixel-status"] });
+      queryClient.removeQueries({ queryKey: ["gtm-status"] });
       queryClient.invalidateQueries({ queryKey: ["pixel-settings"] });
       queryClient.invalidateQueries({ queryKey: ["gtm-settings"] });
       queryClient.invalidateQueries({ queryKey: ["pixel-status"] });
@@ -93,19 +101,24 @@ export function PixelDialog({ open, onOpenChange }: DialogProps) {
   const { data: saved, isLoading } = useQuery({
     queryKey: ["pixel-settings"],
     enabled: open,
+    staleTime: 0,
     queryFn: async () => {
       const url = import.meta.env.VITE_API_URL || "http://localhost:8000";
       const keys = ["meta_pixel_id", "meta_capi_token"].join(",");
-      const res = await fetch(`${url}/settings/get.php?keys=${keys}`);
+      const res = await fetch(`${url}/settings/get.php?keys=${keys}&_t=${Date.now()}`, { cache: "no-store" });
       const data = await res.json();
       const map: Record<string, string> = {};
-      data?.forEach((r: any) => { map[r.key] = r.value; });
+      data?.forEach((r: any) => {
+        if (r && r.key && r.value) {
+          map[r.key] = String(r.value).trim();
+        }
+      });
       return map;
     },
   });
 
-  const savedPixel = saved?.["meta_pixel_id"] || "";
-  const savedCapi = saved?.["meta_capi_token"] || "";
+  const savedPixel = saved?.["meta_pixel_id"] ? String(saved["meta_pixel_id"]).trim() : "";
+  const savedCapi = saved?.["meta_capi_token"] ? String(saved["meta_capi_token"]).trim() : "";
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -192,11 +205,13 @@ export function GtmDialog({ open, onOpenChange }: DialogProps) {
   const { data: saved, isLoading } = useQuery({
     queryKey: ["gtm-settings"],
     enabled: open,
+    staleTime: 0,
     queryFn: async () => {
       const url = import.meta.env.VITE_API_URL || "http://localhost:8000";
-      const res = await fetch(`${url}/settings/get.php?keys=gtm_id`);
+      const res = await fetch(`${url}/settings/get.php?keys=gtm_id&_t=${Date.now()}`, { cache: "no-store" });
       const data = await res.json();
-      return data?.[0]?.value || "";
+      const val = data?.[0]?.value;
+      return val && typeof val === "string" ? val.trim() : "";
     },
   });
 

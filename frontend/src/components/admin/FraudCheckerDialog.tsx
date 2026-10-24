@@ -39,23 +39,30 @@ export function FraudCheckerDialog({ open, onOpenChange }: { open: boolean; onOp
   const { data: savedKey, isLoading } = useQuery({
     queryKey: ["app-settings-ecomah"],
     enabled: open,
+    staleTime: 0,
     queryFn: async () => {
       const url = import.meta.env.VITE_API_URL || "http://localhost:8000";
-      const res = await fetch(`${url}/settings/get.php?keys=${ECOMAH_SETTING_KEY}`);
+      const res = await fetch(`${url}/settings/get.php?keys=${ECOMAH_SETTING_KEY}&_t=${Date.now()}`, { cache: "no-store" });
       const data = await res.json();
-      return data?.[0]?.value || "";
+      const val = data?.[0]?.value;
+      return val && typeof val === "string" ? val.trim() : "";
     },
   });
 
   const { data: courierSettings } = useQuery({
     queryKey: ["app-settings-courier"],
     enabled: open,
+    staleTime: 0,
     queryFn: async () => {
       const url = import.meta.env.VITE_API_URL || "http://localhost:8000";
-      const res = await fetch(`${url}/settings/get.php?keys=steadfast_api_key,steadfast_secret_key`);
+      const res = await fetch(`${url}/settings/get.php?keys=steadfast_api_key,steadfast_secret_key&_t=${Date.now()}`, { cache: "no-store" });
       const data = await res.json();
       const map: Record<string, string> = {};
-      data?.forEach((r: any) => { map[r.key] = r.value; });
+      data?.forEach((r: any) => {
+        if (r && r.key && r.value) {
+          map[r.key] = String(r.value).trim();
+        }
+      });
       return map;
     },
   });
@@ -85,6 +92,8 @@ export function FraudCheckerDialog({ open, onOpenChange }: { open: boolean; onOp
   const handleDeleteKey = async () => {
     try {
       await deleteEcomahApiKey();
+      queryClient.removeQueries({ queryKey: ["app-settings-ecomah"] });
+      queryClient.removeQueries({ queryKey: ["ecomah-status"] });
       queryClient.invalidateQueries({ queryKey: ["app-settings-ecomah"] });
       queryClient.invalidateQueries({ queryKey: ["ecomah-status"] });
       toast.success(t("API Key ডিলিট হয়েছে", "API Key deleted"));

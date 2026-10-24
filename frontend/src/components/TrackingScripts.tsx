@@ -65,7 +65,7 @@ export function getEnrichedUserData(): Record<string, string> {
   return data;
 }
 
-const DEFAULT_PIXEL_ID = "149492662193854";
+const DEFAULT_PIXEL_ID: string | null = null;
 
 export default function TrackingScripts() {
   const [pixelId, setPixelId] = useState<string | null>(DEFAULT_PIXEL_ID);
@@ -78,15 +78,23 @@ export default function TrackingScripts() {
   useEffect(() => {
     if (isAdmin) return;
     const url = import.meta.env.VITE_API_URL || "https://api.ssseedshop.com";
-    fetch(`${url}/settings/get.php?keys=meta_pixel_id,gtm_id`)
+    fetch(`${url}/settings/get.php?keys=meta_pixel_id,gtm_id&_t=${Date.now()}`, { cache: "no-store" })
       .then((r) => r.json())
       .then((data) => {
+        let foundPixel: string | null = null;
+        let foundGtm: string | null = null;
         if (Array.isArray(data)) {
           data.forEach((r: any) => {
-            if (r?.key === "meta_pixel_id" && r?.value) setPixelId(r.value);
-            if (r?.key === "gtm_id" && r?.value) setGtmId(r.value);
+            if (r?.key === "meta_pixel_id" && typeof r?.value === "string" && r.value.trim()) {
+              foundPixel = r.value.trim();
+            }
+            if (r?.key === "gtm_id" && typeof r?.value === "string" && r.value.trim()) {
+              foundGtm = r.value.trim();
+            }
           });
         }
+        setPixelId(foundPixel);
+        setGtmId(foundGtm);
       })
       .catch(() => {});
   }, [isAdmin]);

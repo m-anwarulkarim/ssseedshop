@@ -44,13 +44,18 @@ function CourierApiDialog({ open, onOpenChange }: { open: boolean; onOpenChange:
   const { data: savedSettings, isLoading } = useQuery({
     queryKey: ["app-settings-courier"],
     enabled: open,
+    staleTime: 0,
     queryFn: async () => {
       const url = import.meta.env.VITE_API_URL || "http://localhost:8000";
       const keys = ["steadfast_api_key", "steadfast_secret_key", "steadfast_webhook_token", "steadfast_courier_note"].join(",");
-      const res = await fetch(`${url}/settings/get.php?keys=${keys}`);
+      const res = await fetch(`${url}/settings/get.php?keys=${keys}&_t=${Date.now()}`, { cache: "no-store" });
       const data = await res.json();
       const map: Record<string, string> = {};
-      data?.forEach((r: any) => { map[r.key] = r.value; });
+      data?.forEach((r: any) => {
+        if (r && r.key && r.value) {
+          map[r.key] = String(r.value).trim();
+        }
+      });
       return map;
     },
   });
@@ -104,6 +109,8 @@ function CourierApiDialog({ open, onOpenChange }: { open: boolean; onOpenChange:
       });
     },
     onSuccess: () => {
+      queryClient.removeQueries({ queryKey: ["app-settings-courier"] });
+      queryClient.removeQueries({ queryKey: ["courier-status"] });
       queryClient.invalidateQueries({ queryKey: ["app-settings-courier"] });
       queryClient.invalidateQueries({ queryKey: ["courier-status"] });
       toast.success(t("ডিলিট হয়েছে", "Deleted"));
@@ -604,9 +611,10 @@ export default function ApiManagement() {
 
   const { data: courierStatus } = useQuery({
     queryKey: ["courier-status"],
+    staleTime: 0,
     queryFn: async () => {
       const url = import.meta.env.VITE_API_URL || "http://localhost:8000";
-      const res = await fetch(`${url}/settings/steadfast.php`, {
+      const res = await fetch(`${url}/settings/steadfast.php?_t=${Date.now()}`, {
         method: "POST", headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ action: "get_balance" })
       });
@@ -619,31 +627,37 @@ export default function ApiManagement() {
 
   const { data: ecomahStatus } = useQuery({
     queryKey: ["ecomah-status"],
+    staleTime: 0,
     queryFn: async () => {
       const url = import.meta.env.VITE_API_URL || "http://localhost:8000";
-      const res = await fetch(`${url}/settings/get.php?keys=${ECOMAH_SETTING_KEY}`);
+      const res = await fetch(`${url}/settings/get.php?keys=${ECOMAH_SETTING_KEY}&_t=${Date.now()}`, { cache: "no-store" });
       const data = await res.json();
-      return data?.[0]?.value ? "active" : "inactive";
+      const val = data?.[0]?.value;
+      return val && typeof val === "string" && val.trim() !== "" ? "active" : "inactive";
     },
   });
 
   const { data: pixelStatus } = useQuery({
     queryKey: ["pixel-status"],
+    staleTime: 0,
     queryFn: async () => {
       const url = import.meta.env.VITE_API_URL || "http://localhost:8000";
-      const res = await fetch(`${url}/settings/get.php?keys=meta_pixel_id`);
+      const res = await fetch(`${url}/settings/get.php?keys=meta_pixel_id&_t=${Date.now()}`, { cache: "no-store" });
       const data = await res.json();
-      return data && data.length > 0 ? "active" : "inactive";
+      const val = data?.[0]?.value;
+      return val && typeof val === "string" && val.trim() !== "" ? "active" : "inactive";
     },
   });
 
   const { data: gtmStatus } = useQuery({
     queryKey: ["gtm-status"],
+    staleTime: 0,
     queryFn: async () => {
       const url = import.meta.env.VITE_API_URL || "http://localhost:8000";
-      const res = await fetch(`${url}/settings/get.php?keys=gtm_id`);
+      const res = await fetch(`${url}/settings/get.php?keys=gtm_id&_t=${Date.now()}`, { cache: "no-store" });
       const data = await res.json();
-      return data && data.length > 0 ? "active" : "inactive";
+      const val = data?.[0]?.value;
+      return val && typeof val === "string" && val.trim() !== "" ? "active" : "inactive";
     },
   });
 
@@ -658,6 +672,7 @@ export default function ApiManagement() {
           icon={Truck}
           title={t("কুরিয়ার API (Steadfast)", "Courier API (Steadfast)")}
           description={t("API Key, Secret Key ও Webhook Token কনফিগার করুন", "Configure API Key, Secret Key & Webhook Token")}
+          status={courierStatus as "active" | "inactive" | undefined}
           onClick={() => setCourierOpen(true)}
         />
         <ApiCard
