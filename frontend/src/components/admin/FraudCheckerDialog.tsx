@@ -1,3 +1,4 @@
+import { API_URL } from "@/config/env";
 import { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -41,7 +42,7 @@ export function FraudCheckerDialog({ open, onOpenChange }: { open: boolean; onOp
     enabled: open,
     staleTime: 0,
     queryFn: async () => {
-      const url = import.meta.env.VITE_API_URL || "http://localhost:8000";
+      const url = API_URL;
       const res = await fetch(`${url}/settings/get.php?keys=${ECOMAH_SETTING_KEY}&_t=${Date.now()}`, { cache: "no-store" });
       const data = await res.json();
       const val = data?.[0]?.value;
@@ -54,7 +55,7 @@ export function FraudCheckerDialog({ open, onOpenChange }: { open: boolean; onOp
     enabled: open,
     staleTime: 0,
     queryFn: async () => {
-      const url = import.meta.env.VITE_API_URL || "http://localhost:8000";
+      const url = API_URL;
       const res = await fetch(`${url}/settings/get.php?keys=steadfast_api_key,steadfast_secret_key&_t=${Date.now()}`, { cache: "no-store" });
       const data = await res.json();
       const map: Record<string, string> = {};
@@ -106,7 +107,7 @@ export function FraudCheckerDialog({ open, onOpenChange }: { open: boolean; onOp
     setTesting(true); setTestResult(null);
 
     try {
-      const url = import.meta.env.VITE_API_URL || "http://localhost:8000";
+      const url = API_URL;
       const res = await fetch(`${url}/settings/fraud_checker.php`, {
         method: "POST", headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ action: "check", phone: testPhone })
@@ -129,7 +130,7 @@ export function FraudCheckerDialog({ open, onOpenChange }: { open: boolean; onOp
     setSteadfastTesting(true);
     setSteadfastTestResult(null);
     try {
-      const url = import.meta.env.VITE_API_URL || "http://localhost:8000";
+      const url = API_URL;
       const res = await fetch(`${url}/courier/steadfast.php`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },

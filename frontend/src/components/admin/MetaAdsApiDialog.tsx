@@ -1,3 +1,4 @@
+import { API_URL } from "@/config/env";
 import { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -24,7 +25,7 @@ export function MetaAdsApiDialog({ open, onOpenChange }: { open: boolean; onOpen
     queryKey: ["app-settings-meta-ads"],
     enabled: open,
     queryFn: async () => {
-      const url = import.meta.env.VITE_API_URL || "http://localhost:8000";
+      const url = API_URL;
       const keys = ["meta_ads_access_token", "meta_ad_account_id"].join(",");
       const res = await fetch(`${url}/settings/get.php?keys=${keys}`);
       const data = await res.json();
@@ -46,7 +47,7 @@ export function MetaAdsApiDialog({ open, onOpenChange }: { open: boolean; onOpen
     setSaving(true);
     try {
       const now = new Date().toISOString();
-      const url = import.meta.env.VITE_API_URL || "http://localhost:8000";
+      const url = API_URL;
       await fetch(`${url}/settings/update.php`, {
         method: "POST", headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ key: "meta_ads_access_token", value: accessToken.trim() })
@@ -70,7 +71,7 @@ export function MetaAdsApiDialog({ open, onOpenChange }: { open: boolean; onOpen
 
   const handleDelete = async () => {
     try {
-      const url = import.meta.env.VITE_API_URL || "http://localhost:8000";
+      const url = API_URL;
       await fetch(`${url}/settings/delete.php`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ key: "meta_ads_access_token" }) });
       await fetch(`${url}/settings/delete.php`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ key: "meta_ad_account_id" }) });
       queryClient.invalidateQueries({ queryKey: ["app-settings-meta-ads"] });

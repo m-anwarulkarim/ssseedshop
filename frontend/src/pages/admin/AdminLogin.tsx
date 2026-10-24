@@ -1,3 +1,4 @@
+import { API_URL } from "@/config/env";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -39,7 +40,7 @@ export default function AdminLogin() {
     }
 
     setLoading(true);
-    const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:8005";
+    const apiUrl = API_URL;
 
     try {
       const res = await fetch(`${apiUrl}/auth/login.php`, {

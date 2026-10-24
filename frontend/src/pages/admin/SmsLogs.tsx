@@ -1,3 +1,4 @@
+import { API_URL } from "@/config/env";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { Badge } from "@/components/ui/badge";
@@ -18,7 +19,7 @@ import { DateRangeFilter, DateRangeValue, getDateRangeISO } from "@/components/a
 import { toast } from "sonner";
 import { getCurrentAdminAccess } from "@/lib/adminAccess";
 
-const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:8005";
+const API_BASE = API_URL;
 
 const REASON_CONFIG: Record<string, { en: string; bn: string; icon: typeof MessageSquare; color: string }> = {
   manual: { en: "Manual", bn: "ম্যানুয়াল", icon: Send, color: "bg-blue-500" },

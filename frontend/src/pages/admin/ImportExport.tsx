@@ -1,3 +1,4 @@
+import { API_URL } from "@/config/env";
 import { useRef, useState } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -9,7 +10,7 @@ import {
   BookOpen, Tag, FileSpreadsheet, CheckCircle2, AlertCircle, HardDrive,
 } from "lucide-react";
 
-const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:8005";
+const API_BASE = API_URL;
 
 interface TableConfig {
   key: string;

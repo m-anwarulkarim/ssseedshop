@@ -1,3 +1,4 @@
+import { API_URL } from "@/config/env";
 import { useEffect, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
@@ -9,7 +10,7 @@ import { Card } from "@/components/ui/card";
 import { toast } from "sonner";
 import { Plus, Trash2, Save, Loader2 } from "lucide-react";
 
-const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:8005";
+const API_BASE = API_URL;
 
 type Tier = { label: string; sub: string; charge: string; isFree: boolean };
 type TimeItem = { label: string; value: string };

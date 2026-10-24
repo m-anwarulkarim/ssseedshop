@@ -1,3 +1,4 @@
+import { API_URL } from "@/config/env";
 import { useState, useMemo, useEffect, useCallback, useRef } from "react";
 import { formatDistanceToNow } from "date-fns";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -134,7 +135,7 @@ export default function WebOrders() {
 
   const saveFieldMutation = useMutation({
     mutationFn: async ({ id, field, value }: { id: string; field: string; value: string }) => {
-      const url = import.meta.env.VITE_API_URL || "http://localhost:8005";
+      const url = API_URL;
       const res = await fetch(`${url}/orders/update.php`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -162,7 +163,7 @@ export default function WebOrders() {
     refetchOnMount: "always",
     refetchInterval: 10000,
     queryFn: async () => {
-      const url = import.meta.env.VITE_API_URL || "http://localhost:8005";
+      const url = API_URL;
       const res = await fetch(`${url}/orders/get.php`);
       let data = await res.json();
       data = data.filter((o: any) => !o.is_deleted);
@@ -217,7 +218,7 @@ export default function WebOrders() {
     refetchOnMount: "always",
     refetchInterval: 10000,
     queryFn: async () => {
-      const url = import.meta.env.VITE_API_URL || "http://localhost:8005";
+      const url = API_URL;
       const res = await fetch(`${url}/orders/get.php`);
       let data = await res.json();
       data = data.filter((o: any) => !o.is_deleted && WEB_STATUS_VALUES.includes(o.status));
@@ -297,7 +298,7 @@ export default function WebOrders() {
     loadingRef.current.add(phone);
     setLoadingFraudPhones(prev => ({ ...prev, [phone]: true }));
     try {
-      const url = import.meta.env.VITE_API_URL || "http://localhost:8005";
+      const url = API_URL;
       const res = await fetch(`${url}/orders/fraud_checker.php`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -335,7 +336,7 @@ export default function WebOrders() {
 
     (async () => {
       try {
-        const url = import.meta.env.VITE_API_URL || "http://localhost:8005";
+        const url = API_URL;
         const res = await fetch(`${url}/orders/fraud_checker.php?action=get_all_cached`);
         if (cancelled || !res.ok) return;
         const json = await res.json();
@@ -367,7 +368,7 @@ export default function WebOrders() {
     mutationFn: async ({ id, status, oldStatus, phone }: { id: string; status: string; oldStatus?: string; phone?: string }) => {
       // Optimistic local badge update
       applyStatusChange(oldStatus, status);
-      const url = import.meta.env.VITE_API_URL || "http://localhost:8005";
+      const url = API_URL;
       const res = await fetch(`${url}/orders/update.php`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -390,7 +391,7 @@ export default function WebOrders() {
       }).catch(console.error);
       // Clean up matching incomplete_orders by phone
       if (phone) {
-        const apiUrl = import.meta.env.VITE_API_URL || "https://api.ssseedshop.com";
+        const apiUrl = API_URL;
         fetch(`${apiUrl}/orders/incomplete.php`, {
           method: "DELETE",
           headers: { "Content-Type": "application/json" },
@@ -411,7 +412,7 @@ export default function WebOrders() {
   // Delete order mutation via PHP API
   const deleteOrderMutation = useMutation({
     mutationFn: async (id: string) => {
-      const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:8005";
+      const apiUrl = API_URL;
       const res = await fetch(`${apiUrl}/orders/delete.php`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -432,7 +433,7 @@ export default function WebOrders() {
   const { data: incompleteOrders, isLoading: incompleteLoading } = useQuery({
     queryKey: ["incomplete-orders", dateRange],
     queryFn: async () => {
-      const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:8005";
+      const apiUrl = API_URL;
       const res = await fetch(`${apiUrl}/orders/incomplete.php`);
       const result = await res.json();
       if (!result.success) throw new Error(result.error || result.message || "Failed to load incomplete orders");
@@ -478,7 +479,7 @@ export default function WebOrders() {
       }
 
       // Delete incomplete order
-      const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:8005";
+      const apiUrl = API_URL;
       await fetch(`${apiUrl}/orders/incomplete.php`, {
         method: "DELETE",
         headers: { "Content-Type": "application/json" },
@@ -502,7 +503,7 @@ export default function WebOrders() {
   // Delete single incomplete order
   const deleteIncompleteMutation = useMutation({
     mutationFn: async (id: string) => {
-      const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:8005";
+      const apiUrl = API_URL;
       const res = await fetch(`${apiUrl}/orders/incomplete.php`, {
         method: "DELETE",
         headers: { "Content-Type": "application/json" },
@@ -522,7 +523,7 @@ export default function WebOrders() {
   // Bulk delete incomplete orders
   const bulkDeleteIncompleteMutation = useMutation({
     mutationFn: async (ids: string[]) => {
-      const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:8005";
+      const apiUrl = API_URL;
       const res = await fetch(`${apiUrl}/orders/incomplete.php`, {
         method: "DELETE",
         headers: { "Content-Type": "application/json" },
@@ -1155,7 +1156,7 @@ export default function WebOrders() {
               onClick={async () => {
                 if (!preDateDialog || !preDateValue) return;
                 // Save pre_date and update status to "pre"
-                const url = import.meta.env.VITE_API_URL || "http://localhost:8000";
+                const url = API_URL;
                 const res = await fetch(`${url}/orders/update.php`, {
                   method: "POST",
                   headers: { "Content-Type": "application/json" },

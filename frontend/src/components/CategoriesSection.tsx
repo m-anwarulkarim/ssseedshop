@@ -1,3 +1,4 @@
+import { API_URL } from "@/config/env";
 import { Loader2, Sparkles } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
@@ -14,7 +15,7 @@ const CategoriesSection = () => {
     staleTime: 30 * 60 * 1000,
     refetchOnWindowFocus: true,
     queryFn: async () => {
-      const url = import.meta.env.VITE_API_URL || "http://localhost:8000";
+      const url = API_URL;
       const res = await fetch(`${url}/categories/get.php`);
       let data = await res.json();
       data = data.sort((a: any, b: any) => (a.position || 0) - (b.position || 0) || new Date(a.created_at).getTime() - new Date(b.created_at).getTime());

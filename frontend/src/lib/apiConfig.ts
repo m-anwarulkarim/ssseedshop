@@ -1,14 +1,13 @@
-// Centralized API Base resolution with intelligent localhost / production switching
+/**
+ * @file apiConfig.ts
+ * @description API base configuration. Re-exports the centralized typed config from @/config/env.
+ */
+import { env, API_URL, buildApiUrl } from "@/config/env";
+
 export function getApiBase(): string {
-  const isLocal = typeof window !== "undefined" && 
-    (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1");
-
-  if (isLocal) {
-    // In local development, always use local PHP server on port 8005
-    return "http://127.0.0.1:8005";
-  }
-
-  return import.meta.env.VITE_API_URL || "https://api.ssseedshop.com";
+  return env.apiUrl;
 }
 
-export const API_BASE = getApiBase();
+export const API_BASE = env.apiUrl;
+export { API_URL, buildApiUrl, env };
+export default API_BASE;

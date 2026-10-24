@@ -1,3 +1,4 @@
+import { API_URL } from "@/config/env";
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -41,7 +42,7 @@ export default function LandingPagesOverviewCard() {
     queryKey: ["landing-overview-products"],
     queryFn: async () => {
       const skus = Array.from(new Set(LANDING_PAGES.map((lp) => lp.sku)));
-      const url = import.meta.env.VITE_API_URL || "http://localhost:8000";
+      const url = API_URL;
       const map: Record<string, any> = {};
       try {
         const res = await fetch(`${url}/products/get.php`);

@@ -1,3 +1,4 @@
+import { API_URL } from "@/config/env";
 import { Link, useLocation } from "react-router-dom";
 import { Mail, MapPin, Phone, Facebook, Instagram } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
@@ -80,7 +81,7 @@ export default function Footer({ showDevelopedBy }: { showDevelopedBy?: boolean 
     queryKey: ["footer-settings"],
     queryFn: async () => {
       try {
-        const url = import.meta.env.VITE_API_URL || "https://api.ssseedshop.com";
+        const url = API_URL;
         const res = await fetch(`${url}/settings/get.php?keys=footer_quick_links,footer_categories`);
         if (!res.ok) return {};
         const data = await res.json();

@@ -1,3 +1,4 @@
+import { API_URL } from "@/config/env";
 import { useState, useMemo, useEffect } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -110,7 +111,7 @@ export default function OrderList() {
   const syncCourierStatus = async (silent = false, specificId?: string) => {
     setSyncingCourier(true);
     try {
-      const url = import.meta.env.VITE_API_URL || "https://api.ssseedshop.com";
+      const url = API_URL;
       const res = await fetch(`${url}/courier/steadfast.php`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -692,7 +693,7 @@ export default function OrderList() {
     if (currentStatus) {
       applyStatusChange(currentStatus, newStatus);
     }
-    const url = import.meta.env.VITE_API_URL || "https://api.ssseedshop.com";
+    const url = API_URL;
 
     try {
       const res = await fetch(`${url}/orders/update.php`, {
@@ -751,7 +752,7 @@ export default function OrderList() {
       const targetOrders = orders.filter((o: any) => ids.includes(o.id));
       targetOrders.forEach((o: any) => applyStatusChange(o.status, newStatus));
 
-      const url = import.meta.env.VITE_API_URL || "https://api.ssseedshop.com";
+      const url = API_URL;
       const res = await fetch(`${url}/orders/update.php`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },

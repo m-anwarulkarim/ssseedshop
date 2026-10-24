@@ -1,3 +1,4 @@
+import { API_URL } from "@/config/env";
 import { useParams, useNavigate } from "react-router-dom";
 import { useEffect, useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -44,7 +45,7 @@ async function downloadInvoice(orderId: string | undefined, order: OrderDetails 
   let invoiceOrder: any = null;
 
   if (orderId) {
-    const url = import.meta.env.VITE_API_URL || "http://localhost:8000";
+    const url = API_URL;
     try {
       const res = await fetch(`${url}/orders/get_single.php?id=${encodeURIComponent(orderId)}`);
       if (res.ok) {

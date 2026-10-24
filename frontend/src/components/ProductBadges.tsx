@@ -1,3 +1,4 @@
+import { API_URL } from "@/config/env";
 import { useQuery } from "@tanstack/react-query";
 import { icons } from "lucide-react";
 
@@ -25,7 +26,7 @@ export function useAllTags() {
   return useQuery({
     queryKey: ["all-tags"],
     queryFn: async () => {
-      const url = import.meta.env.VITE_API_URL || "https://api.ssseedshop.com";
+      const url = API_URL;
       const res = await fetch(`${url}/tags/get.php`);
       if (!res.ok) return [];
       const data = await res.json();

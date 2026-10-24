@@ -1,4 +1,5 @@
 // 🔒 DO_NOT_MODIFY_START — Facebook Pixel & Meta CAPI tracking (full file locked)
+import { API_URL } from "@/config/env";
 import { useEffect, useRef, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -77,7 +78,7 @@ export default function TrackingScripts() {
   // Fetch tracking IDs once
   useEffect(() => {
     if (isAdmin) return;
-    const url = import.meta.env.VITE_API_URL || "https://api.ssseedshop.com";
+    const url = API_URL;
     fetch(`${url}/settings/get.php?keys=meta_pixel_id,gtm_id&_t=${Date.now()}`, { cache: "no-store" })
       .then((r) => r.json())
       .then((data) => {

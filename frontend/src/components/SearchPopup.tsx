@@ -1,3 +1,4 @@
+import { API_URL } from "@/config/env";
 import { useState, useCallback, useEffect, useMemo } from "react";
 import { Search, Mic, Sparkles, ArrowRight, SlidersHorizontal, Package, TrendingUp } from "lucide-react";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
@@ -48,7 +49,7 @@ export default function SearchPopup({ open, onOpenChange }: SearchPopupProps) {
     setSearching(true);
     setHasSearched(true);
     
-    const url = import.meta.env.VITE_API_URL || "http://localhost:8000";
+    const url = API_URL;
     const res = await fetch(`${url}/products/get.php`);
     let data = await res.json();
     data = data.filter((p: any) => !p.is_hidden);
@@ -83,7 +84,7 @@ export default function SearchPopup({ open, onOpenChange }: SearchPopupProps) {
 
   useEffect(() => {
     if (!open) return;
-    const url = import.meta.env.VITE_API_URL || "http://localhost:8000";
+    const url = API_URL;
     fetch(`${url}/categories/get.php`)
       .then((res) => res.json())
       .then((data) => {

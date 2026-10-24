@@ -1,3 +1,4 @@
+import { API_URL, GOOGLE_CLIENT_ID } from "@/config/env";
 import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -13,10 +14,9 @@ declare global {
 }
 
 const CUSTOMER_SESSION_KEY = "customer-session";
-const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID || "934384186684-5s17f4snee7neecq45h0ssmh26b57pbk.apps.googleusercontent.com";
 
 async function callPhoneAuth(body: Record<string, any>) {
-  const url = import.meta.env.VITE_API_URL || "http://localhost:8000";
+  const url = API_URL;
   const res = await fetch(`${url}/customer/phone_auth.php`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -82,7 +82,7 @@ export default function CustomerLogin({ onLogin }: Props) {
     if (!response?.credential) return;
     setGoogleLoading(true);
     try {
-      const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:8000";
+      const apiUrl = API_URL;
       const res = await fetch(`${apiUrl}/customer/google_auth.php`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },

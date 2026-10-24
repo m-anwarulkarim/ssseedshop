@@ -2,6 +2,7 @@
 // Resilient client-side handler for E-COMAH SMS & Balance checking
 // Provides native direct gateway fallback for 100% uptime even if backend proxy fails.
 
+import { API_URL } from "@/config/env";
 import { ECOMAH_SETTING_KEY } from "./ecomahSettings";
 
 export interface EcomahBalanceData {
@@ -34,7 +35,7 @@ export async function getEcomahApiKey(): Promise<string> {
   }
 
   try {
-    const url = import.meta.env.VITE_API_URL || "http://localhost:8005";
+    const url = API_URL;
     const res = await fetch(`${url}/settings/get.php?keys=${ECOMAH_SETTING_KEY}`);
     const data = await res.json();
     const val = data?.[0]?.value || "";
@@ -53,7 +54,7 @@ export async function getEcomahApiKey(): Promise<string> {
  */
 export async function checkEcomahBalance(providedKey?: string): Promise<EcomahBalanceData> {
   const apiKey = providedKey || (await getEcomahApiKey());
-  const url = import.meta.env.VITE_API_URL || "http://localhost:8005";
+  const url = API_URL;
 
   // Stage 1: Try backend proxy
   try {
@@ -168,7 +169,7 @@ export async function sendEcomahSms({
   }
 
   const apiKey = providedKey || (await getEcomahApiKey());
-  const url = import.meta.env.VITE_API_URL || "http://localhost:8005";
+  const url = API_URL;
 
   // Stage 1: Try backend endpoint (for DB logging)
   try {

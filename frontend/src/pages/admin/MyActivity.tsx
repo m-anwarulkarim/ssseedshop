@@ -1,3 +1,4 @@
+import { API_URL } from "@/config/env";
 import { useState, useMemo, useRef } from "react";
 import { Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
@@ -58,7 +59,7 @@ export default function MyActivity() {
 
       // Enrich from backend admins list if accessible
       try {
-        const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:8005";
+        const apiUrl = API_URL;
         const res = await fetch(`${apiUrl}/admin/manage.php?action=list`);
         if (res.ok) {
           const admins = await res.json();
@@ -93,7 +94,7 @@ export default function MyActivity() {
   const { data: allOrders = [], isLoading: ordersLoading, refetch: refetchOrders, isRefetching } = useQuery({
     queryKey: ["my-activity-orders-list"],
     queryFn: async () => {
-      const apiUrl = import.meta.env.VITE_API_URL || "https://api.ssseedshop.com";
+      const apiUrl = API_URL;
       try {
         const res = await fetch(`${apiUrl}/orders/get.php`, {
           cache: "no-store",
@@ -262,7 +263,7 @@ export default function MyActivity() {
       const compressed = await compressAvatarImage(file);
       const formData = new FormData();
       formData.append("file", compressed, compressed.name || "admin_avatar.webp");
-      const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:8005";
+      const apiUrl = API_URL;
       const res = await fetch(`${apiUrl}/media/upload.php`, {
         method: "POST",
         body: formData,

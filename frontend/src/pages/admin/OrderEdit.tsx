@@ -1,3 +1,4 @@
+import { API_URL } from "@/config/env";
 import { useState, useEffect, useMemo, useRef, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -88,7 +89,7 @@ function CourierEntrySettingsPopover({ order }: { order?: any }) {
     }
     setSaving(true);
     try {
-      const url = import.meta.env.VITE_API_URL || "http://localhost:8005";
+      const url = API_URL;
       const res = await fetch(`${url}/orders/update.php`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -308,7 +309,7 @@ export default function OrderEdit() {
     if (!normalizedPhone) return;
 
     try {
-      const url = import.meta.env.VITE_API_URL || "http://localhost:8005";
+      const url = API_URL;
       await fetch(`${url}/orders/incomplete.php`, {
         method: "DELETE",
         headers: { "Content-Type": "application/json" },
@@ -374,7 +375,7 @@ export default function OrderEdit() {
     queryKey: ["order-edit", id],
     enabled: !!id,
     queryFn: async () => {
-      const url = import.meta.env.VITE_API_URL || "http://localhost:8005";
+      const url = API_URL;
       const res = await fetch(`${url}/orders/get.php?id=${id}`);
       if (!res.ok) throw new Error("Order not found");
       return res.json();
@@ -428,7 +429,7 @@ export default function OrderEdit() {
     if (!order || isNew) return;
     if (!noteInitRef.current) { noteInitRef.current = true; return; }
     const timer = setTimeout(async () => {
-      const url = import.meta.env.VITE_API_URL || "http://localhost:8005";
+      const url = API_URL;
       fetch(`${url}/orders/update.php`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -446,7 +447,7 @@ export default function OrderEdit() {
     const trimmed = altPhone.trim();
     if (trimmed.length > 0 && trimmed.length < 11) return;
     const timer = setTimeout(async () => {
-      const url = import.meta.env.VITE_API_URL || "http://localhost:8005";
+      const url = API_URL;
       fetch(`${url}/orders/update.php`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -483,7 +484,7 @@ export default function OrderEdit() {
   const { data: pickerCategories } = useQuery({
     queryKey: ["picker-categories"],
     queryFn: async () => {
-      const url = import.meta.env.VITE_API_URL || "http://localhost:8000";
+      const url = API_URL;
       const res = await fetch(`${url}/categories/get.php`);
       let data = await res.json();
       data = data.sort((a: any, b: any) => (a.position || 0) - (b.position || 0));
@@ -502,7 +503,7 @@ export default function OrderEdit() {
   const { data: products } = useQuery({
     queryKey: ["products-picker", pickerMode, productSearch, selectedCategory, selectedTag],
     queryFn: async () => {
-      const url = import.meta.env.VITE_API_URL || "http://localhost:8000";
+      const url = API_URL;
       const res = await fetch(`${url}/products/get.php`);
       if (!res.ok) throw new Error("Failed to fetch products");
       let data = await res.json();
@@ -719,7 +720,7 @@ export default function OrderEdit() {
     if (!p || p.length < 11 || fraudRefreshing) return;
     setFraudRefreshing(true);
     try {
-      const url = import.meta.env.VITE_API_URL || "https://api.ssseedshop.com";
+      const url = API_URL;
       const res = await fetch(`${url}/orders/fraud_checker.php`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -743,7 +744,7 @@ export default function OrderEdit() {
     enabled: false, // Inactive per user request (Steadfast Risk Check active)
     queryFn: async () => {
       try {
-        const url = import.meta.env.VITE_API_URL || "https://api.ssseedshop.com";
+        const url = API_URL;
         const res = await fetch(`${url}/orders/fraud_checker.php`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -767,7 +768,7 @@ export default function OrderEdit() {
     enabled: cleanPhone.length >= 11,
     queryFn: async () => {
       try {
-        const url = import.meta.env.VITE_API_URL || "http://localhost:8000";
+        const url = API_URL;
         const res = await fetch(`${url}/courier/steadfast.php?action=fraud_check&phone=${cleanPhone}`);
         if (!res.ok) return null;
         const json = await res.json();
@@ -785,7 +786,7 @@ export default function OrderEdit() {
     if (!p || p.length < 11 || steadfastRefreshing) return;
     setSteadfastRefreshing(true);
     try {
-      const url = import.meta.env.VITE_API_URL || "http://localhost:8000";
+      const url = API_URL;
       const res = await fetch(`${url}/courier/steadfast.php`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -870,7 +871,7 @@ export default function OrderEdit() {
     const finalStatus = newStatus || savedStatus || status;
 
     try {
-      const url = import.meta.env.VITE_API_URL || "http://localhost:8005";
+      const url = API_URL;
       
       const payload = {
         id: isNew ? undefined : order!.id,
@@ -1212,7 +1213,7 @@ export default function OrderEdit() {
                     onKeyDown={async (e) => {
                       if (e.key === "Enter" && editingInvoiceValue.trim() && order) {
                         try {
-                          const url = import.meta.env.VITE_API_URL || "http://localhost:8005";
+                          const url = API_URL;
                           const res = await fetch(`${url}/orders/update.php`, {
                             method: "POST",
                             headers: { "Content-Type": "application/json" },
@@ -1351,7 +1352,7 @@ export default function OrderEdit() {
                           <input type="checkbox" checked={printNote} onChange={(e) => {
                             setPrintNote(e.target.checked);
                             if (order && !isNew) {
-                              const url = import.meta.env.VITE_API_URL || "http://localhost:8005";
+                              const url = API_URL;
                               fetch(`${url}/orders/update.php`, {
                                 method: "POST",
                                 headers: { "Content-Type": "application/json" },
@@ -1860,7 +1861,7 @@ export default function OrderEdit() {
                           return;
                         }
                         if (!isNew && order) {
-                          const url = import.meta.env.VITE_API_URL || "http://localhost:8005";
+                          const url = API_URL;
                           await fetch(`${url}/orders/update.php`, {
                             method: "POST",
                             headers: { "Content-Type": "application/json" },
@@ -2501,7 +2502,7 @@ export default function OrderEdit() {
                     if (!order?.id) return;
                     setSaving(true);
                     try {
-                      const url = import.meta.env.VITE_API_URL || "http://localhost:8005";
+                      const url = API_URL;
                       const res = await fetch(`${url}/orders/delete.php`, {
                         method: "POST",
                         headers: { "Content-Type": "application/json" },
@@ -2541,7 +2542,7 @@ export default function OrderEdit() {
                   if (!order?.id) return;
                   setSaving(true);
                   try {
-                    const url = import.meta.env.VITE_API_URL || "http://localhost:8005";
+                    const url = API_URL;
                     const res = await fetch(`${url}/orders/delete.php`, {
                       method: "POST",
                       headers: { "Content-Type": "application/json" },

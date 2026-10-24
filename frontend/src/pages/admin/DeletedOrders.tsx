@@ -1,3 +1,4 @@
+import { API_URL } from "@/config/env";
 import { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -38,7 +39,7 @@ export default function DeletedOrders() {
     staleTime: 0,
     refetchOnMount: "always",
     queryFn: async () => {
-      const url = import.meta.env.VITE_API_URL || "http://localhost:8005";
+      const url = API_URL;
       const searchParam = search.trim() ? `&search=${encodeURIComponent(search.trim())}` : "";
       const since = getDateRangeISO(dateRange);
       const sinceParam = since ? `&since=${encodeURIComponent(since)}` : "";
@@ -63,7 +64,7 @@ export default function DeletedOrders() {
   // Restore mutation (single or multiple)
   const restoreMutation = useMutation({
     mutationFn: async (ids: string[]) => {
-      const url = import.meta.env.VITE_API_URL || "http://localhost:8005";
+      const url = API_URL;
       const res = await fetch(`${url}/orders/update.php`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -86,7 +87,7 @@ export default function DeletedOrders() {
   // Permanent Delete mutation (single or multiple)
   const permanentDeleteMutation = useMutation({
     mutationFn: async (ids: string[]) => {
-      const url = import.meta.env.VITE_API_URL || "http://localhost:8005";
+      const url = API_URL;
       const res = await fetch(`${url}/orders/delete.php`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },

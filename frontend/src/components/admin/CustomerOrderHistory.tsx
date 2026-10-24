@@ -1,3 +1,4 @@
+import { API_URL } from "@/config/env";
 import { useQuery } from "@tanstack/react-query";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { Badge } from "@/components/ui/badge";
@@ -18,7 +19,7 @@ export function CustomerOrderHistory({ phone }: { phone: string }) {
   const { data: orders, isLoading } = useQuery({
     queryKey: ["customer-orders", phone],
     queryFn: async () => {
-      const url = import.meta.env.VITE_API_URL || "http://localhost:8005";
+      const url = API_URL;
       const res = await fetch(`${url}/orders/get.php?phone=${encodeURIComponent(phone)}`);
       const data = await res.json();
       if (!Array.isArray(data)) return [];

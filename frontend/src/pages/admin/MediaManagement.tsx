@@ -1,9 +1,10 @@
+import { API_URL } from "@/config/env";
 import { useState, useEffect, useCallback } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 
-const API_BASE = import.meta.env.VITE_API_URL || "https://api.ssseedshop.com";
+const API_BASE = API_URL;
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";

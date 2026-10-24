@@ -1,3 +1,4 @@
+import { API_URL } from "@/config/env";
 import { useLocation, useNavigate } from "react-router-dom";
 import { isLovablePreview } from "@/lib/previewMode";
 import { getSavedPath } from "@/lib/adminPageState";
@@ -419,7 +420,7 @@ export function AdminSidebar() {
     queryKey: ["sidebar-order-counts"],
     enabled: isAdmin,
     queryFn: async () => {
-      const url = import.meta.env.VITE_API_URL || "http://localhost:8005";
+      const url = API_URL;
       const res = await fetch(`${url}/orders/get.php?include_deleted=1`);
       const data = await res.json();
       if (!Array.isArray(data)) return { pending: 0, pre: 0, confirmed: 0, deleted: 0 };

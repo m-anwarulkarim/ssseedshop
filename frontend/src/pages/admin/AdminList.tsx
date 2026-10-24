@@ -1,3 +1,4 @@
+import { API_URL } from "@/config/env";
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -150,7 +151,7 @@ export default function AdminList() {
       const compressed = await compressAvatarImage(file);
       const formData = new FormData();
       formData.append("file", compressed, compressed.name || "admin_avatar.webp");
-      const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:8005";
+      const apiUrl = API_URL;
       const res = await fetch(`${apiUrl}/media/upload.php`, {
         method: "POST",
         body: formData,
@@ -176,7 +177,7 @@ export default function AdminList() {
   const { data: admins = [], isLoading } = useQuery({
     queryKey: ["admin-list"],
     queryFn: async () => {
-      const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:8005";
+      const apiUrl = API_URL;
       const res = await fetch(`${apiUrl}/admin/manage.php?action=list`);
       if (!res.ok) throw new Error("Failed to fetch admins");
       const result = await res.json();
@@ -187,7 +188,7 @@ export default function AdminList() {
 
   const createMutation = useMutation({
     mutationFn: async () => {
-      const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:8005";
+      const apiUrl = API_URL;
       const res = await fetch(`${apiUrl}/admin/manage.php`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -218,7 +219,7 @@ export default function AdminList() {
 
   const deleteMutation = useMutation({
     mutationFn: async (userId: string) => {
-      const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:8005";
+      const apiUrl = API_URL;
       const res = await fetch(`${apiUrl}/admin/manage.php`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -238,7 +239,7 @@ export default function AdminList() {
   const updateMutation = useMutation({
     mutationFn: async () => {
       if (!editingAdmin) return;
-      const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:8005";
+      const apiUrl = API_URL;
       const res = await fetch(`${apiUrl}/admin/manage.php`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },

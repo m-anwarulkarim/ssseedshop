@@ -1,3 +1,4 @@
+import { API_URL } from "@/config/env";
 import { useState } from "react";
 import { ShoppingCart, Star, Check } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
@@ -53,7 +54,7 @@ export default function ProductCard({ product, reviewStats: propReviewStats, hid
 
   const handlePrefetch = () => {
     if (!targetSlug) return;
-    const apiUrl = import.meta.env.VITE_API_URL || "https://api.ssseedshop.com";
+    const apiUrl = API_URL;
     queryClient.prefetchQuery({
       queryKey: ["product", targetSlug],
       queryFn: async () => {

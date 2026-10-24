@@ -1,3 +1,4 @@
+import { API_URL } from "@/config/env";
 import { useState, useMemo } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
@@ -36,7 +37,7 @@ export default function PreOrders() {
     queryKey: ["pre-orders-all"],
     refetchInterval: 30000,
     queryFn: async () => {
-      const url = import.meta.env.VITE_API_URL || "http://localhost:8005";
+      const url = API_URL;
       const res = await fetch(`${url}/orders/get.php?status=pre`);
       const data = await res.json();
       if (!Array.isArray(data)) return [];
@@ -96,7 +97,7 @@ export default function PreOrders() {
   // Update pre_date mutation via PHP API
   const updatePreDateMutation = useMutation({
     mutationFn: async ({ id, pre_date }: { id: string; pre_date: string }) => {
-      const url = import.meta.env.VITE_API_URL || "http://localhost:8005";
+      const url = API_URL;
       const res = await fetch(`${url}/orders/update.php`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },

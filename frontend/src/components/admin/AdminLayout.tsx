@@ -1,3 +1,4 @@
+import { API_URL } from "@/config/env";
 import { useCallback, useEffect, useRef, useState, Suspense } from "react";
 import { Outlet, useNavigate, useLocation } from "react-router-dom";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
@@ -95,7 +96,7 @@ function usePageCounts(pathname: string) {
     queryKey: ["header-order-counts"],
     enabled: pathname === "/admin/orders/pre" || pathname === "/admin/orders/web",
     queryFn: async () => {
-      const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:8005";
+      const apiUrl = API_URL;
       const res = await fetch(`${apiUrl}/orders/stats.php`);
       return await res.json();
     },

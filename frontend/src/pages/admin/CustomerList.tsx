@@ -1,3 +1,4 @@
+import { API_URL } from "@/config/env";
 import { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -85,7 +86,7 @@ export default function CustomerList() {
   const { data: customers, isLoading } = useQuery({
     queryKey: ["customers", search, typeFilter, countFilter, amountFilter, statusFilter],
     queryFn: async () => {
-      const url = import.meta.env.VITE_API_URL || "http://localhost:8005";
+      const url = API_URL;
       const searchParam = search.trim() ? `?search=${encodeURIComponent(search.trim())}` : "";
       const res = await fetch(`${url}/customer/get.php${searchParam}`);
       let data = await res.json();
@@ -113,7 +114,7 @@ export default function CustomerList() {
   // Update customer info via PHP API
   const updateMutation = useMutation({
     mutationFn: async (data: any) => {
-      const url = import.meta.env.VITE_API_URL || "http://localhost:8005";
+      const url = API_URL;
       const res = await fetch(`${url}/customer/profile.php`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -146,7 +147,7 @@ export default function CustomerList() {
   // Ban/Unban customer via PHP API
   const banMutation = useMutation({
     mutationFn: async ({ visitor_id, ban }: { visitor_id: string; ban: boolean }) => {
-      const url = import.meta.env.VITE_API_URL || "http://localhost:8005";
+      const url = API_URL;
       const res = await fetch(`${url}/customer/profile.php`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },

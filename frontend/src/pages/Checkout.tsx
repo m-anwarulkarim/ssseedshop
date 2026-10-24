@@ -1,3 +1,4 @@
+import { API_URL } from "@/config/env";
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { useQueryClient } from "@tanstack/react-query";
@@ -82,7 +83,7 @@ export default function Checkout() {
     if (customerSession.name && !name) setName(customerSession.name);
     if (customerSession.phone && !phone) setPhone(customerSession.phone);
 
-    const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:8005";
+    const apiUrl = API_URL;
     const queryParam = customerSession.profile_id
       ? `id=${encodeURIComponent(customerSession.profile_id)}`
       : customerSession.phone
@@ -156,7 +157,7 @@ export default function Checkout() {
     if (!code) return toast.error(t("কুপন কোড লিখুন","Enter coupon code"));
     setCouponLoading(true);
     try {
-      const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:8005";
+      const apiUrl = API_URL;
       const res = await fetch(`${apiUrl}/orders/coupons.php?code=${encodeURIComponent(code)}&amount=${totalPrice}`);
       const result = await res.json();
       
@@ -203,7 +204,7 @@ export default function Checkout() {
     }));
 
     try {
-      const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:8005";
+      const apiUrl = API_URL;
       await fetch(`${apiUrl}/orders/incomplete.php`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -255,7 +256,7 @@ export default function Checkout() {
     try {
       // Live stock validation — re-check against current available stock
       const productIds = [...new Set(items.map((i) => i.id))];
-      const url = import.meta.env.VITE_API_URL || "http://localhost:8000";
+      const url = API_URL;
       const pRes = await fetch(`${url}/products/get.php`);
       let stockRows = await pRes.json();
       stockRows = stockRows.filter((p: any) => productIds.includes(String(p.id)));
@@ -367,7 +368,7 @@ export default function Checkout() {
 
       // Update coupon usage atomically via PHP API
       if (appliedCoupon && couponDiscount > 0) {
-        const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:8005";
+        const apiUrl = API_URL;
         await fetch(`${apiUrl}/orders/coupons.php`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },

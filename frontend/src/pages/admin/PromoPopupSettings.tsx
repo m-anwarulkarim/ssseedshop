@@ -1,3 +1,4 @@
+import { API_URL } from "@/config/env";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -9,7 +10,7 @@ import { toast } from "sonner";
 import { Loader2, Plus, Trash2, Sparkles, Save } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 
-const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:8005";
+const API_BASE = API_URL;
 
 interface PromoRow {
   id: string;

@@ -1,3 +1,4 @@
+import { API_URL } from "@/config/env";
 import { useState, useCallback } from "react";
 import { Truck, PlayCircle, Search, Phone, X } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -21,7 +22,7 @@ export default function ActionButtonsRow() {
     setSearching(true);
     setHasSearched(true);
     try {
-      const url = import.meta.env.VITE_API_URL || "http://localhost:8000";
+      const url = API_URL;
       const res = await fetch(`${url}/products/get.php`);
       let allProducts = await res.json();
       allProducts = allProducts.filter((p: any) => !p.is_hidden);

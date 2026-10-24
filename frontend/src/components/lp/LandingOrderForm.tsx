@@ -1,3 +1,4 @@
+import { API_URL } from "@/config/env";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -87,7 +88,7 @@ export default function LandingOrderForm({ product, title }: Props) {
         if (!pc) validProfileId = null;
       }
 
-      const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:8005";
+      const apiUrl = API_URL;
       const payload = {
         customer_name: name.trim(),
         phone: phone.trim(),

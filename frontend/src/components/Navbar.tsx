@@ -1,3 +1,4 @@
+import { API_URL } from "@/config/env";
 import { ShoppingCart, Search, Menu, Home, LayoutGrid, ClipboardList, Sprout, UserRoundCog, ArrowRight, Palette, Check, HelpCircle, Image as ImageIcon, Languages, LogIn, LogOut } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useTheme, ThemeMode } from "@/contexts/ThemeContext";
@@ -321,7 +322,7 @@ function translateNavLabel(it: { label: string; href: string }, lang: string) {
 
 async function fetchNavbarItems() {
   try {
-    const url = import.meta.env.VITE_API_URL || "https://api.ssseedshop.com";
+    const url = API_URL;
     const res = await fetch(`${url}/settings/get.php?key=navbar_menu_items`);
     if (!res.ok) return DEFAULT_NAVBAR_ITEMS;
     const data = await res.json();

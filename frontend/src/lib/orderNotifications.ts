@@ -1,6 +1,7 @@
 // frontend/src/lib/orderNotifications.ts
 // Bulletproof order SMS notification dispatcher with server + direct fallback
 
+import { API_URL } from "@/config/env";
 import { sendEcomahSms } from "./ecomahClient";
 
 const DEFAULT_TEMPLATES: Record<string, { enabledKey: string; msgKey: string; defaultMsg: string }> = {
@@ -47,7 +48,7 @@ export async function dispatchOrderNotification(
   payload: OrderNotificationPayload
 ): Promise<{ success: boolean; smsSent: boolean; message?: string }> {
   const currentStatus = payload.newStatus || payload.status || "pending";
-  const url = import.meta.env.VITE_API_URL || "http://localhost:8005";
+  const url = API_URL;
 
   // 1. Try PHP API endpoint first (so it writes to database logs)
   try {

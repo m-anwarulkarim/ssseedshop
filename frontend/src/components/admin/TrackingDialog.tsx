@@ -1,3 +1,4 @@
+import { API_URL } from "@/config/env";
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
@@ -17,7 +18,7 @@ function useTrackingSave() {
 
   const saveMutation = useMutation({
     mutationFn: async ({ key, value }: { key: string; value: string }) => {
-      const url = import.meta.env.VITE_API_URL || "http://localhost:8000";
+      const url = API_URL;
       await fetch(`${url}/settings/update.php`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -40,7 +41,7 @@ function useTrackingSave() {
 
   const deleteMutation = useMutation({
     mutationFn: async (key: string) => {
-      const url = import.meta.env.VITE_API_URL || "http://localhost:8000";
+      const url = API_URL;
       await fetch(`${url}/settings/delete.php`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -103,7 +104,7 @@ export function PixelDialog({ open, onOpenChange }: DialogProps) {
     enabled: open,
     staleTime: 0,
     queryFn: async () => {
-      const url = import.meta.env.VITE_API_URL || "http://localhost:8000";
+      const url = API_URL;
       const keys = ["meta_pixel_id", "meta_capi_token"].join(",");
       const res = await fetch(`${url}/settings/get.php?keys=${keys}&_t=${Date.now()}`, { cache: "no-store" });
       const data = await res.json();
@@ -207,7 +208,7 @@ export function GtmDialog({ open, onOpenChange }: DialogProps) {
     enabled: open,
     staleTime: 0,
     queryFn: async () => {
-      const url = import.meta.env.VITE_API_URL || "http://localhost:8000";
+      const url = API_URL;
       const res = await fetch(`${url}/settings/get.php?keys=gtm_id&_t=${Date.now()}`, { cache: "no-store" });
       const data = await res.json();
       const val = data?.[0]?.value;

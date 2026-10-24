@@ -1,3 +1,4 @@
+import { API_URL } from "@/config/env";
 import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -27,7 +28,7 @@ export default function PublicInvoice() {
       const cleanId = orderId.trim();
 
       // Try matching by order_id string (case-insensitive) first
-      const url = import.meta.env.VITE_API_URL || "http://localhost:8000";
+      const url = API_URL;
       let data = null;
       try {
         const res = await fetch(`${url}/orders/get_single.php?id=${encodeURIComponent(cleanId)}`);

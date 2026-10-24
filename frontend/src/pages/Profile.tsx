@@ -1,10 +1,11 @@
+import { API_URL } from "@/config/env";
 import { useState, useEffect, useRef, useMemo } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import SideCart from "@/components/SideCart";
 import Footer from "@/components/Footer";
 
-const getApiUrl = () => import.meta.env.VITE_API_URL || "http://localhost:8000";
+const getApiUrl = () => API_URL;
 import CustomerLogin, {
   getCustomerSession,
   clearCustomerSession,

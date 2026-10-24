@@ -1,3 +1,4 @@
+import { API_URL } from "@/config/env";
 import { useState, useEffect, useRef, useCallback } from "react";
 import useEmblaCarousel from "embla-carousel-react";
 import DOMPurify from "dompurify";
@@ -101,7 +102,7 @@ export default function ProductDetail() {
     refetchOnWindowFocus: false,
     queryFn: async () => {
       if (!slug) return null;
-      const url = import.meta.env.VITE_API_URL || "http://localhost:8000";
+      const url = API_URL;
       const res = await fetch(`${url}/products/get_single.php?slug=${encodeURIComponent(slug)}`);
       if (!res.ok) return null;
       return await res.json();
@@ -131,7 +132,7 @@ export default function ProductDetail() {
     enabled: !!categoryName,
     queryFn: async () => {
       try {
-        const url = import.meta.env.VITE_API_URL || "http://localhost:8000";
+        const url = API_URL;
         const res = await fetch(`${url}/categories/get.php?name=${encodeURIComponent(categoryName!)}`);
         if (!res.ok) return null;
         const data = await res.json();
@@ -147,7 +148,7 @@ export default function ProductDetail() {
     queryKey: ["related-products", product?.id, categoryName],
     enabled: !!product?.id,
     queryFn: async () => {
-      const url = import.meta.env.VITE_API_URL || "http://localhost:8000";
+      const url = API_URL;
       const res = await fetch(`${url}/products/get_related.php`);
       if (!res.ok) return [];
       const data = await res.json();
@@ -217,7 +218,7 @@ export default function ProductDetail() {
     if (session.name && !name) setName(session.name);
     if (session.phone && !phone) setPhone(session.phone);
 
-    const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:8005";
+    const apiUrl = API_URL;
     const queryParam = session.profile_id
       ? `id=${encodeURIComponent(session.profile_id)}`
       : session.phone
@@ -369,7 +370,7 @@ export default function ProductDetail() {
   const saveIncompleteOrder = async (reason: string) => {
     const currentVisitorId = localStorage.getItem(VISITOR_ID_KEY) || null;
     try {
-      const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:8005";
+      const apiUrl = API_URL;
       await fetch(`${apiUrl}/orders/incomplete.php`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -440,7 +441,7 @@ export default function ProductDetail() {
     try {
       const currentVisitorId = localStorage.getItem(VISITOR_ID_KEY) || null;
       const validProfileId = session?.profile_id || visitorProfileId || null;
-      const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:8005";
+      const apiUrl = API_URL;
       const itemName = selectedVariation ? selectedVariation.name : product.name!;
 
       const payload = {

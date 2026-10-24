@@ -1,3 +1,4 @@
+import { API_URL } from "@/config/env";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -21,7 +22,7 @@ export default function FunnelAnalytics() {
     staleTime: 60_000,
     refetchInterval: 60_000,
     queryFn: async () => {
-      const url = import.meta.env.VITE_API_URL || "https://api.ssseedshop.com";
+      const url = API_URL;
       const res = await fetch(`${url}/analytics/overview.php`);
       if (!res.ok) return null;
       const json = await res.json();

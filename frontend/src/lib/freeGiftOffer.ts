@@ -1,3 +1,4 @@
+import { API_URL } from "@/config/env";
 export const FREE_GIFT_SETTINGS_KEY = "free_gift_offer";
 
 export interface FreeGiftTier {
@@ -35,7 +36,7 @@ export function normalizeConfig(raw: unknown): FreeGiftConfig {
 
 export async function fetchFreeGiftConfig(): Promise<FreeGiftConfig> {
   try {
-    const url = import.meta.env.VITE_API_URL || "https://api.ssseedshop.com";
+    const url = API_URL;
     const res = await fetch(`${url}/settings/get.php?key=${FREE_GIFT_SETTINGS_KEY}`);
     if (!res.ok) return EMPTY_FREE_GIFT_CONFIG;
     const data = await res.json();

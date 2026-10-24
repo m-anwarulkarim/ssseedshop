@@ -1,3 +1,4 @@
+import { API_URL } from "@/config/env";
 import { useState, useMemo, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -85,7 +86,7 @@ export default function ConfirmedOrders() {
   const { data: ordersResult, isLoading } = useQuery({
     queryKey: ["confirmed-orders", search, statusFilter, page, dateRange],
     queryFn: async () => {
-      const url = import.meta.env.VITE_API_URL || "http://localhost:8005";
+      const url = API_URL;
       const res = await fetch(`${url}/orders/get.php`);
       let data = await res.json();
       
@@ -132,7 +133,7 @@ export default function ConfirmedOrders() {
     queryKey: ["confirmed-orders-counts-rpc-v1", search, dateRange],
     refetchOnMount: "always",
     queryFn: async () => {
-      const url = import.meta.env.VITE_API_URL || "http://localhost:8005";
+      const url = API_URL;
       const res = await fetch(`${url}/orders/get.php`);
       let allOrders = await res.json();
       
@@ -170,7 +171,7 @@ export default function ConfirmedOrders() {
   const { data: invoiceNames = [] } = useQuery({
     queryKey: ["invoice-names-list"],
     queryFn: async () => {
-      const url = import.meta.env.VITE_API_URL || "http://localhost:8005";
+      const url = API_URL;
       const res = await fetch(`${url}/products/get.php`);
       const pData = await res.json();
       const names = new Set<string>();
@@ -184,7 +185,7 @@ export default function ConfirmedOrders() {
     queryKey: ["invoice-filter-orders", invoiceFilter],
     enabled: !!invoiceFilter,
     queryFn: async () => {
-      const url = import.meta.env.VITE_API_URL || "http://localhost:8005";
+      const url = API_URL;
       const res = await fetch(`${url}/products/get.php`);
       let pData = await res.json();
       pData = pData.filter((p: any) => p.sku === invoiceFilter);
@@ -271,7 +272,7 @@ export default function ConfirmedOrders() {
     mutationFn: async ({ id, status, oldStatus }: { id: string; status: string; oldStatus?: string }) => {
       applyStatusChange(oldStatus, status);
       
-      const url = import.meta.env.VITE_API_URL || "http://localhost:8005";
+      const url = API_URL;
       const payload = {
         id,
         status,
@@ -328,7 +329,7 @@ export default function ConfirmedOrders() {
     for (const o of selectedOrders) {
       setEntryProgress((prev) => ({ ...prev, current: o.order_id }));
       try {
-        const url = import.meta.env.VITE_API_URL || "http://localhost:8005";
+        const url = API_URL;
         const res = await fetch(`${url}/courier/steadfast.php`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -479,7 +480,7 @@ export default function ConfirmedOrders() {
                     const targetOrders = orders?.filter((o: any) => ids.includes(o.id)) || [];
                     targetOrders.forEach((o: any) => applyStatusChange(o.status, newStatus));
                     try {
-                      const url = import.meta.env.VITE_API_URL || "http://localhost:8005";
+                      const url = API_URL;
                       
                       await Promise.all(ids.map(async (id) => {
                         const res = await fetch(`${url}/orders/update.php`, {

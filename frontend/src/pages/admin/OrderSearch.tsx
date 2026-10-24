@@ -1,3 +1,4 @@
+import { API_URL } from "@/config/env";
 import { useState, useRef, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -66,7 +67,7 @@ export default function OrderSearch() {
     if (trimmed.length < 2) { setQuickResult(null); return; }
     setQuickLoading(true);
     try {
-      const url = import.meta.env.VITE_API_URL || "http://localhost:8000";
+      const url = API_URL;
       const res = await fetch(`${url}/orders/get.php`);
       let data = await res.json();
       const s = trimmed.toLowerCase();

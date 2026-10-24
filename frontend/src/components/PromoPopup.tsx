@@ -1,3 +1,4 @@
+import { API_URL } from "@/config/env";
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { X, Gift, Plus } from "lucide-react";
@@ -58,7 +59,7 @@ export default function PromoPopup() {
     (async () => {
       let data: any[] = [];
       try {
-        const url = import.meta.env.VITE_API_URL || "https://api.ssseedshop.com";
+        const url = API_URL;
         const res = await fetch(`${url}/settings/get.php?key=promo_popups`);
         if (res.ok) {
           const json = await res.json();
@@ -82,7 +83,7 @@ export default function PromoPopup() {
 
       const ids = [row.buy_product_id, row.free_product_id].filter(Boolean) as string[];
       if (ids.length) {
-        const url = import.meta.env.VITE_API_URL || "http://localhost:8000";
+        const url = API_URL;
         const res = await fetch(`${url}/products/get.php`);
         const allProducts = await res.json();
         const prods = allProducts.filter((p: any) => ids.includes(p.id));

@@ -1,3 +1,4 @@
+import { API_URL } from "@/config/env";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -35,7 +36,7 @@ export default function Overview() {
     staleTime: 60000,
     refetchInterval: 60000,
     queryFn: async () => {
-      const url = import.meta.env.VITE_API_URL || "https://api.ssseedshop.com";
+      const url = API_URL;
       const res = await fetch(`${url}/analytics/overview.php`);
       if (!res.ok) throw new Error("Failed to load analytics");
       const json = await res.json();

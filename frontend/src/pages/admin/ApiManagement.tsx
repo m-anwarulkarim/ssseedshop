@@ -1,3 +1,4 @@
+import { API_URL } from "@/config/env";
 import { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -39,14 +40,14 @@ function CourierApiDialog({ open, onOpenChange }: { open: boolean; onOpenChange:
   const [savedCourierNote, setSavedCourierNote] = useState("");
   const [savingNote, setSavingNote] = useState(false);
 
-  const callbackUrl = `${import.meta.env.VITE_API_URL || "http://localhost:8000"}/settings/steadfast_webhook.php`;
+  const callbackUrl = `${API_URL}/settings/steadfast_webhook.php`;
 
   const { data: savedSettings, isLoading } = useQuery({
     queryKey: ["app-settings-courier"],
     enabled: open,
     staleTime: 0,
     queryFn: async () => {
-      const url = import.meta.env.VITE_API_URL || "http://localhost:8000";
+      const url = API_URL;
       const keys = ["steadfast_api_key", "steadfast_secret_key", "steadfast_webhook_token", "steadfast_courier_note"].join(",");
       const res = await fetch(`${url}/settings/get.php?keys=${keys}&_t=${Date.now()}`, { cache: "no-store" });
       const data = await res.json();
@@ -75,7 +76,7 @@ function CourierApiDialog({ open, onOpenChange }: { open: boolean; onOpenChange:
   const handleSaveNote = async () => {
     setSavingNote(true);
     try {
-      const url = import.meta.env.VITE_API_URL || "http://localhost:8000";
+      const url = API_URL;
       await fetch(`${url}/settings/update.php`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -101,7 +102,7 @@ function CourierApiDialog({ open, onOpenChange }: { open: boolean; onOpenChange:
 
   const deleteMutation = useMutation({
     mutationFn: async (key: string) => {
-      const url = import.meta.env.VITE_API_URL || "http://localhost:8000";
+      const url = API_URL;
       await fetch(`${url}/settings/delete.php`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -128,7 +129,7 @@ function CourierApiDialog({ open, onOpenChange }: { open: boolean; onOpenChange:
     setGeneratingToken(true);
     try {
       const token = generateToken();
-      const url = import.meta.env.VITE_API_URL || "http://localhost:8000";
+      const url = API_URL;
       const res = await fetch(`${url}/settings/steadfast.php`, {
         method: "POST", headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ action: "update_webhook_token", token })
@@ -151,7 +152,7 @@ function CourierApiDialog({ open, onOpenChange }: { open: boolean; onOpenChange:
     }
     setSavingKeys(true);
     try {
-      const url = import.meta.env.VITE_API_URL || "http://localhost:8000";
+      const url = API_URL;
       const updateRes = await fetch(`${url}/settings/steadfast.php`, {
         method: "POST", headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ action: "update_keys", api_key: apiKey, secret_key: secretKey })
@@ -395,7 +396,7 @@ function SmsNotificationSettings() {
   const { data: settings, isLoading } = useQuery({
     queryKey: ["sms-notification-settings"],
     queryFn: async () => {
-      const url = import.meta.env.VITE_API_URL || "http://localhost:8000";
+      const url = API_URL;
       const res = await fetch(`${url}/settings/get.php?keys=${allKeys.join(",")}`);
       const data = await res.json();
       const map: Record<string, string> = {};
@@ -421,7 +422,7 @@ function SmsNotificationSettings() {
 
   const toggleMutation = useMutation({
     mutationFn: async ({ key, value }: { key: string; value: boolean }) => {
-      const url = import.meta.env.VITE_API_URL || "http://localhost:8000";
+      const url = API_URL;
       await fetch(`${url}/settings/update.php`, {
         method: "POST", headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ key, value: value ? "true" : "false" })
@@ -432,7 +433,7 @@ function SmsNotificationSettings() {
 
   const saveMsgMutation = useMutation({
     mutationFn: async ({ key, value }: { key: string; value: string }) => {
-      const url = import.meta.env.VITE_API_URL || "http://localhost:8000";
+      const url = API_URL;
       await fetch(`${url}/settings/update.php`, {
         method: "POST", headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ key, value })
@@ -518,7 +519,7 @@ function CustomerOtpTemplateSettings() {
   const { data: saved, isLoading } = useQuery({
     queryKey: ["customer-otp-template"],
     queryFn: async () => {
-      const url = import.meta.env.VITE_API_URL || "http://localhost:8000";
+      const url = API_URL;
       const res = await fetch(`${url}/settings/get.php?keys=${TEMPLATE_KEY}`);
       const data = await res.json();
       return (data?.[0]?.value as string) || DEFAULT_TPL;
@@ -530,7 +531,7 @@ function CustomerOtpTemplateSettings() {
 
   const saveMutation = useMutation({
     mutationFn: async (v: string) => {
-      const url = import.meta.env.VITE_API_URL || "http://localhost:8000";
+      const url = API_URL;
       await fetch(`${url}/settings/update.php`, {
         method: "POST", headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ key: TEMPLATE_KEY, value: v })
@@ -613,7 +614,7 @@ export default function ApiManagement() {
     queryKey: ["courier-status"],
     staleTime: 0,
     queryFn: async () => {
-      const url = import.meta.env.VITE_API_URL || "http://localhost:8000";
+      const url = API_URL;
       const res = await fetch(`${url}/settings/steadfast.php?_t=${Date.now()}`, {
         method: "POST", headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ action: "get_balance" })
@@ -629,7 +630,7 @@ export default function ApiManagement() {
     queryKey: ["ecomah-status"],
     staleTime: 0,
     queryFn: async () => {
-      const url = import.meta.env.VITE_API_URL || "http://localhost:8000";
+      const url = API_URL;
       const res = await fetch(`${url}/settings/get.php?keys=${ECOMAH_SETTING_KEY}&_t=${Date.now()}`, { cache: "no-store" });
       const data = await res.json();
       const val = data?.[0]?.value;
@@ -641,7 +642,7 @@ export default function ApiManagement() {
     queryKey: ["pixel-status"],
     staleTime: 0,
     queryFn: async () => {
-      const url = import.meta.env.VITE_API_URL || "http://localhost:8000";
+      const url = API_URL;
       const res = await fetch(`${url}/settings/get.php?keys=meta_pixel_id&_t=${Date.now()}`, { cache: "no-store" });
       const data = await res.json();
       const val = data?.[0]?.value;
@@ -653,7 +654,7 @@ export default function ApiManagement() {
     queryKey: ["gtm-status"],
     staleTime: 0,
     queryFn: async () => {
-      const url = import.meta.env.VITE_API_URL || "http://localhost:8000";
+      const url = API_URL;
       const res = await fetch(`${url}/settings/get.php?keys=gtm_id&_t=${Date.now()}`, { cache: "no-store" });
       const data = await res.json();
       const val = data?.[0]?.value;
