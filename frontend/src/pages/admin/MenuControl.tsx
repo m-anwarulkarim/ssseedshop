@@ -9,7 +9,6 @@ import { cn } from "@/lib/utils";
 const DEFAULT_MENU_ORDER = [
   "my-activity",
   "dashboard",
-  "expenses",
   "customer-support",
   "order-search",
   "product",
@@ -24,7 +23,6 @@ const DEFAULT_MENU_ORDER = [
 const MENU_LABELS: Record<string, { bn: string; en: string }> = {
   "my-activity": { bn: "মাই একটিভিটি", en: "My Activity" },
   "dashboard": { bn: "ড্যাশবোর্ড", en: "Dashboard" },
-  "expenses": { bn: "খরচ ট্র্যাকার", en: "Expenses" },
   "customer-support": { bn: "কাস্টমার সাপোর্ট", en: "Customer Support" },
   "order-search": { bn: "অর্ডার সার্চ", en: "Order Search" },
   "product": { bn: "পণ্য", en: "Product" },

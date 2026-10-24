@@ -47,9 +47,6 @@ function saveCartSafely(items: CartItem[]) {
     try {
       // Storage quota exceeded! Clear non-essential large caches from localStorage
       const purgeKeys = [
-        "agroseed:ledger-entries-en",
-        "agroseed:ledger-meta-en",
-        "agroseed_ledger_entries_v2",
         "admin_support_tickets",
         "search_history",
         "order_search_history",

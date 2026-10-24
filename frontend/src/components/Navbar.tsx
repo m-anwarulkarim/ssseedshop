@@ -309,7 +309,7 @@ const NAV_LABEL_EN: Record<string, string> = {
   "/": "Home",
   "/products": "All Products",
   "/categories": "Categories",
-  "/services": "Services",
+  "/cultivation-guide": "Guide",
   "/profile": "Account",
   "/help": "Help",
 };
@@ -396,7 +396,7 @@ function BottomNav({ pathname }: { pathname: string }) {
     { label: lang === "en" ? "Home" : "হোম", icon: Home, to: "/", match: (p: string) => p === "/" },
     { label: lang === "en" ? "All Products" : "সকল পণ্য", icon: ClipboardList, to: "/products", match: (p: string) => p === "/products" || p.startsWith("/shop") },
     { label: lang === "en" ? "Categories" : "ক্যাটাগরি", icon: LayoutGrid, to: "/categories", match: (p: string) => p.startsWith("/categor") },
-    { label: lang === "en" ? "Services" : "কৃষি সেবা", icon: Sprout, to: "/services", match: (p: string) => p === "/services" },
+    { label: lang === "en" ? "Guide" : "চাষ গাইড", icon: Sprout, to: "/cultivation-guide", match: (p: string) => p === "/cultivation-guide" },
     { label: lang === "en" ? "Account" : "একাউন্ট", icon: UserRoundCog, to: "/profile", match: (p: string) => p.startsWith("/profile") },
   ];
 

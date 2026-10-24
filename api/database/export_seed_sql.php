@@ -31,11 +31,9 @@ $tables = [
     'incomplete_orders' => [__DIR__ . '/incomplete_orders.json', ['cart_snapshot']],
     'coupons'           => [__DIR__ . '/coupons.json', []],
     'settings'          => [__DIR__ . '/settings.json', []],
-    'blogs'             => [__DIR__ . '/blogs.json', []],
     'sms_logs'          => [__DIR__ . '/sms_logs.json', ['gateway']],
     'fraud_cache'       => [__DIR__ . '/fraud_cache.json', []],
     'otps'              => [__DIR__ . '/otps.json', []],
-    'ledger_entries'    => [__DIR__ . '/ledger_entries.json', []],
     'order_status_history' => [__DIR__ . '/order_status_history.json', []],
     'visitor_profiles'  => [__DIR__ . '/visitor_profiles.json', []],
 ];

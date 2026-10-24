@@ -25,7 +25,7 @@ export const DEFAULT_NAVBAR_ITEMS = [
   { label: "হোম", href: "/", icon: "Home" },
   { label: "সকল পণ্য", href: "/products", icon: "ClipboardList" },
   { label: "ক্যাটাগরি", href: "/categories", icon: "LayoutGrid" },
-  { label: "কৃষি সেবা", href: "/services", icon: "Sprout" },
+  { label: "চাষ গাইড", href: "/cultivation-guide", icon: "BookOpen" },
   { label: "একাউন্ট", href: "/profile", icon: "UserRoundCog" },
   { label: "সাহায্য", href: "/help", icon: "HelpCircle" },
 ];

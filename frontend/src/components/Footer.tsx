@@ -12,7 +12,6 @@ type FooterLink = { label: string; href: string };
 const defaultQuickLinks: FooterLink[] = [
   { label: "হোম", href: "/" },
   { label: "ক্যাটাগরি", href: "/categories" },
-  { label: "কৃষি সেবা", href: "/services" },
   { label: "চাষাবাদ নির্দেশিকা", href: "/cultivation-guide" },
   { label: "ডেলিভারি চার্জ", href: "/delivery-charge" },
   { label: "সাহায্য", href: "/help" },

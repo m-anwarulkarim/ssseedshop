@@ -55,8 +55,6 @@ const OrderConfirmed = lazyRetry(() => import("./pages/OrderConfirmed.tsx"));
 const PublicInvoice = lazyRetry(() => import("./pages/PublicInvoice.tsx"));
 const Profile = lazyRetry(() => import("./pages/Profile.tsx"));
 const Help = lazyRetry(() => import("./pages/Help.tsx"));
-const Services = lazyRetry(() => import("./pages/Services.tsx"));
-const BlogDetail = lazyRetry(() => import("./pages/BlogDetail.tsx"));
 const DeliveryCharge = lazyRetry(() => import("./pages/DeliveryCharge.tsx"));
 const PrivacyPolicy = lazyRetry(() => import("./pages/PrivacyPolicy.tsx"));
 const TermsConditions = lazyRetry(() => import("./pages/TermsConditions.tsx"));
@@ -100,8 +98,6 @@ const ImportExport = lazyRetry(() => import("./pages/admin/ImportExport.tsx"));
 const OrderNotifications = lazyRetry(() => import("./pages/admin/Notifications.tsx"));
 const HelpSupport = lazyRetry(() => import("./pages/admin/HelpSupport.tsx"));
 const LandingPagesList = lazyRetry(() => import("./pages/admin/LandingPagesList.tsx"));
-const BlogList = lazyRetry(() => import("./pages/admin/BlogList.tsx"));
-const ExpenseTracker = lazyRetry(() => import("./pages/admin/ExpenseTracker.tsx"));
 const OrderControl = lazyRetry(() => import("./pages/admin/OrderControl.tsx"));
 const PromoPopupSettings = lazyRetry(() => import("./pages/admin/PromoPopupSettings.tsx"));
 const FreeGiftSettings = lazyRetry(() => import("./pages/admin/FreeGiftSettings.tsx"));
@@ -168,8 +164,6 @@ function ProductStockRealtime() {
       // Orders & Order Items (admin panel & activity live updates)
       .on("postgres_changes", { event: "*", schema: "public", table: "orders" }, invalidate(["orders", "admin-orders", "web-orders", "confirmed-orders", "pre-orders", "deleted-orders", "my-activity", "notifications"]))
       .on("postgres_changes", { event: "*", schema: "public", table: "order_items" }, invalidate(["orders", "admin-orders", "web-orders", "confirmed-orders", "pre-orders", "my-activity"]))
-      // Expenses
-      .on("postgres_changes", { event: "*", schema: "public", table: "expenses" }, invalidate(["expenses", "admin-expenses"]))
       // Visitor profiles
       .on("postgres_changes", { event: "*", schema: "public", table: "visitor_profiles" }, invalidate(["customers", "visitor-profiles", "admin-customers"]))
       .subscribe();
@@ -236,8 +230,6 @@ const App = () => {
                 <Route path="/profile" element={<Profile />} />
                 <Route path="/offers" element={<Navigate to="/" replace />} />
                 <Route path="/help" element={<Help />} />
-                <Route path="/services" element={<Services />} />
-                <Route path="/services/:slug" element={<BlogDetail />} />
                 <Route path="/delivery-charge" element={<DeliveryCharge />} />
                 <Route path="/privacy-policy" element={<PrivacyPolicy />} />
                 <Route path="/terms-conditions" element={<TermsConditions />} />
@@ -256,7 +248,6 @@ const App = () => {
                   <Route element={<AdminLayout />}>
                     <Route path="my-activity" element={<MyActivity />} />
                     <Route path="overview" element={<Overview />} />
-                    <Route path="expenses" element={<ExpenseTracker />} />
 
                     <Route path="products" element={<ProductList />} />
                     <Route path="products/create" element={<ProductForm />} />
@@ -264,7 +255,6 @@ const App = () => {
                     <Route path="products/edit/:id" element={<ProductForm />} />
                     <Route path="categories" element={<CategoryList />} />
                     <Route path="product-tags" element={<TagList />} />
-                    <Route path="blogs" element={<BlogList />} />
 
                     <Route path="orders" element={<Navigate to="/admin/orders/list" replace />} />
                     <Route path="orders/:id" element={<OrderEdit />} />

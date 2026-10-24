@@ -112,20 +112,7 @@ def run_live_audit():
             print(f"❌ Admin Products Error: {e}")
             results.append({"page": "Admin Products", "status": "FAIL", "error": str(e)})
 
-        # 6. Admin Expense Tracker (Where AB seed previously occurred)
-        try:
-            print("\n6️⃣ Checking Admin Expense Tracker...")
-            page.goto(f"{FRONTEND_BASE}/admin/expenses", wait_until="domcontentloaded", timeout=15000)
-            page.wait_for_timeout(2000)
-            save_screenshot(page, "35_admin_expenses_live.png")
-            body_text = page.inner_text("body")
-            has_ab_seed = "ab seed" in body_text.lower()
-            print(f"   Legacy 'ab seed' found in Expense Tracker: {has_ab_seed}")
-            assert not has_ab_seed, "Old branding 'ab seed' found in Expense Tracker!"
-            results.append({"page": "Admin Expenses", "status": "PASS"})
-        except Exception as e:
-            print(f"❌ Admin Expenses Error: {e}")
-            results.append({"page": "Admin Expenses", "status": "FAIL", "error": str(e)})
+
 
         # 7. Footer & Brand check
         try:

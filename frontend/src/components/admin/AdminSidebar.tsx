@@ -12,8 +12,7 @@ import {
   ChevronDown, MousePointer2, Headphones, UserCog, UsersRound, Code,
   FileImage, Activity, Share2, ListOrdered, BookOpen, CalendarClock,
   ArrowUpDown, BellRing, ChevronsLeftRight, Keyboard, LogOut, Truck,
-} from "@/components/admin/icons";
-import { Sparkles, Tag as TagIcon, Receipt, ShieldBan, Gift } from "lucide-react";
+ Sparkles, Tag as TagIcon, ShieldBan, Gift } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import {
   Sidebar,
@@ -471,15 +470,6 @@ export function AdminSidebar() {
       permissionKey: "overview",
     },
     {
-      menuKey: "expenses",
-      title: t("খরচ ট্র্যাকার", "Expenses"),
-      icon: Receipt,
-      iconColor: "text-emerald-600",
-      iconBg: "bg-emerald-50",
-      url: "/admin/expenses",
-      permissionKey: "expenses",
-    },
-    {
       menuKey: "my-activity",
       title: t("মাই একটিভিটি", "My Activity"),
       icon: Activity,
@@ -515,7 +505,6 @@ export function AdminSidebar() {
         { title: t("পণ্য তালিকা", "Product List"), url: "/admin/products", icon: ListOrdered, iconColor: "text-emerald-600", iconBg: "bg-emerald-50", permissionKey: "product-list" },
         { title: t("ক্যাটাগরি", "Category"), url: "/admin/categories", icon: BookOpen, iconColor: "text-indigo-600", iconBg: "bg-indigo-50", permissionKey: "categories" },
         { title: t("প্রোডাক্ট ব্যাজ", "Product Badges"), url: "/admin/product-tags", icon: TagIcon, iconColor: "text-amber-600", iconBg: "bg-amber-50", permissionKey: "categories" },
-        { title: t("ব্লগ", "Blogs"), url: "/admin/blogs", icon: BookOpen, iconColor: "text-sky-600", iconBg: "bg-sky-50", permissionKey: "blogs" },
       ],
     },
     {
