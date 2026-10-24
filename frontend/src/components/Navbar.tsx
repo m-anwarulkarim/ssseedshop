@@ -1,5 +1,5 @@
 import { API_URL } from "@/config/env";
-import { ShoppingCart, Search, Menu, Home, LayoutGrid, ClipboardList, Sprout, UserRoundCog, ArrowRight, Palette, Check, HelpCircle, Image as ImageIcon, Languages, LogIn, LogOut } from "lucide-react";
+import { ShoppingCart, Search, Menu, Home, LayoutGrid, ClipboardList, Sprout, UserRoundCog, ArrowRight, Palette, Check, HelpCircle, Image as ImageIcon, Languages, LogIn, LogOut, User } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useTheme, ThemeMode } from "@/contexts/ThemeContext";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -56,16 +56,35 @@ const Navbar = () => {
 
       {/* Top header */}
       <header className="bg-white shadow-sm border-b border-gray-100">
-        <div className="flex items-center gap-2 h-14 px-2.5 max-w-screen-2xl mx-auto">
-          {/* Hamburger — mobile only */}
+        {/* Mobile Header: Styled exactly as reference screenshot */}
+        <div className="flex md:hidden items-center gap-2.5 h-14 px-3 w-full">
+          {/* Hamburger Menu Button */}
           <button
             onClick={() => setMenuOpen(true)}
             aria-label="Menu"
-            className="md:hidden p-1.5 rounded-md text-gray-700 hover:bg-gray-100"
+            className="p-1.5 -ml-1 rounded-lg text-gray-700 hover:bg-gray-100 active:scale-95 transition-transform shrink-0"
           >
-            <Menu className="w-5 h-5" />
+            <Menu className="w-6 h-6 stroke-[2]" />
           </button>
 
+          {/* Styled Search Bar with Action Button */}
+          <button
+            type="button"
+            onClick={() => setSearchOpen(true)}
+            className="flex-1 flex items-center justify-between h-10 pl-3.5 pr-1.5 rounded-lg bg-[#f5f6f8] hover:bg-[#eaecee] transition-colors text-left border border-gray-200/80 focus:outline-none"
+            aria-label="Search"
+          >
+            <span className="text-xs sm:text-sm text-gray-400 font-normal truncate">
+              {lang === "en" ? "Search seeds & products..." : "বীজ বা পছন্দের পণ্য খুঁজুন..."}
+            </span>
+            <span className="flex items-center justify-center w-8 h-8 rounded-lg bg-pink-50 text-[#e41d56] shrink-0">
+              <Search className="w-4 h-4 stroke-[2.5]" />
+            </span>
+          </button>
+        </div>
+
+        {/* Desktop Header: Unchanged full layout */}
+        <div className="hidden md:flex items-center gap-2 h-14 px-2.5 max-w-screen-2xl mx-auto w-full">
           {/* Logo */}
           <Link to="/" className="shrink-0">
             <img
@@ -75,23 +94,13 @@ const Navbar = () => {
             />
           </Link>
 
-          {/* Search input (pill) — mobile only */}
-          <button
-            onClick={() => setSearchOpen(true)}
-            className="md:hidden flex-1 flex items-center gap-2 h-9 px-3 rounded-full bg-gray-100 hover:bg-gray-200 transition-colors text-left"
-            aria-label="Search"
-          >
-            <Search className="w-4 h-4 text-gray-500 shrink-0" />
-            <span className="text-xs text-gray-500 truncate">{lang === "en" ? "Search products" : "পণ্য খুঁজুন"}</span>
-          </button>
-
           {/* Desktop centered nav menu */}
-          <nav className="hidden md:flex flex-1 items-center justify-center gap-1">
+          <nav className="flex flex-1 items-center justify-center gap-1">
             <DesktopNavItems />
           </nav>
 
           {/* Desktop search icon + theme + language */}
-          <div className="hidden md:flex items-center gap-1">
+          <div className="flex items-center gap-1">
             <button
               onClick={() => setSearchOpen(true)}
               aria-label="Search"
@@ -393,6 +402,7 @@ function NavMenuItems({ onNavigate }: { onNavigate: (to: string) => void }) {
 
 function BottomNav({ pathname }: { pathname: string }) {
   const { lang } = useLanguage();
+  const { openCart, totalItems } = useCart();
 
   // Hide mobile bottom tab bar on desktop, and on product details / checkout / landing pages
   if (
@@ -405,33 +415,72 @@ function BottomNav({ pathname }: { pathname: string }) {
     return null;
   }
 
-  const items = [
-    { label: lang === "en" ? "Home" : "হোম", icon: Home, to: "/", match: (p: string) => p === "/" },
-    { label: lang === "en" ? "All Products" : "সকল পণ্য", icon: ClipboardList, to: "/products", match: (p: string) => p === "/products" || p.startsWith("/shop") },
-    { label: lang === "en" ? "Categories" : "ক্যাটাগরি", icon: LayoutGrid, to: "/categories", match: (p: string) => p.startsWith("/categor") },
-    { label: lang === "en" ? "Guide" : "চাষ গাইড", icon: Sprout, to: "/cultivation-guide", match: (p: string) => p === "/cultivation-guide" },
-    { label: lang === "en" ? "Account" : "একাউন্ট", icon: UserRoundCog, to: "/profile", match: (p: string) => p.startsWith("/profile") },
-  ];
+  const isHomeActive = pathname === "/";
+  const isCategoriesActive = pathname.startsWith("/categories") || pathname.startsWith("/category");
+  const isAccountActive = pathname.startsWith("/profile");
 
   return (
-    <nav className="md:hidden fixed bottom-0 left-0 right-0 w-full z-40 bg-white border-t border-gray-200 shadow-[0_-4px_12px_-6px_rgba(0,0,0,0.1)]">
-      <div className="grid grid-cols-5 h-14">
-        {items.map((it) => {
-          const active = it.match(pathname);
-          const Icon = it.icon;
-          return (
-            <Link
-              key={it.label}
-              to={it.to}
-              className={`flex flex-col items-center justify-center gap-0.5 text-[10px] ${
-                active ? "text-primary" : "text-gray-500"
-              }`}
-            >
-              <Icon className={`w-5 h-5 ${active ? "text-primary" : "text-gray-500"}`} strokeWidth={active ? 2.4 : 2} />
-              <span className="font-medium leading-none">{it.label}</span>
-            </Link>
-          );
-        })}
+    <nav className="md:hidden fixed bottom-0 left-0 right-0 w-full z-40 bg-white border-t border-gray-200/80 shadow-[0_-2px_10px_rgba(0,0,0,0.06)]">
+      <div className="grid grid-cols-4 h-14">
+        {/* 1. Home */}
+        <Link
+          to="/"
+          className={`flex flex-col items-center justify-center gap-0.5 text-[11px] transition-colors ${
+            isHomeActive ? "text-[#e41d56] font-semibold" : "text-gray-500 hover:text-gray-800 font-medium"
+          }`}
+        >
+          <Home
+            className={`w-5 h-5 ${isHomeActive ? "fill-current text-[#e41d56]" : "text-gray-500"}`}
+            strokeWidth={isHomeActive ? 2.2 : 1.8}
+          />
+          <span className="leading-tight">{lang === "en" ? "Home" : "হোম"}</span>
+        </Link>
+
+        {/* 2. Categories */}
+        <Link
+          to="/categories"
+          className={`flex flex-col items-center justify-center gap-0.5 text-[11px] transition-colors ${
+            isCategoriesActive ? "text-[#e41d56] font-semibold" : "text-gray-500 hover:text-gray-800 font-medium"
+          }`}
+        >
+          <LayoutGrid
+            className={`w-5 h-5 ${isCategoriesActive ? "text-[#e41d56]" : "text-gray-500"}`}
+            strokeWidth={isCategoriesActive ? 2.2 : 1.8}
+          />
+          <span className="leading-tight">{lang === "en" ? "Categories" : "ক্যাটাগরি"}</span>
+        </Link>
+
+        {/* 3. Cart */}
+        <button
+          type="button"
+          onClick={openCart}
+          className="flex flex-col items-center justify-center gap-0.5 text-[11px] text-gray-500 hover:text-gray-800 font-medium transition-colors"
+          aria-label="Cart"
+        >
+          <div className="relative flex items-center justify-center">
+            <ShoppingCart className="w-5 h-5 text-gray-500" strokeWidth={1.8} />
+            {totalItems > 0 && (
+              <span className="absolute -top-1.5 -right-2.5 min-w-[17px] h-[17px] px-1 rounded-full bg-[#e41d56] text-white text-[9px] font-extrabold flex items-center justify-center ring-1 ring-white">
+                {totalItems}
+              </span>
+            )}
+          </div>
+          <span className="leading-tight">{lang === "en" ? "Cart" : "কার্ট"}</span>
+        </button>
+
+        {/* 4. Account */}
+        <Link
+          to="/profile"
+          className={`flex flex-col items-center justify-center gap-0.5 text-[11px] transition-colors ${
+            isAccountActive ? "text-[#e41d56] font-semibold" : "text-gray-500 hover:text-gray-800 font-medium"
+          }`}
+        >
+          <User
+            className={`w-5 h-5 ${isAccountActive ? "text-[#e41d56]" : "text-gray-500"}`}
+            strokeWidth={isAccountActive ? 2.2 : 1.8}
+          />
+          <span className="leading-tight">{lang === "en" ? "Account" : "একাউন্ট"}</span>
+        </Link>
       </div>
     </nav>
   );
