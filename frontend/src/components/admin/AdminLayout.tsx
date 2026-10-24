@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState, Suspense } from "react";
 import { Outlet, useNavigate, useLocation } from "react-router-dom";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AdminSidebar } from "./AdminSidebar";
-import { Loader2, AlertTriangle, X, ShieldAlert, Plus, Search, List, Globe, CalendarClock, Package, Layers, Tag, BarChart3, Users, ShieldCheck, Settings, Palette, Languages, MousePointer2, MessageSquare, FileText, Image, ArrowDownUp, Bell, MessageCircle, Share2, DollarSign, ArrowRightLeft, ChevronsLeftRight, Keyboard } from "lucide-react";
+import { Loader2, AlertTriangle, X, ShieldAlert, Plus, Search, List, Globe, CalendarClock, Package, Layers, Tag, BarChart3, Users, ShieldCheck, Settings, Palette, Languages, MousePointer2, MessageSquare, FileText, Image, ArrowDownUp, Bell, MessageCircle, Share2, DollarSign, ArrowRightLeft } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { CursorProvider } from "@/contexts/CursorContext";
 import { CustomCursor } from "./CustomCursor";
@@ -47,8 +47,6 @@ const urlToPermission: Record<string, string> = {
   "/admin/settings/theme": "settings-theme",
   "/admin/settings/language": "settings-language",
   "/admin/settings/cursor": "settings-cursor",
-  "/admin/settings/menu": "settings-menu",
-  "/admin/settings/shortcuts": "settings-shortcuts",
   "/admin/support/ai-inbox": "support-inbox",
   "/admin/notifications/orders": "notifications-orders",
 };
@@ -79,8 +77,6 @@ const routeTitles: Record<string, { bn: string; en: string; subBn?: string; subE
   "/admin/settings/theme": { bn: "থিম সেটিংস", en: "Theme Settings" },
   "/admin/settings/language": { bn: "ভাষা সেটিংস", en: "Language Settings" },
   "/admin/settings/cursor": { bn: "কার্সর সেটিংস", en: "Cursor Settings" },
-  "/admin/settings/menu": { bn: "মেনু কন্ট্রোল", en: "Menu Control" },
-  "/admin/settings/shortcuts": { bn: "কীবোর্ড শর্টকাট", en: "Keyboard Shortcuts" },
   "/admin/support/ai-inbox": { bn: "ইনবক্স", en: "Inbox", subBn: "কাস্টমার চ্যাট সেশন", subEn: "Customer chat sessions" },
   "/admin/notifications/orders": { bn: "অর্ডার নোটিফিকেশন", en: "Order Notifications" },
   
@@ -145,8 +141,6 @@ const sectionShortcuts: Record<string, Shortcut[]> = {
     { icon: Palette, label: "Theme", labelBn: "থিম", to: "/admin/settings/theme" },
     { icon: Languages, label: "Language", labelBn: "ভাষা", to: "/admin/settings/language" },
     { icon: MousePointer2, label: "Cursor", labelBn: "কার্সর", to: "/admin/settings/cursor" },
-    { icon: ChevronsLeftRight, label: "Menu Control", labelBn: "মেনু কন্ট্রোল", to: "/admin/settings/menu" },
-    { icon: Keyboard, label: "Shortcuts", labelBn: "শর্টকাট", to: "/admin/settings/shortcuts" },
   ],
   support: [],
   notifications: [

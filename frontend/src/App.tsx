@@ -84,10 +84,7 @@ const CustomerList = lazyRetry(() => import("./pages/admin/CustomerList.tsx"));
 const ThemeSettings = lazyRetry(() => import("./pages/admin/ThemeSettings.tsx"));
 const LanguageSettings = lazyRetry(() => import("./pages/admin/LanguageSettings.tsx"));
 const CursorSettings = lazyRetry(() => import("./pages/admin/CursorSettings.tsx"));
-const MenuControl = lazyRetry(() => import("./pages/admin/MenuControl.tsx"));
-const FooterEditor = lazyRetry(() => import("./pages/admin/FooterEditor.tsx"));
 const DeliveryChargeEditor = lazyRetry(() => import("./pages/admin/DeliveryChargeEditor.tsx"));
-const KeyboardShortcuts = lazyRetry(() => import("./pages/admin/KeyboardShortcuts.tsx"));
 const MediaManagement = lazyRetry(() => import("./pages/admin/MediaManagement.tsx"));
 const ApiManagement = lazyRetry(() => import("./pages/admin/ApiManagement.tsx"));
 const OrderEdit = lazyRetry(() => import("./pages/admin/OrderEdit.tsx"));
@@ -281,10 +278,7 @@ const App = () => {
                     <Route path="settings/theme" element={<ThemeSettings />} />
                     <Route path="settings/language" element={<LanguageSettings />} />
                     <Route path="settings/cursor" element={<CursorSettings />} />
-                    <Route path="settings/menu" element={<MenuControl />} />
-                    <Route path="settings/footer" element={<FooterEditor />} />
                     <Route path="settings/delivery-charge" element={<DeliveryChargeEditor />} />
-                    <Route path="settings/shortcuts" element={<KeyboardShortcuts />} />
                     <Route path="settings/order-control" element={<OrderControl />} />
                     <Route path="settings/promo-popup" element={<PromoPopupSettings />} />
                     <Route path="settings/free-gift" element={<FreeGiftSettings />} />

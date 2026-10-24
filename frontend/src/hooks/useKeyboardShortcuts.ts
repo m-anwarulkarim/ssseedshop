@@ -190,8 +190,6 @@ export const ADMIN_MENU_TARGETS: { label: string; labelBn: string; url: string; 
   { label: "Theme", labelBn: "থিম", url: "/admin/settings/theme", group: "Settings" },
   { label: "Language", labelBn: "ভাষা", url: "/admin/settings/language", group: "Settings" },
   { label: "Cursor Effect", labelBn: "কার্সর ইফেক্ট", url: "/admin/settings/cursor", group: "Settings" },
-  { label: "Menu Control", labelBn: "মেনু কন্ট্রোল", url: "/admin/settings/menu", group: "Settings" },
-  { label: "Keyboard Shortcuts", labelBn: "কীবোর্ড শর্টকাট", url: "/admin/settings/shortcuts", group: "Settings" },
   // Notifications
   { label: "Notification Log", labelBn: "নোটিফিকেশন লগ", url: "/admin/notifications/orders", group: "Notification" },
 ];

@@ -107,8 +107,6 @@ const menuStructure = [
       { key: "settings-theme", label: "থিম", icon: Palette },
       { key: "settings-language", label: "ভাষা", icon: Languages },
       { key: "settings-cursor", label: "কার্সর ইফেক্ট", icon: MousePointer2 },
-      { key: "settings-menu", label: "মেনু কন্ট্রোল", icon: Settings },
-      { key: "settings-shortcuts", label: "কীবোর্ড শর্টকাট", icon: Settings },
       { key: "settings-order-control", label: "অর্ডার কন্ট্রোল", icon: Settings },
     ],
   },
