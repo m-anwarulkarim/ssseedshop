@@ -1,5 +1,5 @@
 -- ========================================================
--- AgroSeed MySQL Database Schema
+-- ssseedshop MySQL Database Schema
 -- Version: 1.0 (Production-Ready for cPanel / MariaDB)
 -- Character Set: utf8mb4 (Full Bengali and Emoji Support)
 -- ========================================================

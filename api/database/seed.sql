@@ -1,6 +1,6 @@
 -- ========================================================
 -- AgroSeed MySQL Initial Data Seed
--- Generated: 2026-10-24 04:38:40
+-- Generated: 2026-10-24 16:20:50
 -- ========================================================
 
 SET NAMES utf8mb4;
@@ -6062,6 +6062,13 @@ INSERT INTO `tags` (`id`, `name`, `slug`, `color`, `position`, `created_at`) VAL
 INSERT INTO `tags` (`id`, `name`, `slug`, `color`, `position`, `created_at`) VALUES ('fb6da226-5220-4aa5-b14a-1045148a78cc', 'বসন্তকাল', 'বসন্তকাল', 'emerald', 15, '2026-09-21T11:15:31.966+00:00') ON DUPLICATE KEY UPDATE `id`=`id`;
 INSERT INTO `tags` (`id`, `name`, `slug`, `color`, `position`, `created_at`) VALUES ('69953230-499f-49c8-8add-0b070aeed9a1', 'শরৎকাল', 'শরৎকাল', 'emerald', 16, '2026-09-21T11:18:25.917+00:00') ON DUPLICATE KEY UPDATE `id`=`id`;
 INSERT INTO `tags` (`id`, `name`, `slug`, `color`, `position`, `created_at`) VALUES ('b898fb96-8da6-48b7-9ce5-d8e6455593a2', '১২ মাস', '১২ মাস', '#e60000', 17, '2026-10-09T00:38:51.667736+00:00') ON DUPLICATE KEY UPDATE `id`=`id`;
+
+-- Table: customers
+INSERT INTO `customers` (`id`, `google_id`, `email`, `name`, `phone`, `alt_phone`, `phone_verified`, `avatar_url`, `district`, `thana`, `address`, `gender`, `age`, `bio`, `username`, `auth_provider`, `created_at`, `updated_at`, `last_login`) VALUES ('cust_427d05e9dfd3', '113139516248392605469', 'dev.anwarul@gmail.com', 'ANWARUL KARIM', '', '', 0, 'https://lh3.googleusercontent.com/a/ACg8ocKD63KgBJGUqTs5pTfGm-BljGWywzxjzOSozb1Wi6GkzUHghJM=s96-c', '', '', '', '', NULL, '', 'dev.anwarul', 'google', '2026-10-24T12:58:05+00:00', '2026-10-24T12:58:05+00:00', '2026-10-24T12:58:05+00:00') ON DUPLICATE KEY UPDATE `id`=`id`;
+INSERT INTO `customers` (`id`, `phone`, `name`, `email`, `avatar_url`, `alt_phone`, `phone_verified`, `district`, `thana`, `address`, `gender`, `age`, `bio`, `username`, `auth_provider`, `created_at`, `updated_at`, `last_login`) VALUES ('cust_4632ad373681', '01712345678', 'মো: আনোয়ারুল করিম', '', '', NULL, 0, NULL, NULL, 'ধানমন্ডি, ঢাকা', NULL, NULL, NULL, 'guest_5678', 'guest', '2026-10-24T13:34:38+00:00', '2026-10-24T13:34:38+00:00', NULL) ON DUPLICATE KEY UPDATE `id`=`id`;
+
+-- Table: orders
+INSERT INTO `orders` (`id`, `order_id`, `profile_id`, `customer_id`, `customer_name`, `phone`, `address`, `alt_phone`, `note`, `total_amount`, `delivery_charge`, `discount`, `subtotal`, `items`, `payment_method`, `status`, `pre_date`, `payment_status`, `traffic_source`, `created_by_admin_id`, `last_status_changed_by`, `created_at`, `updated_at`) VALUES ('6adcb3ee8f2c5', '84357', 'cust_4632ad373681', 'cust_4632ad373681', 'মো: আনোয়ারুল করিম', '01712345678', 'ধানমন্ডি, ঢাকা', NULL, NULL, 370, 70, 0, 0, '[{\"product_id\":\"1\",\"product_name\":\"হাইব্রিড উন্নত মানের বীজ\",\"product_image\":\"https:\\/\\/placehold.co\\/100x100\",\"quantity\":2,\"unit_price\":150,\"variation_id\":null,\"sku\":null}]', 'cash_on_delivery', 'pending', NULL, 'pending', 'direct', NULL, NULL, '2026-10-24T13:34:38+00:00', '2026-10-24T13:34:38+00:00') ON DUPLICATE KEY UPDATE `id`=`id`;
 
 -- Table: coupons
 INSERT INTO `coupons` (`id`, `code`, `discount_type`, `discount_value`, `min_order_amount`, `max_discount_amount`, `usage_limit`, `used_count`, `total_discount_given`, `starts_at`, `expires_at`, `is_active`, `created_at`, `updated_at`) VALUES ('coup_ssseedshop10', 'SS10', 'percentage', 10, 500, 200, 100, 0, 0, '2026-01-01T00:00:00+00:00', '2027-12-31T23:59:59+00:00', 1, '2026-01-01T00:00:00+00:00', '2026-01-01T00:00:00+00:00') ON DUPLICATE KEY UPDATE `id`=`id`;
