@@ -85,7 +85,7 @@ const resolvedApiUrl = resolveApiUrl();
 const resolvedMode = import.meta.env.MODE || (import.meta.env.PROD ? "production" : "development");
 const resolvedIsProd = Boolean(import.meta.env.PROD);
 const resolvedIsDev = Boolean(import.meta.env.DEV);
-const DEFAULT_GOOGLE_CLIENT_ID = "934384186684-5s17f4snee7neecq45h0ssmh26b57pbk.apps.googleusercontent.com";
+const DEFAULT_GOOGLE_CLIENT_ID = "934384186684-9e5iifeb2qj3a3erp29d7lc8ae415n9c.apps.googleusercontent.com";
 const resolvedGoogleClientId = (import.meta.env.VITE_GOOGLE_CLIENT_ID || DEFAULT_GOOGLE_CLIENT_ID).trim();
 
 function createApiUrlBuilder(base: string) {

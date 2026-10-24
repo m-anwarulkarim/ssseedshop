@@ -86,8 +86,8 @@ if (!$google_payload) {
         $valid_iss = in_array($decoded['iss'] ?? '', ['accounts.google.com', 'https://accounts.google.com']);
         $not_expired = isset($decoded['exp']) && ($decoded['exp'] > (time() - 300)); // 5 min grace
         
-        $expected_client_id = $env['GOOGLE_CLIENT_ID'] ?? '934384186684-5s17f4snee7neecq45h0ssmh26b57pbk.apps.googleusercontent.com';
-        $valid_aud = empty($expected_client_id) || ($decoded['aud'] === $expected_client_id);
+        $expected_client_id = $env['GOOGLE_CLIENT_ID'] ?? '934384186684-9e5iifeb2qj3a3erp29d7lc8ae415n9c.apps.googleusercontent.com';
+        $valid_aud = empty($expected_client_id) || ($decoded['aud'] === $expected_client_id) || ($decoded['aud'] === '934384186684-5s17f4snee7neecq45h0ssmh26b57pbk.apps.googleusercontent.com');
         
         if ($valid_iss && $not_expired && $valid_aud) {
             $google_payload = $decoded;

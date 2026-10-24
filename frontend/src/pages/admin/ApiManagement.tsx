@@ -19,6 +19,7 @@ import { Switch } from "@/components/ui/switch";
 import { FraudCheckerDialog } from "@/components/admin/FraudCheckerDialog";
 import { PixelDialog, GtmDialog } from "@/components/admin/TrackingDialog";
 import { ECOMAH_SETTING_KEY } from "@/lib/ecomahSettings";
+import { Textarea } from "@/components/ui/textarea";
 
 
 // ─── Courier API Dialog ───
