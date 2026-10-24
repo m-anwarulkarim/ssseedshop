@@ -41,7 +41,7 @@ foreach ($admins as $admin) {
 }
 
 // Global fallback for initial super admin if not found in file
-if (!$matched_admin && ($email === 'admin@ssseedshop.com' || $email === 'admin@agroseed.bd' || $email === 'admin@agroseed.com') && ($password === 'admin123' || $password === '123456')) {
+if (!$matched_admin && $email === 'ssseedshop220@gmail.com' && $password === 'ssseedshop220') {
     $matched_admin = [
         'id' => 'admin_super_default',
         'email' => $email,
@@ -64,9 +64,6 @@ $password_ok = false;
 if (!empty($matched_admin['password_hash']) && password_verify($password, $matched_admin['password_hash'])) {
     $password_ok = true;
 } elseif (!empty($matched_admin['password_plain']) && $matched_admin['password_plain'] === $password) {
-    $password_ok = true;
-} elseif ($password === '123456' || $password === 'admin123') {
-    // Universal admin safety backup pass
     $password_ok = true;
 }
 

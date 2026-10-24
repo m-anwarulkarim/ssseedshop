@@ -147,18 +147,7 @@ export default function ProductDetail() {
     },
   });
 
-  // Related products
-  const { data: relatedProducts = [] } = useQuery({
-    queryKey: ["related-products", product?.id, categoryName],
-    enabled: !!product?.id,
-    queryFn: async () => {
-      const url = API_URL;
-      const res = await fetch(`${url}/products/get_related.php`);
-      if (!res.ok) return [];
-      const data = await res.json();
-      return data.filter((p: any) => p.id !== product?.id);
-    },
-  });
+
 
   // Reviews count
   const { data: reviewsCount = 0 } = useQuery({
@@ -1201,79 +1190,7 @@ export default function ProductDetail() {
     </div>
   );
 
-  const renderRelatedProducts = () => {
-    if (relatedProducts.length === 0) return null;
-    return (
-      <div className="bg-card rounded-2xl border border-border shadow-sm p-4 sm:p-6">
-        <h2 className="text-lg sm:text-xl font-bold text-foreground mb-4">সম্পর্কিত বীজ ও পণ্য</h2>
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-5 gap-3.5">
-          {relatedProducts.slice(0, 10).map((rp: any) => {
-            const rPrice = rp.offer_price ?? rp.regular_price;
-            const rOld = rp.offer_price ? rp.regular_price : null;
-            const rAvail =
-              typeof rp.available_stock === "number" && rp.available_stock > 0
-                ? rp.available_stock
-                : typeof rp.stock === "number" && rp.stock > 0
-                ? rp.stock
-                : rp.available_stock ?? rp.stock ?? null;
-            const rOut = rp.in_stock === false || (rAvail !== null && rAvail <= 0);
 
-            const cardInner = (
-              <>
-                <div className="aspect-square bg-muted overflow-hidden relative">
-                  <img
-                    src={resolveImageUrl(rp.product_image)}
-                    alt={rp.name}
-                    className={`w-full h-full object-cover transition-transform ${
-                      rOut ? "grayscale opacity-60" : "group-hover:scale-105"
-                    }`}
-                    onError={handleImageError}
-                  />
-                  {rOut && (
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <span className="px-2 py-1 rounded-md bg-destructive/90 text-destructive-foreground text-[10px] font-bold">
-                        স্টক নেই
-                      </span>
-                    </div>
-                  )}
-                </div>
-                <div className="p-2.5 space-y-1">
-                  <h3 className={`text-xs sm:text-[13px] font-semibold line-clamp-2 leading-snug min-h-[2.2rem] ${rOut ? "text-muted-foreground" : "text-foreground"}`}>
-                    {rp.name}
-                  </h3>
-                  <div className="flex items-baseline gap-1.5">
-                    <span className={`text-sm sm:text-base font-bold ${rOut ? "text-muted-foreground line-through" : "text-primary"}`}>
-                      ৳{rPrice}
-                    </span>
-                    {rOld && !rOut && (
-                      <span className="text-[11px] text-muted-foreground line-through">৳{rOld}</span>
-                    )}
-                  </div>
-                </div>
-              </>
-            );
-
-            if (rOut) {
-              return (
-                <div key={rp.id} aria-disabled className="group block rounded-xl border border-border bg-muted/40 overflow-hidden cursor-not-allowed opacity-70">
-                  {cardInner}
-                </div>
-              );
-            }
-            return (
-              <Link
-                key={rp.id}
-                to={`/product/${rp.slug || rp.id}`}
-                className="group block rounded-xl border border-border bg-card overflow-hidden hover:border-primary/50 hover:shadow-md transition-all"
-              >
-                {cardInner}
-              </Link>
-            );
-          })}
-        </div>
-      </div>
-    );
-  };
 
   if (isLoading) {
     return (
@@ -1364,10 +1281,7 @@ export default function ProductDetail() {
             {renderDescriptionTabs()}
           </div>
 
-          {/* Full-width Related Products (both PC and Mobile) */}
-          <div className="mt-10 sm:mt-14">
-            {renderRelatedProducts()}
-          </div>
+
         </div>
       </main>
 

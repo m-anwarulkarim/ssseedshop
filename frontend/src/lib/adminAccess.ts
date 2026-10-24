@@ -14,7 +14,7 @@ type AdminAccessResult =
       isSuperAdmin: boolean;
     };
 
-const SUPER_ADMIN_EMAIL = "admin@ssseedshop.com";
+const SUPER_ADMIN_EMAIL = "ssseedshop220@gmail.com";
 
 export async function getCurrentAdminAccess(): Promise<AdminAccessResult> {
   if (typeof window !== "undefined") {
@@ -27,8 +27,7 @@ export async function getCurrentAdminAccess(): Promise<AdminAccessResult> {
           const isSuper = Boolean(
             adminUser.is_super_admin ||
             adminUser.role === "admin" ||
-            adminUser.email === SUPER_ADMIN_EMAIL ||
-            adminUser.email === "admin@ssseedshop.com"
+            adminUser.email === SUPER_ADMIN_EMAIL
           );
           const perms = (adminUser.permissions && adminUser.permissions.length > 0)
             ? adminUser.permissions

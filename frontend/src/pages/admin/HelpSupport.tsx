@@ -138,10 +138,10 @@ export default function HelpSupport() {
       const session = localStorage.getItem("admin_session") || sessionStorage.getItem("admin_session");
       if (session) {
         const parsed = JSON.parse(session);
-        return parsed.email || "admin@ssseedshop.com";
+        return parsed.email || "ssseedshop220@gmail.com";
       }
     } catch {}
-    return "admin@ssseedshop.com";
+    return "ssseedshop220@gmail.com";
   }, []);
 
   // System Diagnostics auto-capture

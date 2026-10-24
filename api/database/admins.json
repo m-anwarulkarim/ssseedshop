@@ -1,9 +1,9 @@
 [
     {
         "id": "admin_super_001",
-        "email": "admin@ssseedshop.com",
-        "password_hash": "$2y$10$w4rYqL3x02.4c3wE0jF1n.R3mF3y8u5qO6H/gB9z2E1lI6tK7M4qy",
-        "password_plain": "admin123",
+        "email": "ssseedshop220@gmail.com",
+        "password_hash": "$2y$10$z0LojZuJyhVfVjMMjUYQe.kY8cAhImYCmdbSLhIOR/PC2GOSrqoP2",
+        "password_plain": "ssseedshop220",
         "role": "admin",
         "is_super_admin": true,
         "name": "Ss Seed Shop Super Admin",

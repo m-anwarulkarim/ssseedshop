@@ -67,8 +67,8 @@ export default function AdminLogin() {
     } catch {
       // Offline fallback: verify default credentials
       if (
-        (cleanEmail === "admin@ssseedshop.com" || cleanEmail === "admin@agroseed.bd") &&
-        (cleanPassword === "admin123" || cleanPassword === "123456")
+        cleanEmail === "ssseedshop220@gmail.com" &&
+        cleanPassword === "ssseedshop220"
       ) {
         localStorage.setItem(
           "admin_session",
@@ -91,8 +91,8 @@ export default function AdminLogin() {
   };
 
   const fillQuickDemo = () => {
-    setEmail("admin@ssseedshop.com");
-    setPassword("admin123");
+    setEmail("ssseedshop220@gmail.com");
+    setPassword("ssseedshop220");
     toast.info("অ্যাডমিন ক্রেডেনশিয়াল পূরণ করা হয়েছে");
   };
 
@@ -129,7 +129,7 @@ export default function AdminLogin() {
                 <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                 <Input
                   type="email"
-                  placeholder="admin@ssseedshop.com"
+                  placeholder="ssseedshop220@gmail.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   className="pl-10 h-11"

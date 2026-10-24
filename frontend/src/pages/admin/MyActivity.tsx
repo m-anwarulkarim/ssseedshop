@@ -21,7 +21,7 @@ import {
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import { format, subDays, eachDayOfInterval } from "date-fns";
 
-const SUPER_ADMIN_EMAIL = "admin@ssseedshop.com";
+const SUPER_ADMIN_EMAIL = "ssseedshop220@gmail.com";
 
 export default function MyActivity() {
   const { t } = useLanguage();
@@ -43,14 +43,12 @@ export default function MyActivity() {
         if (session?.user) supaUser = session.user;
       } catch {}
 
-      const email = activeUser?.email || (access.status === "authorized" ? access.email : "") || supaUser?.email || "admin@ssseedshop.com";
+      const email = activeUser?.email || (access.status === "authorized" ? access.email : "") || supaUser?.email || "ssseedshop220@gmail.com";
       const id = activeUser?.id || supaUser?.id || (email ? email.replace(/[^a-zA-Z0-9]/g, "_") : "admin_001");
       const isSuperAdmin = Boolean(
         activeUser?.is_super_admin ||
         (access.status === "authorized" && access.isSuperAdmin) ||
-        email === SUPER_ADMIN_EMAIL ||
-        email === "admin@ssseedshop.com" ||
-        email === "admin@agroseed.bd"
+        email === SUPER_ADMIN_EMAIL
       );
       let role = activeUser?.role || (access.status === "authorized" ? access.role : "admin");
       let name = activeUser?.name || supaUser?.user_metadata?.name || email.split("@")[0] || "Admin";
@@ -245,7 +243,7 @@ export default function MyActivity() {
 
   const user = currentUser || {
     id: "admin_super_001",
-    email: "admin@ssseedshop.com",
+    email: "ssseedshop220@gmail.com",
     role: "admin",
     isSuperAdmin: true,
     name: "Ss Seed Shop Admin",

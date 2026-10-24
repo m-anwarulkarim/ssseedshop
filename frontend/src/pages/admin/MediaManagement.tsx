@@ -226,7 +226,7 @@ export default function MediaManagement() {
     try {
       const adminSessionStr = localStorage.getItem("admin_session");
       const adminSession = adminSessionStr ? JSON.parse(adminSessionStr) : null;
-      const adminEmail = adminSession?.email || "admin@ssseedshop.com";
+      const adminEmail = adminSession?.email || "ssseedshop220@gmail.com";
 
       // Verify admin password against auth/login.php
       const authRes = await fetch(`${API_BASE}/auth/login.php`, {

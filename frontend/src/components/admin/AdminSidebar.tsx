@@ -36,7 +36,7 @@ import { useSidebar } from "@/components/ui/sidebar";
 import { useState, useRef, useEffect, useCallback, createContext, useContext } from "react";
 import { getCurrentAdminAccess, getActiveAdminUser } from "@/lib/adminAccess";
 
-const SUPER_ADMIN_EMAIL = "admin@ssseedshop.com";
+const SUPER_ADMIN_EMAIL = "ssseedshop220@gmail.com";
 const WEB_ORDER_SOURCE_FILTER = "traffic_source.is.null,traffic_source.neq.ecomdrive";
 
 // Permission key → sidebar URL mapping
@@ -345,7 +345,6 @@ export function AdminSidebar() {
   const isSyncAdmin = Boolean(
     syncAdminUser?.is_super_admin ||
     syncAdminUser?.role === "admin" ||
-    syncAdminUser?.email === "admin@ssseedshop.com" ||
     syncAdminUser?.email === SUPER_ADMIN_EMAIL ||
     syncAdminUser?.permissions?.includes("*") ||
     (typeof window !== "undefined" && (
