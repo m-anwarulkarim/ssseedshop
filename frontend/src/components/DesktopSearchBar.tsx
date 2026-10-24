@@ -38,7 +38,12 @@ export const POPULAR_PRESETS = [
   ],
 ];
 
-export default function DesktopSearchBar() {
+interface SearchBarProps {
+  className?: string;
+  isMobile?: boolean;
+}
+
+export default function DesktopSearchBar({ className = "", isMobile = false }: SearchBarProps) {
   const navigate = useNavigate();
   const { lang } = useLanguage();
   const { data: allProducts } = useAllProducts();
@@ -117,10 +122,13 @@ export default function DesktopSearchBar() {
   const activePresets = POPULAR_PRESETS[presetIndex];
 
   return (
-    <div ref={containerRef} className="relative w-full max-w-xl lg:max-w-2xl">
+    <div
+      ref={containerRef}
+      className={`relative w-full ${isMobile ? "max-w-full" : "max-w-xl lg:max-w-2xl"} ${className}`}
+    >
       {/* Search Bar Input Container */}
       <div
-        className={`flex items-center h-11 pl-4 pr-1.5 rounded-xl bg-white border-2 transition-all shadow-sm ${
+        className={`flex items-center ${isMobile ? "h-10 pl-3 pr-1.5" : "h-11 pl-4 pr-1.5"} rounded-xl bg-white border-2 transition-all shadow-sm ${
           isOpen
             ? "border-pink-300 ring-4 ring-pink-50/80 shadow-md"
             : "border-gray-200/90 hover:border-pink-200"
@@ -137,7 +145,7 @@ export default function DesktopSearchBar() {
           onFocus={() => setIsOpen(true)}
           onKeyDown={handleKeyDown}
           placeholder={lang === "en" ? "Search seeds, plants & gardening..." : "বীজ বা পছন্দের পণ্য খুঁজুন..."}
-          className="flex-1 bg-transparent text-sm text-gray-800 placeholder:text-gray-400 focus:outline-none"
+          className={`flex-1 bg-transparent ${isMobile ? "text-xs" : "text-sm"} text-gray-800 placeholder:text-gray-400 focus:outline-none`}
         />
 
         {/* Clear query button */}
@@ -166,146 +174,162 @@ export default function DesktopSearchBar() {
         </button>
       </div>
 
-      {/* Floating Dropdown Attached Directly Underneath (Matches Reference Screenshot) */}
+      {/* Floating Dropdown Attached Directly Underneath */}
       {isOpen && (
-        <div className="absolute top-full left-0 right-0 mt-2 z-50 bg-white rounded-2xl shadow-2xl border border-gray-100 p-4 overflow-hidden animate-in fade-in-50 zoom-in-95 duration-150">
-          {/* STATE 1: Empty Query - Show "Popular Right Now" */}
-          {!query.trim() ? (
-            <div>
-              {/* Header: Popular Right Now + Refresh button */}
-              <div className="flex items-center justify-between mb-3 pb-2 border-b border-gray-50">
-                <span className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
-                  {lang === "en" ? "Popular Right Now" : "জনপ্রিয় অনুসন্ধান"}
-                </span>
-                <button
-                  type="button"
-                  onClick={handleRefresh}
-                  className="p-1 text-gray-400 hover:text-gray-700 hover:bg-gray-100 rounded-full transition-all"
-                  title={lang === "en" ? "Shuffle suggestions" : "নতুন পরামর্শ দেখুন"}
-                  aria-label="Refresh"
-                >
-                  <RotateCw
-                    className={`w-3.5 h-3.5 transition-transform duration-500 ${
-                      isSpinning ? "rotate-180" : ""
-                    }`}
-                  />
-                </button>
-              </div>
-
-              {/* Pill Tags */}
-              <div className="flex flex-wrap gap-2">
-                {activePresets.map((item, idx) => (
-                  <button
-                    key={`${item.tag}-${idx}`}
-                    type="button"
-                    onClick={() => handleSelectTag(item.tag)}
-                    className="group flex items-center gap-1.5 px-3.5 py-1.5 rounded-full border border-gray-200 bg-white hover:bg-pink-50/70 hover:border-pink-300 hover:text-[#e41d56] text-gray-700 text-xs font-medium transition-all active:scale-95"
-                  >
-                    {item.isHot && <span className="text-xs leading-none">🔥</span>}
-                    <span className="group-hover:translate-x-0.5 transition-transform">{item.tag}</span>
-                  </button>
-                ))}
-              </div>
-            </div>
-          ) : (
-            /* STATE 2: User is Typing - Live Instant Product Results */
-            <div>
-              <div className="flex items-center justify-between mb-2 pb-1.5 border-b border-gray-50 text-xs text-gray-500">
-                <span className="font-semibold text-gray-600">
-                  {lang === "en" ? "Search Results" : "পণ্য ফলাফল"} ({filteredProducts.length}টি)
-                </span>
-                <button
-                  type="button"
-                  onClick={() => handleSubmit()}
-                  className="text-xs font-medium text-[#e41d56] hover:underline flex items-center gap-1"
-                >
-                  <span>{lang === "en" ? "View all" : "সবগুলো দেখুন"}</span>
-                  <ArrowRight className="w-3 h-3" />
-                </button>
-              </div>
-
-              {filteredProducts.length === 0 ? (
-                <div className="text-center py-6">
-                  <p className="text-sm font-medium text-gray-700">
-                    "{query}" {lang === "en" ? "not found" : "দিয়ে কোনো পণ্য পাওয়া যায়নি"}
-                  </p>
-                  <p className="text-xs text-gray-400 mt-1">
-                    {lang === "en" ? "Try another keyword or seed name" : "অন্য কোনো বীজ বা শাকসবজির নাম লিখে খুঁজুন"}
-                  </p>
-                </div>
-              ) : (
-                <div className="divide-y divide-gray-50 max-h-80 overflow-y-auto [scrollbar-width:thin]">
-                  {filteredProducts.map((p) => {
-                    const price = p.offer_price ?? p.regular_price ?? 0;
-                    const oldPrice = p.offer_price ? p.regular_price : null;
-                    const imgUrl = resolveImageUrl(p.product_image || (p.images && p.images[0]));
-                    return (
-                      <div
-                        key={p.id}
-                        onClick={() => {
-                          setIsOpen(false);
-                          navigate(`/product/${p.slug || p.id}`);
-                        }}
-                        className="flex items-center gap-3 p-2 rounded-xl hover:bg-pink-50/40 cursor-pointer transition-colors group"
-                      >
-                        <div className="w-11 h-11 rounded-lg bg-gray-50 border border-gray-100 overflow-hidden shrink-0">
-                          <img
-                            src={imgUrl}
-                            alt={p.name}
-                            className="w-full h-full object-cover group-hover:scale-105 transition-transform"
-                            onError={handleImageError}
-                          />
-                        </div>
-
-                        <div className="flex-1 min-w-0">
-                          <p className="text-xs font-semibold text-gray-800 truncate group-hover:text-[#e41d56] transition-colors">
-                            {p.name}
-                          </p>
-                          <div className="flex items-center gap-2 mt-0.5">
-                            {p.category && (
-                              <span className="text-[10px] text-gray-400 font-medium">
-                                {p.category}
-                              </span>
-                            )}
-                            {p.in_stock === false && (
-                              <span className="text-[10px] text-red-500 font-semibold">স্টক আউট</span>
-                            )}
-                          </div>
-                        </div>
-
-                        <div className="text-right shrink-0">
-                          <div className="text-xs font-bold text-emerald-700 tabular-nums">
-                            ৳{price}
-                          </div>
-                          {oldPrice && (
-                            <div className="text-[10px] text-gray-400 line-through tabular-nums">
-                              ৳{oldPrice}
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
-
-              {/* Bottom Quick Action */}
-              <div className="pt-2 mt-2 border-t border-gray-100 flex items-center justify-between">
-                <button
-                  type="button"
-                  onClick={() => handleSubmit()}
-                  className="w-full py-2 px-3 rounded-xl bg-gray-50 hover:bg-pink-50 text-xs font-semibold text-gray-700 hover:text-[#e41d56] flex items-center justify-center gap-1.5 transition-colors"
-                >
-                  <Sparkles className="w-3.5 h-3.5 text-amber-500" />
-                  <span>
-                    "{query}" {lang === "en" ? "search all products" : "এর সম্পূর্ণ তালিকা দেখুন"}
-                  </span>
-                  <ArrowRight className="w-3.5 h-3.5 ml-1" />
-                </button>
-              </div>
-            </div>
+        <>
+          {/* Mobile backdrop for easy dismissal */}
+          {isMobile && (
+            <div
+              className="fixed inset-0 z-40 bg-black/25 md:hidden"
+              onClick={() => setIsOpen(false)}
+            />
           )}
-        </div>
+
+          <div
+            className={`${
+              isMobile
+                ? "fixed inset-x-2.5 top-[60px] max-h-[75vh] overflow-y-auto"
+                : "absolute top-full left-0 right-0 mt-2 overflow-hidden"
+            } z-50 bg-white rounded-2xl shadow-2xl border border-gray-100 p-3.5 md:p-4 animate-in fade-in-50 zoom-in-95 duration-150`}
+          >
+            {/* STATE 1: Empty Query - Show "Popular Right Now" */}
+            {!query.trim() ? (
+              <div>
+                {/* Header: Popular Right Now + Refresh button */}
+                <div className="flex items-center justify-between mb-3 pb-2 border-b border-gray-50">
+                  <span className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
+                    {lang === "en" ? "Popular Right Now" : "জনপ্রিয় অনুসন্ধান"}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={handleRefresh}
+                    className="p-1 text-gray-400 hover:text-gray-700 hover:bg-gray-100 rounded-full transition-all"
+                    title={lang === "en" ? "Shuffle suggestions" : "নতুন পরামর্শ দেখুন"}
+                    aria-label="Refresh"
+                  >
+                    <RotateCw
+                      className={`w-3.5 h-3.5 transition-transform duration-500 ${
+                        isSpinning ? "rotate-180" : ""
+                      }`}
+                    />
+                  </button>
+                </div>
+
+                {/* Pill Tags */}
+                <div className="flex flex-wrap gap-2">
+                  {activePresets.map((item, idx) => (
+                    <button
+                      key={`${item.tag}-${idx}`}
+                      type="button"
+                      onClick={() => handleSelectTag(item.tag)}
+                      className="group flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-gray-200 bg-white hover:bg-pink-50/70 hover:border-pink-300 hover:text-[#e41d56] text-gray-700 text-xs font-medium transition-all active:scale-95"
+                    >
+                      {item.isHot && <span className="text-xs leading-none">🔥</span>}
+                      <span className="group-hover:translate-x-0.5 transition-transform">{item.tag}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            ) : (
+              /* STATE 2: User is Typing - Live Instant Product Results */
+              <div>
+                <div className="flex items-center justify-between mb-2 pb-1.5 border-b border-gray-50 text-xs text-gray-500">
+                  <span className="font-semibold text-gray-600">
+                    {lang === "en" ? "Search Results" : "পণ্য ফলাফল"} ({filteredProducts.length}টি)
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => handleSubmit()}
+                    className="text-xs font-medium text-[#e41d56] hover:underline flex items-center gap-1"
+                  >
+                    <span>{lang === "en" ? "View all" : "সবগুলো দেখুন"}</span>
+                    <ArrowRight className="w-3 h-3" />
+                  </button>
+                </div>
+
+                {filteredProducts.length === 0 ? (
+                  <div className="text-center py-6">
+                    <p className="text-sm font-medium text-gray-700">
+                      "{query}" {lang === "en" ? "not found" : "দিয়ে কোনো পণ্য পাওয়া যায়নি"}
+                    </p>
+                    <p className="text-xs text-gray-400 mt-1">
+                      {lang === "en" ? "Try another keyword or seed name" : "অন্য কোনো বীজ বা শাকসবজির নাম লিখে খুঁজুন"}
+                    </p>
+                  </div>
+                ) : (
+                  <div className="divide-y divide-gray-50 max-h-72 overflow-y-auto [scrollbar-width:thin]">
+                    {filteredProducts.map((p) => {
+                      const price = p.offer_price ?? p.regular_price ?? 0;
+                      const oldPrice = p.offer_price ? p.regular_price : null;
+                      const imgUrl = resolveImageUrl(p.product_image || (p.images && p.images[0]));
+                      return (
+                        <div
+                          key={p.id}
+                          onClick={() => {
+                            setIsOpen(false);
+                            navigate(`/product/${p.slug || p.id}`);
+                          }}
+                          className="flex items-center gap-3 p-2 rounded-xl hover:bg-pink-50/40 cursor-pointer transition-colors group"
+                        >
+                          <div className="w-11 h-11 rounded-lg bg-gray-50 border border-gray-100 overflow-hidden shrink-0">
+                            <img
+                              src={imgUrl}
+                              alt={p.name}
+                              className="w-full h-full object-cover group-hover:scale-105 transition-transform"
+                              onError={handleImageError}
+                            />
+                          </div>
+
+                          <div className="flex-1 min-w-0">
+                            <p className="text-xs font-semibold text-gray-800 truncate group-hover:text-[#e41d56] transition-colors">
+                              {p.name}
+                            </p>
+                            <div className="flex items-center gap-2 mt-0.5">
+                              {p.category && (
+                                <span className="text-[10px] text-gray-400 font-medium">
+                                  {p.category}
+                                </span>
+                              )}
+                              {p.in_stock === false && (
+                                <span className="text-[10px] text-red-500 font-semibold">স্টক আউট</span>
+                              )}
+                            </div>
+                          </div>
+
+                          <div className="text-right shrink-0">
+                            <div className="text-xs font-bold text-emerald-700 tabular-nums">
+                              ৳{price}
+                            </div>
+                            {oldPrice && (
+                              <div className="text-[10px] text-gray-400 line-through tabular-nums">
+                                ৳{oldPrice}
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+
+                {/* Bottom Quick Action */}
+                <div className="pt-2 mt-2 border-t border-gray-100 flex items-center justify-between">
+                  <button
+                    type="button"
+                    onClick={() => handleSubmit()}
+                    className="w-full py-2 px-3 rounded-xl bg-gray-50 hover:bg-pink-50 text-xs font-semibold text-gray-700 hover:text-[#e41d56] flex items-center justify-center gap-1.5 transition-colors"
+                  >
+                    <Sparkles className="w-3.5 h-3.5 text-amber-500" />
+                    <span>
+                      "{query}" {lang === "en" ? "search all products" : "এর সম্পূর্ণ তালিকা দেখুন"}
+                    </span>
+                    <ArrowRight className="w-3.5 h-3.5 ml-1" />
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        </>
       )}
     </div>
   );

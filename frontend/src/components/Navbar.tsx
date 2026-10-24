@@ -57,7 +57,7 @@ const Navbar = () => {
 
       {/* Top header */}
       <header className="bg-white shadow-sm border-b border-gray-100">
-        {/* Mobile Header: Styled exactly as reference screenshot */}
+        {/* Mobile Header: Interactive Search with Attached Floating Popup (PC Style) */}
         <div className="flex md:hidden items-center gap-2.5 h-14 px-3 w-full">
           {/* Hamburger Menu Button */}
           <button
@@ -68,20 +68,10 @@ const Navbar = () => {
             <Menu className="w-6 h-6 stroke-[2]" />
           </button>
 
-          {/* Styled Search Bar with Action Button */}
-          <button
-            type="button"
-            onClick={() => setSearchOpen(true)}
-            className="flex-1 flex items-center justify-between h-10 pl-3.5 pr-1.5 rounded-lg bg-[#f5f6f8] hover:bg-[#eaecee] transition-colors text-left border border-gray-200/80 focus:outline-none"
-            aria-label="Search"
-          >
-            <span className="text-xs sm:text-sm text-gray-400 font-normal truncate">
-              {lang === "en" ? "Search seeds & products..." : "বীজ বা পছন্দের পণ্য খুঁজুন..."}
-            </span>
-            <span className="flex items-center justify-center w-8 h-8 rounded-lg bg-pink-50 text-[#e41d56] shrink-0">
-              <Search className="w-4 h-4 stroke-[2.5]" />
-            </span>
-          </button>
+          {/* Interactive Search Bar matching PC style */}
+          <div className="flex-1 min-w-0">
+            <DesktopSearchBar isMobile={true} />
+          </div>
         </div>
 
         {/* Desktop Header: 2-Tier Modern Layout Matching Reference Screenshot */}
@@ -157,9 +147,9 @@ const Navbar = () => {
             </div>
           </div>
 
-          {/* Tier 2: Sub-Nav Bar (All Categories | Menu Items) */}
+          {/* Tier 2: Sub-Nav Bar (All Categories | Menu Items) — Centered */}
           <div className="border-t border-gray-100 bg-gray-50/60">
-            <div className="flex items-center gap-2 h-10 px-4 max-w-screen-2xl mx-auto w-full">
+            <div className="flex items-center justify-center gap-3 h-10 px-4 max-w-screen-2xl mx-auto w-full">
               {/* All Categories shortcut */}
               <Link
                 to="/categories"
@@ -367,7 +357,6 @@ const NAV_LABEL_EN: Record<string, string> = {
   "/": "Home",
   "/products": "All Products",
   "/categories": "Categories",
-  "/cultivation-guide": "Guide",
   "/profile": "Account",
   "/help": "Help",
 };
@@ -381,14 +370,16 @@ async function fetchNavbarItems() {
   try {
     const url = API_URL;
     const res = await fetch(`${url}/settings/get.php?key=navbar_menu_items`);
-    if (!res.ok) return DEFAULT_NAVBAR_ITEMS;
+    if (!res.ok) return DEFAULT_NAVBAR_ITEMS.filter((it) => it.href !== "/cultivation-guide");
     const data = await res.json();
     if (data?.value) {
       const parsed = JSON.parse(data.value);
-      if (Array.isArray(parsed) && parsed.length) return parsed as typeof DEFAULT_NAVBAR_ITEMS;
+      if (Array.isArray(parsed) && parsed.length) {
+        return parsed.filter((it: any) => it.href !== "/cultivation-guide") as typeof DEFAULT_NAVBAR_ITEMS;
+      }
     }
   } catch {}
-  return DEFAULT_NAVBAR_ITEMS;
+  return DEFAULT_NAVBAR_ITEMS.filter((it) => it.href !== "/cultivation-guide");
 }
 
 function DesktopNavItems() {
@@ -399,7 +390,7 @@ function DesktopNavItems() {
     queryFn: fetchNavbarItems,
     staleTime: 5 * 60 * 1000,
   });
-  const list = items || DEFAULT_NAVBAR_ITEMS;
+  const list = (items || DEFAULT_NAVBAR_ITEMS).filter((it) => it.href !== "/cultivation-guide");
   return (
     <>
       {list.map((it, idx) => {
@@ -427,7 +418,7 @@ function NavMenuItems({ onNavigate }: { onNavigate: (to: string) => void }) {
     queryFn: fetchNavbarItems,
     staleTime: 5 * 60 * 1000,
   });
-  const list = items || DEFAULT_NAVBAR_ITEMS;
+  const list = (items || DEFAULT_NAVBAR_ITEMS).filter((it) => it.href !== "/cultivation-guide");
   return (
     <>
       {list.map((it, idx) => {
