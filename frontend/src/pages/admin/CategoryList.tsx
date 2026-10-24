@@ -18,6 +18,7 @@ import { toast } from "sonner";
 import { Plus, Pencil, Trash2, Loader2, Package, FolderOpen, X } from "lucide-react";
 import { MediaPickerDialog } from "@/components/admin/MediaPickerDialog";
 import { SubcategoryManager } from "@/components/admin/SubcategoryManager";
+import { resolveImageUrl, handleImageError } from "@/lib/imageFallback";
 
 interface CategoryFormData {
   name: string;
@@ -136,7 +137,12 @@ export default function CategoryList() {
           {categories?.map((cat) => (
             <div key={cat.id} className="group flex items-center gap-4 p-4 bg-card rounded-xl border border-border hover:shadow-md transition-all">
               {cat.image ? (
-                <img src={cat.image} alt={cat.name} className="w-16 h-16 rounded-xl object-cover flex-shrink-0" />
+                <img
+                  src={resolveImageUrl(cat.image)}
+                  alt={cat.name}
+                  className="w-16 h-16 rounded-xl object-cover flex-shrink-0"
+                  onError={handleImageError}
+                />
               ) : (
                 <div className="w-16 h-16 rounded-xl bg-muted flex items-center justify-center flex-shrink-0">
                   <Package className="w-6 h-6 text-muted-foreground" />
@@ -207,7 +213,12 @@ export default function CategoryList() {
               <div className="mt-2 flex items-center gap-3">
                 {form.image ? (
                   <div className="relative w-20 h-20 rounded-lg overflow-hidden border border-border">
-                    <img src={form.image} alt="Preview" className="w-full h-full object-cover" />
+                    <img
+                      src={resolveImageUrl(form.image)}
+                      alt="Preview"
+                      className="w-full h-full object-cover"
+                      onError={handleImageError}
+                    />
                     <button type="button" onClick={() => setForm({ ...form, image: "" })} className="absolute top-0.5 right-0.5 bg-destructive text-destructive-foreground rounded-full p-0.5">
                       <X className="w-3 h-3" />
                     </button>

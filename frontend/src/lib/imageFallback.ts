@@ -6,28 +6,50 @@ export const PLACEHOLDER_IMAGE = brandPlaceholderSvg;
 
 /**
  * Robust image URL resolver:
- * - Fixes relative paths (e.g. /uploads/..., uploads/...) by prepending API_URL
- * - Detects and gracefully handles dead Supabase URLs
- * - Handles blob: and data: URLs
- * - Gracefully handles empty / null
+ * - If url is missing or empty, returns PLACEHOLDER_IMAGE
+ * - If url is an exact reference to placeholder.svg/png, returns PLACEHOLDER_IMAGE
+ * - If url is blob: or data:, returns it as-is (for client previews)
+ * - If url is an absolute HTTP/HTTPS URL, returns it directly so the browser can load it!
+ * - If url is a relative path (e.g. /uploads/... or uploads/...), prepends API_URL
+ * - If the image is actually broken (404 / network failure), the <img> tag's onError={handleImageError}
+ *   will automatically swap to PLACEHOLDER_IMAGE!
  */
 export function resolveImageUrl(url: string | null | undefined): string {
   if (!url) return PLACEHOLDER_IMAGE;
   const trimmed = String(url).trim();
   if (!trimmed) return PLACEHOLDER_IMAGE;
 
-  // Blob or Data URLs (e.g. client previews)
+  // Exact static placeholder paths
+  if (
+    trimmed === "/placeholder.svg" ||
+    trimmed === "/placeholder.png" ||
+    trimmed === "placeholder.svg" ||
+    trimmed === "placeholder.png"
+  ) {
+    return PLACEHOLDER_IMAGE;
+  }
+
+  // Blob or Data URLs (e.g. client previews during file selection)
   if (trimmed.startsWith("blob:") || trimmed.startsWith("data:")) {
     return trimmed;
   }
 
-  // Dead Supabase project links fallback or local placeholder references
-  if (trimmed.includes("supabase.co") || trimmed.includes("placeholder")) {
-    return PLACEHOLDER_IMAGE;
-  }
-
   // Already an absolute HTTP/HTTPS URL
   if (trimmed.startsWith("http://") || trimmed.startsWith("https://")) {
+    // If it's a localhost URL containing /uploads/ (e.g. uploaded during local dev)
+    // normalize it to API_URL so it loads seamlessly across dev & production
+    if (trimmed.includes("/uploads/")) {
+      try {
+        const parsed = new URL(trimmed);
+        if (parsed.hostname === "localhost" || parsed.hostname === "127.0.0.1") {
+          const uploadIdx = trimmed.indexOf("/uploads/");
+          const relativeUpload = trimmed.substring(uploadIdx + 1); // "uploads/..."
+          return `${API_URL}/${relativeUpload}`;
+        }
+      } catch {
+        // Ignore URL parse error and continue
+      }
+    }
     return trimmed;
   }
 

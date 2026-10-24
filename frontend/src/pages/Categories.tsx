@@ -6,6 +6,7 @@ import { Loader2 } from "lucide-react";
 import SEOHead from "@/components/SEOHead";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useCategories } from "@/hooks/useCatalog";
+import { resolveImageUrl, handleImageError } from "@/lib/imageFallback";
 
 export default function Categories() {
   const { t } = useLanguage();
@@ -40,10 +41,11 @@ export default function Categories() {
                   <div className="aspect-[4/3] overflow-hidden bg-muted">
                     {cat.image ? (
                       <img
-                        src={cat.image}
+                        src={resolveImageUrl(cat.image)}
                         alt={cat.name}
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
                         loading="lazy"
+                        onError={handleImageError}
                       />
                     ) : (
                       <div className="w-full h-full bg-primary/10 flex items-center justify-center">

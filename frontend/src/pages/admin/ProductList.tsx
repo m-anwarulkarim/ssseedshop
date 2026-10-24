@@ -41,6 +41,7 @@ import { restrictToVerticalAxis } from "@dnd-kit/modifiers";
 
 const PAGE_SIZE = 70;
 import { API_BASE } from "@/lib/apiConfig";
+import { resolveImageUrl, handleImageError } from "@/lib/imageFallback";
 
 interface ProductRow {
   id: string;
@@ -434,7 +435,12 @@ export default function ProductList() {
                           </TableCell>
                           <TableCell>
                             {product.product_image ? (
-                              <img src={product.product_image} alt={product.name} className="w-10 h-10 rounded-md object-cover" />
+                              <img
+                                src={resolveImageUrl(product.product_image)}
+                                alt={product.name}
+                                className="w-10 h-10 rounded-md object-cover"
+                                onError={handleImageError}
+                              />
                             ) : (
                               <div className="w-10 h-10 rounded-md bg-muted flex items-center justify-center">
                                 <Package className="w-4 h-4 text-muted-foreground" />

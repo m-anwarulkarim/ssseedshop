@@ -381,9 +381,8 @@ export default function ProductDetail() {
     typeof img === "string" ? img.split(/[|]/).map((s: string) => s.trim()).filter(Boolean) : []
   );
   const rawImages = [product?.product_image, ...cleanGallery].filter(Boolean) as string[];
-  const allImages = rawImages.length <= 1 && product?.product_image
-    ? [product.product_image, product.product_image, product.product_image]
-    : rawImages;
+  const uniqueImages = Array.from(new Set(rawImages));
+  const allImages = uniqueImages.length > 0 ? uniqueImages : [PLACEHOLDER_IMAGE];
 
   const rawAvail = (product as any)?.available_stock;
   const rawStock = (product as any)?.stock;

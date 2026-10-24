@@ -10,6 +10,7 @@ import { Loader2, ChevronRight } from "lucide-react";
 import SEOHead from "@/components/SEOHead";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useCategories, useAllProducts } from "@/hooks/useCatalog";
+import { resolveImageUrl, handleImageError } from "@/lib/imageFallback";
 
 export default function CategoryPage() {
   const { t } = useLanguage();
@@ -74,9 +75,10 @@ export default function CategoryPage() {
         {category?.image ? (
           <>
             <img
-              src={category.image}
+              src={resolveImageUrl(category.image)}
               alt={decodedName}
               className="w-full h-full object-cover scale-105"
+              onError={handleImageError}
             />
             <div className="absolute inset-0 backdrop-blur-[1px]" />
             <div className="absolute bottom-0 left-0 right-0 h-2/3 backdrop-blur-sm" />
