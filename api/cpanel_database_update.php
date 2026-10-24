@@ -1,7 +1,7 @@
 <?php
 // api/cpanel_database_update.php
-// Ss Seed Shop cPanel Database Migration & Optimization Tool
-// Access via browser: https://api.ssseedshop.com/cpanel_database_update.php
+// AgroSeed cPanel Database Migration & Optimization Tool
+// Access via browser: https://api.agroseed.bd/cpanel_database_update.php
 
 ini_set('display_errors', 1);
 error_reporting(E_ALL);
@@ -17,19 +17,6 @@ $db   = $env['DB_NAME'] ?? '';
 $user = $env['DB_USER'] ?? '';
 $pass = $env['DB_PASS'] ?? '';
 
-// Auto-heal common typo (jjcelcf -> jjcceicf)
-if (strpos($user, 'jjcelcf') !== false || strpos($db, 'jjcelcf') !== false) {
-    $user = str_replace('jjcelcf', 'jjcceicf', $user);
-    $db   = str_replace('jjcelcf', 'jjcceicf', $db);
-    if (file_exists($env_path) && is_writable($env_path)) {
-        $env_raw = file_get_contents($env_path);
-        if (strpos($env_raw, 'jjcelcf') !== false) {
-            $env_raw = str_replace('jjcelcf', 'jjcceicf', $env_raw);
-            @file_put_contents($env_path, $env_raw);
-        }
-    }
-}
-
 $results = [];
 $error_count = 0;
 $success_count = 0;
@@ -39,6 +26,23 @@ function log_msg($type, $msg) {
     if ($type === 'error') $error_count++;
     if ($type === 'success') $success_count++;
     $results[] = ['type' => $type, 'message' => $msg];
+}
+
+// Auto-heal common typo or overwritten old .env (jjcelcf or agroseed_admin)
+if (strpos($user, 'jjcelcf') !== false || strpos($db, 'jjcelcf') !== false || $user === 'agroseed_admin' || $user === 'agroseed_user' || (empty($db) && !empty($_SERVER['HTTP_HOST']))) {
+    $host = 'localhost';
+    $db   = 'jjcceicf_ssseedshop';
+    $user = 'jjcceicf_ssseedshop';
+    $pass = '8.GdFreD&XPEWzC.';
+    if (file_exists($env_path) && is_writable($env_path)) {
+        $env_raw = file_get_contents($env_path);
+        $env_raw = preg_replace('/DB_HOST\s*=\s*["\']?[^"\'\r\n]+["\']?/', 'DB_HOST="localhost"', $env_raw);
+        $env_raw = preg_replace('/DB_NAME\s*=\s*["\']?[^"\'\r\n]+["\']?/', 'DB_NAME="jjcceicf_ssseedshop"', $env_raw);
+        $env_raw = preg_replace('/DB_USER\s*=\s*["\']?[^"\'\r\n]+["\']?/', 'DB_USER="jjcceicf_ssseedshop"', $env_raw);
+        $env_raw = preg_replace('/DB_PASS\s*=\s*["\']?[^"\'\r\n]+["\']?/', 'DB_PASS="8.GdFreD&XPEWzC."', $env_raw);
+        @file_put_contents($env_path, $env_raw);
+        log_msg('success', "🔧 .env ফাইল স্বয়ংক্রিয়ভাবে সঠিক ক্রেডেনশিয়াল (jjcceicf_ssseedshop) দিয়ে মেরামত করা হয়েছে।");
+    }
 }
 
 // 1. Check Connection
@@ -78,29 +82,6 @@ if ($pdo) {
             }
         }
         log_msg('success', "বেস স্কিমা সফলভাবে এক্সিকিউট হয়েছে। ($tbl_count টি টেবিল ভেরিফাইড)");
-
-        // Drop legacy OTPs table if present
-        try {
-            $pdo->exec("DROP TABLE IF EXISTS `otps`");
-        } catch (Exception $e) {}
-
-        // 2b. Sync Super Admin (ssseedshop220@gmail.com)
-        try {
-            $hash = password_hash('ssseedshop220', PASSWORD_DEFAULT);
-            $pdo->exec("DELETE FROM `admins` WHERE `email` IN ('admin@ssseedshop.com', 'admin@agroseed.bd', 'admin@agroseed.com')");
-            $chk = $pdo->prepare("SELECT id FROM `admins` WHERE `email` = 'ssseedshop220@gmail.com'");
-            $chk->execute();
-            if ($chk->rowCount() === 0) {
-                $ins = $pdo->prepare("INSERT INTO `admins` (`id`, `email`, `password_hash`, `password_plain`, `role`, `is_super_admin`, `name`, `permissions`, `created_at`) VALUES ('admin_super_001', 'ssseedshop220@gmail.com', ?, 'ssseedshop220', 'admin', 1, 'Ss Seed Shop Super Admin', '[\"*\"]', NOW()) ON DUPLICATE KEY UPDATE `email`='ssseedshop220@gmail.com', `password_hash`=?, `password_plain`='ssseedshop220', `role`='admin', `is_super_admin`=1");
-                $ins->execute([$hash, $hash]);
-            } else {
-                $up = $pdo->prepare("UPDATE `admins` SET `password_hash` = ?, `password_plain` = 'ssseedshop220', `role` = 'admin', `is_super_admin` = 1 WHERE `email` = 'ssseedshop220@gmail.com'");
-                $up->execute([$hash]);
-            }
-            log_msg('success', "🔑 সুপার অ্যাডমিন সফলভাবে সিঙ্ক ও আপডেট হয়েছে: <strong>ssseedshop220@gmail.com</strong> (পাসওয়ার্ড: ssseedshop220)");
-        } catch (Exception $e) {
-            log_msg('error', "অ্যাডমিন সিঙ্ক এরর: " . htmlspecialchars($e->getMessage()));
-        }
     }
 
     // 3. Helper to add column if not exists
@@ -150,12 +131,6 @@ if ($pdo) {
     add_column_if_missing($pdo, 'products', 'available_stock', 'INT DEFAULT 0 AFTER `in_stock`');
     add_column_if_missing($pdo, 'products', 'position', 'INT DEFAULT 0 AFTER `stock`');
     add_column_if_missing($pdo, 'products', 'is_hidden', 'TINYINT(1) DEFAULT 0 AFTER `position`');
-    add_column_if_missing($pdo, 'products', 'package_tiers', 'LONGTEXT DEFAULT NULL AFTER `variations`');
-    add_column_if_missing($pdo, 'products', 'highlight_features', 'TEXT DEFAULT NULL AFTER `package_tiers`');
-    add_column_if_missing($pdo, 'products', 'trust_card_1_title', 'VARCHAR(255) DEFAULT NULL AFTER `highlight_features`');
-    add_column_if_missing($pdo, 'products', 'trust_card_1_text', 'TEXT DEFAULT NULL AFTER `trust_card_1_title`');
-    add_column_if_missing($pdo, 'products', 'trust_card_2_title', 'VARCHAR(255) DEFAULT NULL AFTER `trust_card_1_text`');
-    add_column_if_missing($pdo, 'products', 'trust_card_2_text', 'TEXT DEFAULT NULL AFTER `trust_card_2_title`');
 
     add_index_if_missing($pdo, 'products', 'idx_prod_slug', '`slug`');
     add_index_if_missing($pdo, 'products', 'idx_prod_hidden', '`is_hidden`');
@@ -180,12 +155,10 @@ if ($pdo) {
         $pdo->exec("ALTER TABLE `products` MODIFY `full_description` LONGTEXT DEFAULT NULL");
     } catch (Exception $e) {}
 
-    // 5. Stock Normalization (Run once here, NOT on every GET request!)
+    // 5. Stock Normalization (Strictly non-destructive: only fills NULL available_stock, preserves all product edits)
     try {
-        $synced_stock = $pdo->exec("UPDATE `products` SET `available_stock` = `stock` WHERE (`available_stock` IS NULL OR `available_stock` = 0) AND `stock` > 0");
-        $synced_instock = $pdo->exec("UPDATE `products` SET `in_stock` = 1 WHERE (`stock` > 0 OR `available_stock` > 0) AND `in_stock` = 0");
-        $synced_outstock = $pdo->exec("UPDATE `products` SET `in_stock` = 0, `available_stock` = 0 WHERE `stock` <= 0");
-        log_msg('info', "স্টক ডাটা সিনক্রোনাইজ করা হয়েছে। (স্টক আউট ফিক্স সম্পন্ন)");
+        $synced_stock = $pdo->exec("UPDATE `products` SET `available_stock` = `stock` WHERE `available_stock` IS NULL AND `stock` > 0");
+        log_msg('info', "স্টক ডাটা যাচাই সম্পন্ন। (বিদ্যমান কোনো প্রোডাক্টের তথ্য বা ডাটা পরিবর্তন করা হয়নি)");
     } catch (Exception $e) {
         log_msg('error', "স্টক সিঙ্ক এরর: " . htmlspecialchars($e->getMessage()));
     }
@@ -197,29 +170,6 @@ if ($pdo) {
             log_msg('success', "✔ অপ্রয়োজনীয় অ্যাডমিন একাউন্ট (hngarden@gmail.com) ডাটাবেস থেকে সম্পূর্ণ মুছে ফেলা হয়েছে।");
         }
     } catch (Exception $e) {}
-
-    // Drop deleted/unwanted legacy tables (blogs, expenses/ledger_entries)
-    try {
-        $pdo->exec("DROP TABLE IF EXISTS `blogs`");
-        $pdo->exec("DROP TABLE IF EXISTS `ledger_entries`");
-        log_msg('success', "✔ অপ্রয়োজনীয় টেবিল (`blogs`, `ledger_entries`) ডাটাবেস থেকে সম্পূর্ণ মুছে ফেলা হয়েছে।");
-    } catch (Exception $e) {}
-
-    // Purge legacy third-party API credentials (Meta Pixel, CAPI, demo keys)
-    try {
-        $purge_query = "DELETE FROM `settings` WHERE `key` IN ('meta_pixel_id', 'meta_capi_token', 'gtm_id') 
-            OR (`key` = 'steadfast_api_key' AND `value` = 'eqegau1wceobpc8ghbt2glt1ssxonkqp') 
-            OR (`key` = 'steadfast_secret_key' AND `value` = 'apgpewveidczs83uccjqlc7o') 
-            OR (`key` = 'ecomah_api_key' AND `value` = 'ek_YVT7Wr15ThUCrpJa')";
-        if (isset($_GET['clear_all_apis'])) {
-            $purge_query = "DELETE FROM `settings` WHERE `key` IN ('meta_pixel_id', 'meta_capi_token', 'gtm_id', 'steadfast_api_key', 'steadfast_secret_key', 'steadfast_webhook_token', 'ecomah_api_key')";
-        }
-        $purged_keys = $pdo->exec($purge_query);
-        if ($purged_keys > 0) {
-            log_msg('success', "✔ পূর্বের পুরাতন/অপ্রয়োজনীয় API ক্রেডেনশিয়াল ($purged_keys টি) ডাটাবেস থেকে মুছে ফেলা হয়েছে।");
-        }
-    } catch (Exception $e) {}
-
 
     // 6. Inspect heavy base64 product images
     try {
@@ -238,8 +188,8 @@ if ($pdo) {
         }
     } catch (Exception $e) {}
 
-    // 7. SMS Gateway (Disabled)
-    log_msg('info', "ℹ️ SMS গেটওয়ে সিস্টেম থেকে নিষ্ক্রিয় ও রিমুভ করা হয়েছে।");
+    // 7. SMS Gateway (Removed per request)
+    // SMS modules and notification gateways have been disabled.
 
     // 8. Handle Live MySQL -> JSON Sync if requested
     if (isset($_GET['action']) && $_GET['action'] === 'sync_json') {
@@ -254,7 +204,9 @@ if ($pdo) {
             'incomplete_orders' => ['cart_snapshot'],
             'coupons'           => [],
             'settings'          => [],
+            'blogs'             => [],
             'sms_logs'          => ['gateway'],
+            'ledger_entries'    => [],
         ];
         $synced_count = 0;
         foreach ($sync_tables as $st => $jcols) {
@@ -280,7 +232,7 @@ if ($pdo) {
     }
 
     // 9. Table Row Count Summary
-    $tables = ['admins', 'products', 'categories', 'customers', 'orders', 'incomplete_orders', 'coupons', 'settings', 'sms_logs'];
+    $tables = ['admins', 'products', 'categories', 'customers', 'orders', 'incomplete_orders', 'coupons', 'settings', 'blogs', 'sms_logs'];
     $summary = [];
     foreach ($tables as $t) {
         try {
@@ -298,7 +250,7 @@ if ($pdo) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ss Seed Shop cPanel Database Migration & Optimization</title>
+    <title>AgroSeed cPanel Database Migration & Optimization</title>
     <style>
         * { box-sizing: border-box; }
         body {
@@ -391,7 +343,7 @@ if ($pdo) {
 </head>
 <body>
     <div class="container">
-        <h1>🌱 Ss Seed Shop cPanel ডাটাবেস অটো-আপডেট ও অপ্টিমাইজেশন</h1>
+        <h1>🌱 AgroSeed cPanel ডাটাবেস অটো-আপডেট ও অপ্টিমাইজেশন</h1>
         <p>এই টুলটি স্বয়ংক্রিয়ভাবে আপনার MySQL ডাটাবেসের টেবিল স্ট্রাকচার পরীক্ষা করে, মিসিং কলাম ও ইনডেক্স যোগ করে এবং ওয়েবসাইট লোডিং স্পিড বাড়ানোর জন্য ডাটাবেস অপ্টিমাইজ করে।</p>
 
         <div class="log-box">
@@ -418,7 +370,6 @@ if ($pdo) {
         <div class="actions">
             <a href="cpanel_database_update.php" class="btn">🔄 পুনরায় পরীক্ষা ও স্কিমা আপডেট</a>
             <a href="cpanel_database_update.php?action=sync_json" class="btn btn-outline" style="border-color: #10b981; color: #a7f3d0;">💾 MySQL থেকে JSON ব্যাকআপ সিঙ্ক</a>
-            <a href="cpanel_database_update.php?clear_all_apis=1" class="btn btn-outline" style="border-color: #ef4444; color: #fca5a5;">🗑️ সকল থার্ড-পার্টি API রিসেট</a>
             <a href="products/get.php" target="_blank" class="btn btn-outline">⚡ প্রোডাক্ট API টেস্ট করুন</a>
         </div>
     </div>

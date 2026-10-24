@@ -36,16 +36,19 @@ $user    = $env['DB_USER'] ?? '';
 $pass    = $env['DB_PASS'] ?? '';
 $charset = 'utf8mb4';
 
-// Auto-heal common cPanel username/database typo (jjcelcf -> jjcceicf)
-if (strpos($user, 'jjcelcf') !== false || strpos($db, 'jjcelcf') !== false) {
-    $user = str_replace('jjcelcf', 'jjcceicf', $user);
-    $db   = str_replace('jjcelcf', 'jjcceicf', $db);
+// Auto-heal common cPanel username/database typos or overwritten old .env
+if (strpos($user, 'jjcelcf') !== false || strpos($db, 'jjcelcf') !== false || $user === 'agroseed_admin' || $user === 'agroseed_user' || (empty($db) && !empty($_SERVER['HTTP_HOST']))) {
+    $host = 'localhost';
+    $db   = 'jjcceicf_ssseedshop';
+    $user = 'jjcceicf_ssseedshop';
+    $pass = '8.GdFreD&XPEWzC.';
     if (file_exists($env_path) && is_writable($env_path)) {
         $env_raw = file_get_contents($env_path);
-        if (strpos($env_raw, 'jjcelcf') !== false) {
-            $env_raw = str_replace('jjcelcf', 'jjcceicf', $env_raw);
-            @file_put_contents($env_path, $env_raw);
-        }
+        $env_raw = preg_replace('/DB_HOST\s*=\s*["\']?[^"\'\r\n]+["\']?/', 'DB_HOST="localhost"', $env_raw);
+        $env_raw = preg_replace('/DB_NAME\s*=\s*["\']?[^"\'\r\n]+["\']?/', 'DB_NAME="jjcceicf_ssseedshop"', $env_raw);
+        $env_raw = preg_replace('/DB_USER\s*=\s*["\']?[^"\'\r\n]+["\']?/', 'DB_USER="jjcceicf_ssseedshop"', $env_raw);
+        $env_raw = preg_replace('/DB_PASS\s*=\s*["\']?[^"\'\r\n]+["\']?/', 'DB_PASS="8.GdFreD&XPEWzC."', $env_raw);
+        @file_put_contents($env_path, $env_raw);
     }
 }
 
