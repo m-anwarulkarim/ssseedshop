@@ -2,8 +2,13 @@ import os
 import zipfile
 
 def build_safe_backend_zip(output_path="backend_api.zip", api_dir="api"):
-    if os.path.exists(output_path):
-        os.remove(output_path)
+    # Delete any existing zip files in root directory to avoid multiple files / confusion
+    import glob
+    for zfile in glob.glob("*.zip"):
+        try:
+            os.remove(zfile)
+        except Exception:
+            pass
     
     # Exclude files and folders that contain LIVE DATA or credentials
     EXCLUDED_FILES = {
