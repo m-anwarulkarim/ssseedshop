@@ -175,8 +175,10 @@ if ($pdo) {
         $initial_file = __DIR__ . '/database/initial_data.sql';
         if (file_exists($initial_file)) {
             $sql = file_get_contents($initial_file);
+            $sql = str_replace(["\r\n", "\r"], "\n", $sql);
             $stmts = array_filter(array_map('trim', explode(";\n", $sql)));
             $imported = 0;
+            $pdo->exec("SET FOREIGN_KEY_CHECKS = 0");
             foreach ($stmts as $s) {
                 if (!empty($s) && !str_starts_with($s, '--') && !str_starts_with($s, '/*')) {
                     try {
@@ -187,6 +189,7 @@ if ($pdo) {
                     }
                 }
             }
+            $pdo->exec("SET FOREIGN_KEY_CHECKS = 1");
             log_msg('success', "🎉 সফলভাবে প্রাথমিক ডাটাবেস রিস্টোর সম্পন্ন হয়েছে ($imported টি রেকর্ড প্রসেস হয়েছে)! সব পণ্য ও ক্যাটাগরি ডেটাবেসে যুক্ত হয়েছে।");
         } else {
             log_msg('error', "initial_data.sql ফাইল পাওয়া যায়নি!");
