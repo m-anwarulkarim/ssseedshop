@@ -198,7 +198,16 @@ export default function ProductForm() {
       setVariations(data.variations || []);
 
       // Load landing features & package tiers
-      setPackageTiers(Array.isArray(data.package_tiers) ? data.package_tiers : []);
+      let loadedTiers: any[] = [];
+      if (Array.isArray(data.package_tiers)) {
+        loadedTiers = data.package_tiers;
+      } else if (typeof data.package_tiers === "string" && (data.package_tiers as string).trim()) {
+        try {
+          const parsed = JSON.parse(data.package_tiers as string);
+          if (Array.isArray(parsed)) loadedTiers = parsed;
+        } catch {}
+      }
+      setPackageTiers(loadedTiers);
       setHighlightFeatures(data.highlight_features || "");
       setTrustCard1Title(data.trust_card_1_title || "");
       setTrustCard1Text(data.trust_card_1_text || "");
