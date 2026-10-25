@@ -27,6 +27,7 @@ import {
   User, Phone, MapPin, ShoppingBag, Package, Clock, Camera, Loader2,
   CheckCircle2, Truck, X, LogOut, Save, KeyRound, Home, UserCircle2, Search,
   FileText, ExternalLink, Copy,
+  Mail,
 } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { districts, getThanas } from "@/data/bangladeshLocations";
