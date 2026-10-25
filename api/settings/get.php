@@ -1,10 +1,9 @@
 <?php
 // api/settings/get.php
-// Ss Seed Shop Settings Fetch API
+// AgroSeed Settings Fetch API
 
 require_once __DIR__ . '/../db.php';
-
-
+$json_file = __DIR__ . '/../database/settings.json';
 
 header('Content-Type: application/json; charset=utf-8');
 header('Cache-Control: public, max-age=300, stale-while-revalidate=1800');

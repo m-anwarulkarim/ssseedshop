@@ -1,16 +1,16 @@
 @echo off
 chcp 65001 >nul
 echo =======================================================
-echo    Ss Seed Shop Local Development Server (Backend + Frontend)
+echo    AgroSeed Local Development Server (Backend + Frontend)
 echo =======================================================
 echo.
 
-echo [1/2] Starting PHP Backend on http://localhost:8005...
-start "Ss Seed Shop Backend (PHP :8005)" cmd /k "php -S localhost:8005 -t api"
+echo [1/2] Starting Multi-Threaded PHP Backend on http://localhost:8005...
+start "AgroSeed Backend (PHP :8005)" cmd /k "set PHP_CLI_SERVER_WORKERS=4 && php -S localhost:8005 -t api"
 
 echo [2/2] Starting Vite Frontend on http://localhost:8080...
 cd frontend
-start "Ss Seed Shop Frontend (Vite :8080)" cmd /k "npm run dev"
+start "AgroSeed Frontend (Vite :8080)" cmd /k "npm run dev"
 
 echo.
 echo =======================================================
