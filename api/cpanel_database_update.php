@@ -114,6 +114,12 @@ if ($pdo) {
     add_column_if_missing($pdo, 'products', 'available_stock', 'INT DEFAULT 0 AFTER `in_stock`');
     add_column_if_missing($pdo, 'products', 'position', 'INT DEFAULT 0 AFTER `stock`');
     add_column_if_missing($pdo, 'products', 'is_hidden', 'TINYINT(1) DEFAULT 0 AFTER `position`');
+    add_column_if_missing($pdo, 'products', 'package_tiers', 'LONGTEXT DEFAULT NULL AFTER `variations`');
+    add_column_if_missing($pdo, 'products', 'highlight_features', 'TEXT DEFAULT NULL AFTER `package_tiers`');
+    add_column_if_missing($pdo, 'products', 'trust_card_1_title', 'VARCHAR(255) DEFAULT NULL AFTER `highlight_features`');
+    add_column_if_missing($pdo, 'products', 'trust_card_1_text', 'TEXT DEFAULT NULL AFTER `trust_card_1_title`');
+    add_column_if_missing($pdo, 'products', 'trust_card_2_title', 'VARCHAR(255) DEFAULT NULL AFTER `trust_card_1_text`');
+    add_column_if_missing($pdo, 'products', 'trust_card_2_text', 'TEXT DEFAULT NULL AFTER `trust_card_2_title`');
 
     add_index_if_missing($pdo, 'products', 'idx_prod_slug', '`slug`');
     add_index_if_missing($pdo, 'products', 'idx_prod_hidden', '`is_hidden`');

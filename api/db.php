@@ -84,7 +84,7 @@ if ($can_attempt_connect) {
 class DB {
     private static $jsonCols = [
         'admins'            => ['permissions'],
-        'products'          => ['categories', 'tags', 'image_gallery', 'variations'],
+        'products'          => ['categories', 'tags', 'image_gallery', 'variations', 'package_tiers'],
         'orders'            => ['items'],
         'incomplete_orders' => ['cart_snapshot'],
         'sms_logs'          => ['gateway'],
