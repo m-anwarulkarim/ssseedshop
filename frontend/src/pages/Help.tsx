@@ -1,8 +1,15 @@
+import { useMemo } from "react";
 import { MessageCircle, Phone, Facebook, Mail, HelpCircle, Instagram, Music2 } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import SideCart from "@/components/SideCart";
 import SEOHead from "@/components/SEOHead";
+import {
+  detectDomainInfo,
+  buildDynamicKeywords,
+  buildBreadcrumbSchema,
+  buildFAQSchema,
+} from "@/lib/seoDomain";
 
 const helpSections = [
   {
@@ -50,18 +57,57 @@ const helpSections = [
 ];
 
 const faqItems = [
-  { q: "অর্ডার কিভাবে করবো?", a: "আমাদের ওয়েবসাইট থেকে পণ্য সিলেক্ট করে অর্ডার দিন, অথবা ফোনে কল করুন।" },
-  { q: "ডেলিভারি কত দিনে হয়?", a: "সাধারণত ঢাকায় ১-২ দিন এবং ঢাকার বাইরে ২-৪ দিনের মধ্যে ডেলিভারি হয়।" },
-  { q: "পণ্য ফেরত দেওয়া যায়?", a: "পণ্যে সমস্যা থাকলে ডেলিভারির সময় কুরিয়ারের কাছে ফেরত দিতে পারবেন।" },
-  { q: "পেমেন্ট কিভাবে করবো?", a: "ক্যাশ অন ডেলিভারি — পণ্য হাতে পেয়ে টাকা দিন।" },
+  { q: "অর্ডার কিভাবে করবো?", a: "আমাদের ওয়েবসাইট থেকে আপনার পছন্দের বীজ সিলেক্ট করে সরাসরি 'অর্ডার করুন' বাটনে ক্লিক করে নাম, মোবাইল নম্বর ও ঠিকানা দিলেই অর্ডার নিশ্চিত হয়ে যাবে।" },
+  { q: "ডেলিভারি কত দিনে হয়?", a: "সাধারণত ঢাকা সিটির ভেতরে ১-২ দিন এবং ঢাকার বাইরে জেলা ও উপজেলায় ২-৪ দিনের মধ্যে ডেলিভারি সম্পন্ন হয়।" },
+  { q: "পণ্য ফেরত দেওয়া যায়?", a: "হ্যাঁ, বীজে কোনো সমস্যা থাকলে ডেলিভারির সময় কুরিয়ারের উপস্থিতিতে যাচাই করে রিটার্ন বা পরিবর্তন করতে পারবেন।" },
+  { q: "পেমেন্ট কিভাবে করবো?", a: "ক্যাশ অন ডেলিভারি — হাতে পণ্য বুঝে পেয়ে মূল্য পরিশোধ করবেন।" },
+  { q: "বীজের অঙ্কুরোদগম না হলে কী করবেন?", a: "আমাদের প্রতিটি বীজ মানসম্মত এবং অঙ্কুরোদগমের হার ন্যূনতম ৮০%। চাষাবাদ নির্দেশিকা অনুযায়ী বপন করলে চমৎকার ফলাফল পাবেন।" },
 ];
 
 export default function Help() {
+  const domainInfo = useMemo(() => detectDomainInfo(), []);
+  const helpCanonical = `${domainInfo.origin}/help`;
+
+  const helpKeywords = useMemo(() => {
+    return buildDynamicKeywords({
+      customKeywords: [
+        "বীজ অর্ডার করার নিয়ম",
+        "সিড শপ হেল্পলাইন",
+        "কাস্টমার সাপোর্ট",
+        "বীজ ডেলিভারি সময়",
+        "রিটার্ন ও রিফান্ড সাহায্য",
+        "online seed shop helpline bd",
+      ],
+    });
+  }, []);
+
+  const helpJsonLd = useMemo(() => {
+    const breadcrumb = buildBreadcrumbSchema([
+      { name: "হোম", url: domainInfo.origin },
+      { name: "সাহায্য ও সাপোর্ট", url: helpCanonical },
+    ]);
+
+    const faqSchema = buildFAQSchema(
+      faqItems.map((item) => ({
+        question: item.q,
+        answer: item.a,
+      }))
+    );
+
+    return [breadcrumb, faqSchema];
+  }, [domainInfo, helpCanonical]);
+
+  const helpTitle = `সাহায্য কেন্দ্র ও সাধারণ জিজ্ঞাসা (FAQ) | Ss Seed Shop`;
+  const helpDesc = `বীজ অর্ডার, দ্রুত ডেলিভারি, ক্যাশ অন ডেলিভারি ও রিটার্ন সংক্রান্ত সকল প্রশ্নের উত্তর জানুন। সার্বক্ষণিক কাস্টমার কেয়ার — Ss Seed Shop (AB Seed)।`;
+
   return (
     <div className="min-h-screen bg-background flex flex-col">
       <SEOHead
-        title="সাহায্য ও সাপোর্ট — Ss Seed Shop"
-        description="Ss Seed Shop এর সাহায্য কেন্দ্র — অর্ডার, ডেলিভারি বা যেকোনো সমস্যায় আমরা আছি আপনার পাশে।"
+        title={helpTitle}
+        description={helpDesc}
+        keywords={helpKeywords}
+        url={helpCanonical}
+        jsonLd={helpJsonLd}
       />
       <Navbar />
       <SideCart />

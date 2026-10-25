@@ -8,6 +8,7 @@ import SideCart from "@/components/SideCart";
 import ProductCard from "@/components/ProductCard";
 import { Loader2, ChevronRight } from "lucide-react";
 import SEOHead from "@/components/SEOHead";
+import { detectDomainInfo, buildDynamicKeywords, buildBreadcrumbSchema } from "@/lib/seoDomain";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useCategories, useAllProducts } from "@/hooks/useCatalog";
 import { resolveImageUrl, handleImageError } from "@/lib/imageFallback";
@@ -60,12 +61,64 @@ export default function CategoryPage() {
       )
     : products;
 
+  const domainInfo = useMemo(() => detectDomainInfo(), []);
+  const catDisplay = category?.display_name || decodedName;
+  const catCanonical = `${domainInfo.origin}/category/${encodeURIComponent(decodedName)}`;
+
+  const catSeoTitle = `${catDisplay} বীজ — উন্নত জাত, উচ্চ অঙ্কুরোদগম ও সেরা দর | Ss Seed Shop`;
+  const catSeoDesc = category?.description ||
+    `উন্নত জাতের ${catDisplay} বীজ সংগ্রহ করুন Ss Seed Shop থেকে। উচ্চ অঙ্কুরোদগম হার (≥৮০%), সুলভ মূল্য ও সারাদেশে দ্রুত ক্যাশ অন হোম ডেলিভারি — Ss Seed Shop (AB Seed)।`;
+
+  const catKeywords = useMemo(() => {
+    return buildDynamicKeywords({
+      category: decodedName,
+      subcategory: selectedSub || undefined,
+    });
+  }, [decodedName, selectedSub]);
+
+  const catJsonLd = useMemo(() => {
+    const breadcrumb = buildBreadcrumbSchema([
+      { name: "হোম", url: domainInfo.origin },
+      { name: "বীজের ক্যাটাগরি", url: `${domainInfo.origin}/categories` },
+      { name: `${catDisplay} বীজ`, url: catCanonical },
+    ]);
+
+    const collectionPage = {
+      "@context": "https://schema.org",
+      "@type": "CollectionPage",
+      "@id": `${catCanonical}#webpage`,
+      url: catCanonical,
+      name: catSeoTitle,
+      description: catSeoDesc,
+      isPartOf: {
+        "@id": `${domainInfo.origin}/#website`,
+      },
+    };
+
+    const itemList = {
+      "@context": "https://schema.org",
+      "@type": "ItemList",
+      itemListElement: (filteredProducts || []).slice(0, 24).map((p: any, idx: number) => ({
+        "@type": "ListItem",
+        position: idx + 1,
+        url: `${domainInfo.origin}/product/${p.slug || p.id}`,
+        name: p.name,
+      })),
+    };
+
+    return [breadcrumb, collectionPage, itemList];
+  }, [domainInfo, catDisplay, catCanonical, catSeoTitle, catSeoDesc, filteredProducts]);
+
   return (
     <div className="min-h-screen bg-background flex flex-col">
       <SEOHead
-        title={`${category?.display_name || decodedName} — বীজ ও পণ্য কিনুন`}
-        description={category?.description || `${decodedName} ক্যাটাগরির সেরা বীজ ও পণ্য সংগ্রহ করুন Ss Seed Shop থেকে। সারাদেশে দ্রুত ডেলিভারি।`}
+        title={catSeoTitle}
+        description={catSeoDesc}
+        keywords={catKeywords}
         image={category?.image}
+        url={catCanonical}
+        category={`${catDisplay} বীজ`}
+        jsonLd={catJsonLd}
       />
       <Navbar />
       <SideCart />

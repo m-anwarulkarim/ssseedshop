@@ -24,7 +24,7 @@ const NotFound = () => {
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-background px-4 text-center">
-      <SEOHead title="পেজ পাওয়া যায়নি — 404" description="আপনি যে পেজটি খুঁজছেন সেটি পাওয়া যায়নি — Ss Seed Shop" />
+      <SEOHead title="পেজ পাওয়া যায়নি — 404" description="আপনি যে পেজটি খুঁজছেন সেটি পাওয়া যায়নি।" noindex={true} />
       <h1 className="text-7xl font-bold text-primary mb-4">404</h1>
       <p className="text-xl text-muted-foreground mb-2">Page Not Found</p>
       <p className="text-sm text-muted-foreground mb-6">

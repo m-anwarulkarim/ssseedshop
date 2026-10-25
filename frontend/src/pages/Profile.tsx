@@ -4,6 +4,7 @@ import { useNavigate, Link } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import SideCart from "@/components/SideCart";
 import Footer from "@/components/Footer";
+import SEOHead from "@/components/SEOHead";
 
 const getApiUrl = () => API_URL;
 import CustomerLogin, {
@@ -341,6 +342,7 @@ export default function Profile() {
   if (!session) {
     return (
       <div className="min-h-screen bg-background">
+        <SEOHead title="কাস্টমার লগইন" description="কাস্টমার একাউন্ট লগইন" noindex={true} />
         <Navbar />
         <CustomerLogin onLogin={(s) => setSession(s)} />
         <SideCart />
@@ -356,6 +358,7 @@ export default function Profile() {
 
   return (
     <div className="min-h-screen bg-muted/30">
+      <SEOHead title={`${displayName} — আমার প্রোফাইল`} description="কাস্টমার প্রোফাইল ও অর্ডার হিস্ট্রি" noindex={true} />
       <Navbar />
 
       <div className="max-w-3xl mx-auto px-3 py-4 space-y-4">

@@ -12,6 +12,14 @@ import FeaturesSection from "@/components/FeaturesSection";
 import { useParams, useNavigate } from "react-router-dom";
 import { usePageViewTracker } from "@/hooks/useAnalyticsTracker";
 import SEOHead from "@/components/SEOHead";
+import {
+  detectDomainInfo,
+  buildDynamicKeywords,
+  buildOrganizationSchema,
+  buildWebSiteSchema,
+  buildFAQSchema,
+  buildBreadcrumbSchema,
+} from "@/lib/seoDomain";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useCategories, useAllProducts } from "@/hooks/useCatalog";
 import { useInfiniteScroll } from "@/hooks/use-infinite-scroll";
@@ -104,19 +112,64 @@ export default function Index() {
 
   const sentinelRef = useInfiniteScroll(loadMore, hasNextPage, false);
 
+  const domainInfo = useMemo(() => detectDomainInfo(), []);
+  const currentCatObj = categoriesList?.find((c) => c.name === activeCategory);
+  const activeCatDisplay = currentCatObj?.display_name || activeCategory;
+
+  const homeSeoTitle =
+    activeCategory === "সকল"
+      ? "Ss Seed Shop — দেশী ও বিদেশী ফুল, ফল ও সবজি বীজের বিশ্বস্ত অনলাইন শপ | AB Seed"
+      : `${activeCatDisplay} বীজ — উন্নত জাত ও সর্বোচ্চ অঙ্কুরোদগম | Ss Seed Shop`;
+
+  const homeSeoDesc =
+    activeCategory === "সকল"
+      ? "Ss Seed Shop (এবি সিড / AB Seed) — বাংলাদেশের শীর্ষস্থানীয় অনলাইন বীজ শপ। উন্নত মানের ফুল, ফল, সবজি ও হাইব্রিড বীজ কিনুন। সারাদেশে দ্রুত ক্যাশ অন হোম ডেলিভারি ও ১০০% খাঁটি বীজের নিশ্চয়তা।"
+      : `${activeCatDisplay} ক্যাটাগরির সেরা বীজ সংগ্রহ করুন Ss Seed Shop থেকে। উচ্চ অঙ্কুরোদগম, সাশ্রয়ী মূল্য ও সারাদেশে ক্যাশ অন ডেলিভারি।`;
+
+  const homeKeywords = useMemo(() => {
+    return buildDynamicKeywords({
+      category: activeCategory !== "সকল" ? activeCategory : undefined,
+    });
+  }, [activeCategory]);
+
+  const homeJsonLd = useMemo(() => {
+    if (activeCategory === "সকল") {
+      const org = buildOrganizationSchema(domainInfo);
+      const web = buildWebSiteSchema(domainInfo);
+      const faqs = buildFAQSchema([
+        {
+          question: "আপনারা কি সারাদেশে হোম ডেলিভারি দেন?",
+          answer: "হ্যাঁ, আমরা ঢাকা সহ বাংলাদেশের প্রতিটি জেলা ও উপজেলায় দ্রুত ক্যাশ অন হোম ডেলিভারি দিয়ে থাকি।",
+        },
+        {
+          question: "আপনাদের বীজের অঙ্কুরোদগম ক্ষমতা কেমন?",
+          answer: "আমাদের প্রতিটি বীজ পরীক্ষিত এবং এর অঙ্কুরোদগম ক্ষমতা ন্যূনতম ৮০% বা তার বেশি।",
+        },
+        {
+          question: "অনলাইনে বীজ অর্ডার করার নিয়ম কী?",
+          answer: "পছন্দের বীজ নির্বাচন করে সরাসরি 'অর্ডার করুন' বাটনে ক্লিক করে নাম, ঠিকানা ও মোবাইল নম্বর দিলেই অর্ডার কনফার্ম হবে।",
+        },
+      ]);
+      return [org, web, faqs];
+    } else {
+      return [
+        buildBreadcrumbSchema([
+          { name: "হোম", url: domainInfo.origin },
+          { name: "ক্যাটাগরি", url: `${domainInfo.origin}/categories` },
+          { name: `${activeCatDisplay} বীজ`, url: `${domainInfo.origin}/category/${encodeURIComponent(activeCategory)}` },
+        ]),
+      ];
+    }
+  }, [activeCategory, activeCatDisplay, domainInfo]);
+
   return (
     <div className="min-h-screen bg-background flex flex-col">
       <SEOHead
-        title={
-          activeCategory === "সকল"
-            ? "Ss Seed Shop — দেশী ও বিদেশী ফুল, ফল ও সবজি বীজের বিশ্বস্ত অনলাইন শপ"
-            : `${categoriesList?.find((c) => c.name === activeCategory)?.display_name || activeCategory} বীজ কিনুন`
-        }
-        description={
-          activeCategory === "সকল"
-            ? "Ss Seed Shop — বাংলাদেশের বিশ্বস্ত অনলাইন সিড শপ। উন্নত মানের ফুল, ফল, সবজি ও হাইব্রিড বীজ কিনুন। সারাদেশে দ্রুত ক্যাশ অন হোম ডেলিভারি।"
-            : `${categoriesList?.find((c) => c.name === activeCategory)?.display_name || activeCategory} ক্যাটাগরির সেরা বীজ সংগ্রহ করুন Ss Seed Shop থেকে। সারাদেশে দ্রুত ডেলিভারি।`
-        }
+        title={homeSeoTitle}
+        description={homeSeoDesc}
+        keywords={homeKeywords}
+        url={domainInfo.origin}
+        jsonLd={homeJsonLd}
       />
       <Navbar />
       <SideCart />

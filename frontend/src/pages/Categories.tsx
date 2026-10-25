@@ -3,14 +3,43 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import SideCart from "@/components/SideCart";
 import { Loader2 } from "lucide-react";
+import { useMemo } from "react";
 import SEOHead from "@/components/SEOHead";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useCategories } from "@/hooks/useCatalog";
 import { resolveImageUrl, handleImageError } from "@/lib/imageFallback";
+import { detectDomainInfo, buildDynamicKeywords, buildBreadcrumbSchema } from "@/lib/seoDomain";
 
 export default function Categories() {
   const { t } = useLanguage();
   const { data: categories, isLoading } = useCategories();
+  const domainInfo = useMemo(() => detectDomainInfo(), []);
+  const catHubCanonical = `${domainInfo.origin}/categories`;
+
+  const catKeywords = useMemo(() => {
+    return buildDynamicKeywords({
+      customKeywords: [
+        "বীজের ক্যাটাগরি",
+        "বীজ তালিকা",
+        "সবজি বীজ তালিকা",
+        "ফুলের বীজ তালিকা",
+        "হাইব্রিড বীজ তালিকা",
+        "seed categories bangladesh",
+      ],
+    });
+  }, []);
+
+  const catHubJsonLd = useMemo(() => {
+    return [
+      buildBreadcrumbSchema([
+        { name: "হোম", url: domainInfo.origin },
+        { name: "বীজের ক্যাটাগরি", url: catHubCanonical },
+      ]),
+    ];
+  }, [domainInfo, catHubCanonical]);
+
+  const catHubTitle = `বীজের সকল ক্যাটাগরি — ফুল, ফল ও সবজি বীজের বিশ্বস্ত তালিকা | Ss Seed Shop`;
+  const catHubDesc = `ফুল বীজ, শাক-সবজি বীজ, ফল বীজ, হাইব্রিড বীজ সহ সকল ক্যাটাগরি থেকে আপনার পছন্দের বীজ বেছে নিন। ১০০% আসল ও পরীক্ষিত বীজ কিনুন — Ss Seed Shop (AB Seed)।`;
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
@@ -18,8 +47,11 @@ export default function Categories() {
       <SideCart />
 
       <SEOHead
-        title="বীজের ক্যাটাগরি — ফুল, ফল, সবজি বীজ"
-        description="Ss Seed Shop এর সকল বীজ ক্যাটাগরি দেখুন — ফুলের বীজ, সবজি বীজ, ফলের বীজ, হাইব্রিড বীজ ও আরও অনেক কিছু। আপনার পছন্দের ক্যাটাগরি বেছে নিন।"
+        title={catHubTitle}
+        description={catHubDesc}
+        keywords={catKeywords}
+        url={catHubCanonical}
+        jsonLd={catHubJsonLd}
       />
       <main className="flex-1">
         <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 py-4">

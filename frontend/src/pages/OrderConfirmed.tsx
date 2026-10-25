@@ -115,7 +115,7 @@ export default function OrderConfirmed() {
 
   return (
     <div className="min-h-screen bg-muted/30 flex items-center justify-center p-4">
-      <SEOHead title="অর্ডার সফল হয়েছে" description="আপনার অর্ডার সফলভাবে গৃহীত হয়েছে — Ss Seed Shop" />
+      <SEOHead title="অর্ডার সফল হয়েছে" description="আপনার অর্ডার সফলভাবে গৃহীত হয়েছে।" noindex={true} />
       <div className="max-w-md w-full bg-card rounded-2xl border border-border p-6 text-center space-y-5">
         <div className="flex justify-center">
           <CheckCircle className="w-14 h-14 text-green-500" />

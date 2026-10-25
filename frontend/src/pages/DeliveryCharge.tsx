@@ -1,8 +1,11 @@
+import { useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Truck, Gift, Clock, MapPin, PartyPopper } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import SEOHead from "@/components/SEOHead";
+import { detectDomainInfo, buildDynamicKeywords, buildBreadcrumbSchema } from "@/lib/seoDomain";
 
 type Tier = { label: string; sub: string; charge: string; isFree: boolean };
 type TimeItem = { label: string; value: string };
@@ -56,9 +59,43 @@ export default function DeliveryCharge() {
   });
 
   const d = data || DEFAULTS;
+  const domainInfo = useMemo(() => detectDomainInfo(), []);
+  const deliveryCanonical = `${domainInfo.origin}/delivery-charge`;
+
+  const deliveryKeywords = useMemo(() => {
+    return buildDynamicKeywords({
+      customKeywords: [
+        "ডেলিভারি চার্জ",
+        "হোম ডেলিভারি ফি",
+        "ক্যাশ অন ডেলিভারি চার্জ",
+        "কুরিয়ার চার্জ",
+        "ফ্রি ডেলিভারি",
+        "seed delivery charge bangladesh",
+      ],
+    });
+  }, []);
+
+  const deliveryJsonLd = useMemo(() => {
+    return [
+      buildBreadcrumbSchema([
+        { name: "হোম", url: domainInfo.origin },
+        { name: "ডেলিভারি চার্জ", url: deliveryCanonical },
+      ]),
+    ];
+  }, [domainInfo, deliveryCanonical]);
+
+  const deliveryTitle = `ডেলিভারি চার্জ ও শিপিং নিয়মাবলী | Ss Seed Shop`;
+  const deliveryDesc = `সারা বাংলাদেশে দ্রুত ক্যাশ অন হোম ডেলিভারি চার্জ তালিকা ও আনুমানিক ডেলিভারি সময় — Ss Seed Shop (AB Seed)। ৳৬০০+ অর্ডারে সম্পূর্ণ ফ্রি ডেলিভারি!`;
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-emerald-50/40 to-white">
+      <SEOHead
+        title={deliveryTitle}
+        description={deliveryDesc}
+        keywords={deliveryKeywords}
+        url={deliveryCanonical}
+        jsonLd={deliveryJsonLd}
+      />
       <Navbar />
       <main className="max-w-2xl mx-auto px-4 py-6">
         {/* Header */}

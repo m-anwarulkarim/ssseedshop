@@ -7,6 +7,7 @@
     "dev": "node ./node_modules/vite/bin/vite.js",
     "build": "node ./node_modules/vite/bin/vite.js build",
     "build:dev": "node ./node_modules/vite/bin/vite.js build --mode development",
+    "sitemap": "node ../scripts/generate_sitemap.js",
     "lint": "eslint .",
     "preview": "node ./node_modules/vite/bin/vite.js preview",
     "test": "vitest run",

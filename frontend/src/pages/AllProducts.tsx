@@ -6,6 +6,11 @@ import Footer from "@/components/Footer";
 import SideCart from "@/components/SideCart";
 import ProductCard from "@/components/ProductCard";
 import SEOHead from "@/components/SEOHead";
+import {
+  detectDomainInfo,
+  buildDynamicKeywords,
+  buildBreadcrumbSchema,
+} from "@/lib/seoDomain";
 import CategoryTabs from "@/components/CategoryTabs";
 import { useInfiniteScroll } from "@/hooks/use-infinite-scroll";
 import { usePageViewTracker } from "@/hooks/useAnalyticsTracker";
@@ -19,6 +24,9 @@ export default function AllProducts() {
   const navigate = useNavigate();
   const { t } = useLanguage();
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
+
+  const domainInfo = useMemo(() => detectDomainInfo(), []);
+  const allCanonical = `${domainInfo.origin}/all-products`;
 
   const handleCategoryChange = useCallback((cat: string) => {
     if (cat === "সকল") return;
@@ -39,11 +47,64 @@ export default function AllProducts() {
 
   const sentinelRef = useInfiniteScroll(loadMore, hasNextPage, false);
 
+  const allKeywords = useMemo(() => {
+    return buildDynamicKeywords({
+      customKeywords: [
+        "সকল বীজ",
+        "সব বীজ",
+        "বীজ তালিকা",
+        "সবজির বীজ কালেকশন",
+        "ফুলের বীজ কালেকশন",
+        "বীজের মেলা",
+        "অনলাইন সিড মার্কেট",
+        "buy seeds bangladesh",
+      ],
+    });
+  }, []);
+
+  const allJsonLd = useMemo(() => {
+    const breadcrumb = buildBreadcrumbSchema([
+      { name: "হোম", url: domainInfo.origin },
+      { name: "সকল বীজ ও পণ্য", url: allCanonical },
+    ]);
+
+    const collectionPage = {
+      "@context": "https://schema.org",
+      "@type": "CollectionPage",
+      "@id": `${allCanonical}#webpage`,
+      url: allCanonical,
+      name: `সকল বীজ ও কৃষি পণ্য কালেকশন | ${domainInfo.primaryBrandName}`,
+      description: `উন্নত মানের দেশী ও বিদেশী ফুল, ফল, সবজি ও হাইব্রিড বীজ কালেকশন।`,
+      isPartOf: {
+        "@id": `${domainInfo.origin}/#website`,
+      },
+    };
+
+    const itemList = {
+      "@context": "https://schema.org",
+      "@type": "ItemList",
+      itemListElement: (products || []).slice(0, 24).map((p: any, idx: number) => ({
+        "@type": "ListItem",
+        position: idx + 1,
+        url: `${domainInfo.origin}/product/${p.slug || p.id}`,
+        name: p.name,
+      })),
+    };
+
+    return [breadcrumb, collectionPage, itemList];
+  }, [domainInfo, allCanonical, products]);
+
+  const allSeoTitle = `সকল বীজ ও কৃষি পণ্য — দেশী ও বিদেশী হাইব্রিড বীজ কালেকশন | Ss Seed Shop`;
+  const allSeoDesc = `উন্নত জাতের ফুল বীজ, সবজি বীজ, ফল বীজ ও হাইব্রিড বীজের বিশাল সমাহার। ১০০% আসল ও পরীক্ষিত বীজ কিনুন সাশ্রয়ী মূল্যে — Ss Seed Shop (AB Seed)। সারাদেশে দ্রুত ক্যাশ অন হোম ডেলিভারি।`;
+
   return (
     <div className="min-h-screen bg-background flex flex-col">
       <SEOHead
-        title="সকল পণ্য"
-        description="আমাদের সকল বীজের সংগ্রহ দেখুন।"
+        title={allSeoTitle}
+        description={allSeoDesc}
+        keywords={allKeywords}
+        url={allCanonical}
+        jsonLd={allJsonLd}
       />
       <Navbar />
       <SideCart />

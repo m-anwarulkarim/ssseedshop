@@ -85,7 +85,7 @@ export default function PublicInvoice() {
   if (loading) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-muted/20 p-4">
-        <SEOHead title="ইনভয়েস লোড হচ্ছে..." description="Ss Seed Shop অর্ডার ইনভয়েস" />
+        <SEOHead title="ইনভয়েস লোড হচ্ছে..." description="অর্ডার চালান" noindex={true} />
         <Loader2 className="w-10 h-10 animate-spin text-primary mb-3" />
         <p className="text-sm text-muted-foreground font-medium">ইনভয়েস তৈরি করা হচ্ছে...</p>
       </div>
@@ -95,7 +95,7 @@ export default function PublicInvoice() {
   if (notFound || !order) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-muted/20 p-4 text-center">
-        <SEOHead title="ইনভয়েস পাওয়া যায়নি" description="Ss Seed Shop অর্ডার ইনভয়েস" />
+        <SEOHead title="ইনভয়েস পাওয়া যায়নি" description="অর্ডার চালান" noindex={true} />
         <div className="bg-card p-8 rounded-2xl border border-border max-w-md w-full shadow-sm space-y-4">
           <div className="w-16 h-16 bg-red-100 dark:bg-red-950/40 text-red-600 rounded-full flex items-center justify-center mx-auto text-2xl font-bold">
             !
@@ -118,7 +118,7 @@ export default function PublicInvoice() {
 
   return (
     <div className="min-h-screen bg-slate-100 dark:bg-slate-900 pb-12">
-      <SEOHead title={`ইনভয়েস — ${order.order_id}`} description={`Ss Seed Shop অর্ডার চালান ${order.order_id}`} />
+      <SEOHead title={`ইনভয়েস — ${order.order_id}`} description={`অর্ডার চালান ${order.order_id}`} noindex={true} />
 
       {/* Top Action Bar */}
       <div className="sticky top-0 z-30 bg-background/95 backdrop-blur border-b border-border shadow-sm">

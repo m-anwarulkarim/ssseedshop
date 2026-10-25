@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { Link } from "react-router-dom";
 import { ArrowLeft, FileText } from "lucide-react";
@@ -5,6 +6,7 @@ import SEOHead from "@/components/SEOHead";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import SideCart from "@/components/SideCart";
+import { detectDomainInfo, buildDynamicKeywords, buildBreadcrumbSchema } from "@/lib/seoDomain";
 
 interface Section {
   number: string;
@@ -122,15 +124,41 @@ const sections: Section[] = [
 
 export default function TermsConditions() {
   const { t } = useLanguage();
+  const domainInfo = useMemo(() => detectDomainInfo(), []);
+  const termsCanonical = `${domainInfo.origin}/terms-conditions`;
+
+  const termsKeywords = useMemo(() => {
+    return buildDynamicKeywords({
+      customKeywords: [
+        "ব্যবহারের শর্তাবলী",
+        "শর্তাবলী",
+        "নীতিমালা",
+        "বীজ ক্রয়ের শর্ত",
+        "terms and conditions bangladesh",
+      ],
+    });
+  }, []);
+
+  const termsJsonLd = useMemo(() => {
+    return [
+      buildBreadcrumbSchema([
+        { name: "হোম", url: domainInfo.origin },
+        { name: "ব্যবহারের শর্তাবলী", url: termsCanonical },
+      ]),
+    ];
+  }, [domainInfo, termsCanonical]);
+
+  const termsTitle = `ব্যবহারের শর্তাবলী ও নীতিমালা | Ss Seed Shop`;
+  const termsDesc = `Ss Seed Shop (AB Seed)-এ বীজ ও কৃষি পণ্য ক্রয়ের সাধারণ নীতিমালা ও শর্তাবলী বিস্তারিত জানুন।`;
 
   return (
     <>
       <SEOHead
-        title={t("শর্তাবলী — Ss Seed Shop", "Terms & Conditions — Ss Seed Shop")}
-        description={t(
-          "Ss Seed Shop-এ বীজ কেনার আগে জেনে নিন আমাদের গুরুত্বপূর্ণ Terms & Conditions।",
-          "Read Ss Seed Shop's important terms and conditions before purchasing seeds."
-        )}
+        title={termsTitle}
+        description={termsDesc}
+        keywords={termsKeywords}
+        url={termsCanonical}
+        jsonLd={termsJsonLd}
       />
       <Navbar />
       <SideCart />

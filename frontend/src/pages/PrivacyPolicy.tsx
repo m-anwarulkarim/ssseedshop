@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { Link } from "react-router-dom";
 import { ArrowLeft, Shield } from "lucide-react";
@@ -5,6 +6,7 @@ import SEOHead from "@/components/SEOHead";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import SideCart from "@/components/SideCart";
+import { detectDomainInfo, buildDynamicKeywords, buildBreadcrumbSchema } from "@/lib/seoDomain";
 
 interface Section {
   number: string;
@@ -79,15 +81,40 @@ const sections: Section[] = [
 
 export default function PrivacyPolicy() {
   const { t } = useLanguage();
+  const domainInfo = useMemo(() => detectDomainInfo(), []);
+  const privacyCanonical = `${domainInfo.origin}/privacy-policy`;
+
+  const privacyKeywords = useMemo(() => {
+    return buildDynamicKeywords({
+      customKeywords: [
+        "প্রাইভেসি পলিসি",
+        "গোপনীয়তা নীতি",
+        "গ্রাহক তথ্য সুরক্ষা",
+        "privacy policy bangladesh",
+      ],
+    });
+  }, []);
+
+  const privacyJsonLd = useMemo(() => {
+    return [
+      buildBreadcrumbSchema([
+        { name: "হোম", url: domainInfo.origin },
+        { name: "প্রাইভেসি পলিসি", url: privacyCanonical },
+      ]),
+    ];
+  }, [domainInfo, privacyCanonical]);
+
+  const privacyTitle = `গোপনীয়তা নীতি (Privacy Policy) | Ss Seed Shop`;
+  const privacyDesc = `Ss Seed Shop (AB Seed)-এ আপনার ব্যক্তিগত তথ্য সুরক্ষা, সংগ্রহ ও ব্যবহারের নীতিমালা বিস্তারিত জানুন।`;
 
   return (
     <>
       <SEOHead
-        title={t("প্রাইভেসি পলিসি — Ss Seed Shop", "Privacy Policy — Ss Seed Shop")}
-        description={t(
-          "Ss Seed Shop-এ আপনার ব্যক্তিগত তথ্য কীভাবে সংগ্রহ, ব্যবহার ও সুরক্ষিত রাখা হয় তা জানুন।",
-          "Learn how Ss Seed Shop collects, uses, and protects your personal information."
-        )}
+        title={privacyTitle}
+        description={privacyDesc}
+        keywords={privacyKeywords}
+        url={privacyCanonical}
+        jsonLd={privacyJsonLd}
       />
       <Navbar />
       <SideCart />

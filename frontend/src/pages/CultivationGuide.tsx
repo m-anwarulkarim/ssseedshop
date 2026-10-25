@@ -1,7 +1,9 @@
+import { useMemo } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { Link } from "react-router-dom";
 import { ArrowLeft, Sprout, Phone, Globe, Facebook } from "lucide-react";
 import SEOHead from "@/components/SEOHead";
+import { detectDomainInfo, buildDynamicKeywords, buildBreadcrumbSchema } from "@/lib/seoDomain";
 
 interface GuideSection {
   title: string;
@@ -615,15 +617,75 @@ function PartBlock({ part }: { part: GuidePart }) {
 
 export default function CultivationGuide() {
   const { t } = useLanguage();
+  const domainInfo = useMemo(() => detectDomainInfo(), []);
+  const guideCanonical = `${domainInfo.origin}/cultivation-guide`;
+
+  const guideKeywords = useMemo(() => {
+    return buildDynamicKeywords({
+      customKeywords: [
+        "বীজ বপন পদ্ধতি",
+        "বীজ থেকে চারা তৈরির নিয়ম",
+        "ছাদবাগান চাষাবাদ",
+        "টবে সবজি চাষ",
+        "টবে ফুল চাষ",
+        "মাটি প্রস্তুত প্রণালী",
+        "বীজের যত্ন ও পরিচর্যা",
+        "gardening guide bangladesh",
+        "seed sowing guide bd",
+      ],
+    });
+  }, []);
+
+  const guideJsonLd = useMemo(() => {
+    const breadcrumb = buildBreadcrumbSchema([
+      { name: "হোম", url: domainInfo.origin },
+      { name: "চাষাবাদ নির্দেশিকা", url: guideCanonical },
+    ]);
+
+    const howTo = {
+      "@context": "https://schema.org",
+      "@type": "HowTo",
+      name: "বীজ বপন ও আধুনিক চাষাবাদ নির্দেশিকা",
+      description: "ফুল ও সবজি বীজ বপন, চারা তৈরি, টবের মাটি প্রস্তুত ও পরিচর্যার পূর্ণাঙ্গ নির্দেশিকা।",
+      step: [
+        {
+          "@type": "HowToStep",
+          name: "মাটি প্রস্তুত",
+          text: "টব বা বেডের জন্য দোআঁশ মাটির সাথে ৪০% পচা গোবর বা ভার্মিকম্পোস্ট মিশিয়ে ঝরঝরে মাটি তৈরি করুন।",
+        },
+        {
+          "@type": "HowToStep",
+          name: "বীজ ভিজিয়ে রাখা",
+          text: "দ্রুত অঙ্কুরোদগমের জন্য বীজ বপনের পূর্বে পরিষ্কার পানিতে ৬ থেকে ৮ ঘণ্টা ভিজিয়ে রাখুন।",
+        },
+        {
+          "@type": "HowToStep",
+          name: "বীজ বপন",
+          text: "মাটিতে বীজের আকারের দ্বিগুণ গভীরতায় বীজ বপন করে হালকা মাটি দিয়ে ঢেকে স্প্রেয়ার দিয়ে পানি দিন।",
+        },
+        {
+          "@type": "HowToStep",
+          name: "চারা পরিচর্যা",
+          text: "চারা গজানোর পর দৈনিক পর্যাপ্ত সকালের রোদ নিশ্চিত করুন এবং পরিমিত পানি দিন।",
+        },
+      ],
+    };
+
+    return [breadcrumb, howTo];
+  }, [domainInfo, guideCanonical]);
+
+  const guideTitle = `বীজ বপন ও আধুনিক চাষাবাদ নির্দেশিকা — কৃষি ও ছাদবাগান গাইড | Ss Seed Shop`;
+  const guideDesc = `সহজ নিয়মে বিভিন্ন ফুল, ফল ও সবজি বীজ বপন, চারা তৈরি, টবের মাটি প্রস্তুত ও সঠিক পরিচর্যার পূর্ণাঙ্গ গাইডলাইন। ঘরে বসেই সফল বাগান গড়ে তুলুন — Ss Seed Shop (AB Seed)।`;
 
   return (
     <>
       <SEOHead
-        title={t("চাষাবাদ নির্দেশিকা — Ss Seed Shop", "Cultivation Guide — Ss Seed Shop")}
-        description={t(
-          "Ss Seed Shop-এর সবজি ও ফুলের বীজ বপন ও পরিচর্যার সম্পূর্ণ গাইড।",
-          "Complete Ss Seed Shop guide for sowing and caring for vegetable and flower seeds."
-        )}
+        title={guideTitle}
+        description={guideDesc}
+        keywords={guideKeywords}
+        url={guideCanonical}
+        type="article"
+        jsonLd={guideJsonLd}
       />
       <main className="min-h-screen bg-background py-6 md:py-10">
         <div className="max-w-4xl mx-auto px-4">

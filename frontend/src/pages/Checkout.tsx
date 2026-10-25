@@ -479,7 +479,11 @@ export default function Checkout() {
 
   return (
     <div className="min-h-screen bg-[hsl(var(--background))] pb-32">
-      <SEOHead title="অর্ডার সম্পন্ন করুন — Ss Seed Shop" description="Ss Seed Shop — মাটি, ভালোবাসা ও বিশ্বাসের সঙ্গে আপনার বাগানের জন্য বাছাই করা বীজ। সারাদেশে নিরাপদ ডেলিভারি।" />
+      <SEOHead
+        title="অর্ডার সম্পন্ন করুন — চেকআউট"
+        description="নিরাপদ চেকআউট — আপনার অর্ডার সম্পন্ন করুন।"
+        noindex={true}
+      />
 
       {/* === Top Strip === */}
       <div className="sticky top-0 z-40 bg-card/95 backdrop-blur-md border-b border-border/60">

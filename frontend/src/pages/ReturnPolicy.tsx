@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { Link } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
@@ -5,6 +6,7 @@ import SEOHead from "@/components/SEOHead";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import SideCart from "@/components/SideCart";
+import { detectDomainInfo, buildDynamicKeywords, buildBreadcrumbSchema } from "@/lib/seoDomain";
 
 const HEADING_COLOR = "#0f3d14";
 const BODY_COLOR = "#212121";
@@ -47,15 +49,41 @@ const sections: Section[] = [
 
 export default function ReturnPolicy() {
   const { t } = useLanguage();
+  const domainInfo = useMemo(() => detectDomainInfo(), []);
+  const returnCanonical = `${domainInfo.origin}/return-policy`;
+
+  const returnKeywords = useMemo(() => {
+    return buildDynamicKeywords({
+      customKeywords: [
+        "রিটার্ন পলিসি",
+        "রিফান্ড পলিসি",
+        "বীজ ফেরত দেওয়ার নিয়ম",
+        "পণ্য পরিবর্তন",
+        "return policy bangladesh",
+      ],
+    });
+  }, []);
+
+  const returnJsonLd = useMemo(() => {
+    return [
+      buildBreadcrumbSchema([
+        { name: "হোম", url: domainInfo.origin },
+        { name: "রিটার্ন পলিসি", url: returnCanonical },
+      ]),
+    ];
+  }, [domainInfo, returnCanonical]);
+
+  const returnTitle = `রিটার্ন ও রিফান্ড পলিসি — সহজ শর্তে পণ্য ফেরত | Ss Seed Shop`;
+  const returnDesc = `Ss Seed Shop (AB Seed)-এর গ্রাহকবান্ধব রিটার্ন ও রিফান্ড নীতিমালা। নষ্ট বা ভুল পণ্যে সহজ রিপ্লেসমেন্ট সুবিধা।`;
 
   return (
     <>
       <SEOHead
-        title={t("রিটার্ন পলিসি — Ss Seed Shop", "Return Policy — Ss Seed Shop")}
-        description={t(
-          "Ss Seed Shop-এ রিটার্ন, রিফান্ড এবং ডেলিভারি প্রত্যাখ্যান সংক্রান্ত নিয়মকানুন জানুন।",
-          "Learn about Ss Seed Shop's return, refund, and delivery rejection policies."
-        )}
+        title={returnTitle}
+        description={returnDesc}
+        keywords={returnKeywords}
+        url={returnCanonical}
+        jsonLd={returnJsonLd}
       />
       <Navbar />
       <SideCart />
