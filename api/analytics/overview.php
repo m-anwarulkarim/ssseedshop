@@ -244,10 +244,6 @@ $response = [
             'total_customers'   => count($unique_phones) ?: $total_orders,
             'total_products'    => count($products),
             'today_visitors'    => max(count($unique_phones) * 3, 24),
-            'sms_balance'       => [
-                'remaining' => 450,
-                'limit'     => 500
-            ],
             'courier_balance'   => [
                 'current_balance' => 0.00
             ]

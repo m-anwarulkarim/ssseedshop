@@ -4,7 +4,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   BarChart3, ShoppingCart, Users, Package, Loader2,
-  Clock, Eye, Wallet, MessageSquare, ShieldCheck,
+  Clock, Eye, Wallet, ShieldCheck,
 } from "lucide-react";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from "recharts";
 import { cn } from "@/lib/utils";
@@ -56,7 +56,6 @@ export default function Overview() {
   const chartData = analytics?.chart_data || [];
   const totalRevenueData = summary.total_revenue || 0;
   const todayVisitors = summary.today_visitors || 0;
-  const smsBalance = summary.sms_balance || { remaining: 450, limit: 500 };
 
   if (isLoading && !analytics) {
     return (
@@ -68,8 +67,8 @@ export default function Overview() {
 
   return (
     <div className="space-y-4">
-      {/* Top 6 Stats Balanced Grid */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+      {/* Top 5 Stats Balanced Grid */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
         <StatCard
           icon={BarChart3}
           iconColor="text-indigo-600 bg-indigo-50"
@@ -105,13 +104,6 @@ export default function Overview() {
           label={t("আজকের ভিজিটর", "Today's Visitors")}
           value={String(todayVisitors || 0)}
           sub={`${summary.total_customers || 0} ${t("মোট কাস্টমার", "customers")}`}
-        />
-        <StatCard
-          icon={MessageSquare}
-          iconColor="text-purple-600 bg-purple-50"
-          label={t("SMS বাকি", "SMS Remaining")}
-          value={smsBalance?.remaining != null ? `${smsBalance.remaining} ${t("টি", "")}` : "—"}
-          sub={smsBalance?.limit != null ? `${t("মোট", "Total")} ${smsBalance.limit} ${t("এর মধ্যে", "available")}` : t("ই-কমা", "Ecomah")}
         />
       </div>
 
