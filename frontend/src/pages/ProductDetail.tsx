@@ -1228,8 +1228,8 @@ export default function ProductDetail() {
 
   // Rich description highlighting price, germination rate, fast delivery, and brand
   const productSeoDesc = cleanDesc.length > 20
-    ? `${cleanName} কিনুন সেরা অফার মূল্যে মাত্র ৳${activeTierPrice}। ${cleanDesc.slice(0, 95)}... শতভাগ আসল বীজ, উচ্চ অঙ্কুরোদগম ও সারাদেশে ক্যাশ অন ডেলিভারি — Ss Seed Shop (AB Seed / এবি সিড)।`
-    : `${cleanName} — উন্নত জাতের ${seoCategoryName} বীজ কিনুন ৳${activeTierPrice} মূল্যে। উচ্চ অঙ্কুরোদগম হার (≥৮০%), ক্যাশ অন হোম ডেলিভারি সারাদেশে — Ss Seed Shop (AB Seed / এবি সিড)।`;
+    ? `${cleanName} কিনুন সেরা অফার মূল্যে মাত্র ৳${activeTierPrice}। ${cleanDesc.slice(0, 95)}... শতভাগ আসল বীজ, উচ্চ অঙ্কুরোদগম ও সারাদেশে ক্যাশ অন ডেলিভারি — SS Seed (Ss Seed Shop)।`
+    : `${cleanName} — উন্নত জাতের ${seoCategoryName} বীজ কিনুন ৳${activeTierPrice} মূল্যে। উচ্চ অঙ্কুরোদগম হার (≥৮০%), ক্যাশ অন হোম ডেলিভারি সারাদেশে — SS Seed (Ss Seed Shop)।`;
 
   // Keywords combining product details and universal seed keywords
   const productKeywords = buildDynamicKeywords({

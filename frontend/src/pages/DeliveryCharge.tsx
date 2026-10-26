@@ -85,7 +85,7 @@ export default function DeliveryCharge() {
   }, [domainInfo, deliveryCanonical]);
 
   const deliveryTitle = `ডেলিভারি চার্জ ও শিপিং নিয়মাবলী | Ss Seed Shop`;
-  const deliveryDesc = `সারা বাংলাদেশে দ্রুত ক্যাশ অন হোম ডেলিভারি চার্জ তালিকা ও আনুমানিক ডেলিভারি সময় — Ss Seed Shop (AB Seed)। ৳৬০০+ অর্ডারে সম্পূর্ণ ফ্রি ডেলিভারি!`;
+  const deliveryDesc = `সারা বাংলাদেশে দ্রুত ক্যাশ অন হোম ডেলিভারি চার্জ তালিকা ও আনুমানিক ডেলিভারি সময় — SS Seed (Ss Seed Shop)। ৳৬০০+ অর্ডারে সম্পূর্ণ ফ্রি ডেলিভারি!`;
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-emerald-50/40 to-white">

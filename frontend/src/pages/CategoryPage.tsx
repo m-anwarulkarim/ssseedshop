@@ -67,7 +67,7 @@ export default function CategoryPage() {
 
   const catSeoTitle = `${catDisplay} বীজ — উন্নত জাত, উচ্চ অঙ্কুরোদগম ও সেরা দর | Ss Seed Shop`;
   const catSeoDesc = category?.description ||
-    `উন্নত জাতের ${catDisplay} বীজ সংগ্রহ করুন Ss Seed Shop থেকে। উচ্চ অঙ্কুরোদগম হার (≥৮০%), সুলভ মূল্য ও সারাদেশে দ্রুত ক্যাশ অন হোম ডেলিভারি — Ss Seed Shop (AB Seed)।`;
+    `উন্নত জাতের ${catDisplay} বীজ সংগ্রহ করুন SS Seed (Ss Seed Shop) থেকে। উচ্চ অঙ্কুরোদগম হার (≥৮০%), সুলভ মূল্য ও সারাদেশে দ্রুত ক্যাশ অন হোম ডেলিভারি।`;
 
   const catKeywords = useMemo(() => {
     return buildDynamicKeywords({

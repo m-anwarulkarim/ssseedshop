@@ -98,7 +98,7 @@ export default function Help() {
   }, [domainInfo, helpCanonical]);
 
   const helpTitle = `সাহায্য কেন্দ্র ও সাধারণ জিজ্ঞাসা (FAQ) | Ss Seed Shop`;
-  const helpDesc = `বীজ অর্ডার, দ্রুত ডেলিভারি, ক্যাশ অন ডেলিভারি ও রিটার্ন সংক্রান্ত সকল প্রশ্নের উত্তর জানুন। সার্বক্ষণিক কাস্টমার কেয়ার — Ss Seed Shop (AB Seed)।`;
+  const helpDesc = `বীজ অর্ডার, দ্রুত ডেলিভারি, ক্যাশ অন ডেলিভারি ও রিটার্ন সংক্রান্ত সকল প্রশ্নের উত্তর জানুন। সার্বক্ষণিক কাস্টমার কেয়ার — SS Seed (Ss Seed Shop)।`;
 
   return (
     <div className="min-h-screen bg-background flex flex-col">

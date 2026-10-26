@@ -105,7 +105,7 @@ export default function PrivacyPolicy() {
   }, [domainInfo, privacyCanonical]);
 
   const privacyTitle = `গোপনীয়তা নীতি (Privacy Policy) | Ss Seed Shop`;
-  const privacyDesc = `Ss Seed Shop (AB Seed)-এ আপনার ব্যক্তিগত তথ্য সুরক্ষা, সংগ্রহ ও ব্যবহারের নীতিমালা বিস্তারিত জানুন।`;
+  const privacyDesc = `SS Seed (Ss Seed Shop)-এ আপনার ব্যক্তিগত তথ্য সুরক্ষা, সংগ্রহ ও ব্যবহারের নীতিমালা বিস্তারিত জানুন।`;
 
   return (
     <>

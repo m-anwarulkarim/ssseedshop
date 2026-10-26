@@ -70,6 +70,7 @@ export default function SEOHead({
     let fullTitle = title.trim();
     const hasBrand =
       fullTitle.toLowerCase().includes(primaryName.toLowerCase()) ||
+      fullTitle.toLowerCase().includes("ss seed") ||
       fullTitle.includes(primaryBn);
 
     if (!hasBrand) {
@@ -90,6 +91,16 @@ export default function SEOHead({
       keywords.split(",").forEach((k) => k && keywordSet.add(k.trim()));
     }
     // Guarantee inclusion of core seed keywords + primary brands
+    keywordSet.add("SS Seed");
+    keywordSet.add("ss seed");
+    keywordSet.add("SS Seeds");
+    keywordSet.add("ss seeds");
+    keywordSet.add("Ss Seed Shop");
+    keywordSet.add("ss seed shop");
+    keywordSet.add("ssseedshop");
+    keywordSet.add("এস এস সিড");
+    keywordSet.add("এসএস সিড");
+    keywordSet.add("এস এস সিড শপ");
     keywordSet.add("বীজ");
     keywordSet.add("অনলাইন বীজ শপ");
     keywordSet.add("সবজি বীজ");
@@ -106,9 +117,9 @@ export default function SEOHead({
       keywordSet.add(`${category} বীজ`);
     }
 
-    const keywordString = Array.from(keywordSet).slice(0, 35).join(", ");
+    const keywordString = Array.from(keywordSet).slice(0, 40).join(", ");
     setMeta("keywords", keywordString, true);
-    setMeta("author", `${primaryName} (${primaryBn})`, true);
+    setMeta("author", `SS Seed / ${primaryName}`, true);
 
     // 4. Canonical URL (Strips tracking params like ?fbclid=..., ?utm_source=...)
     const rawUrl = url || window.location.href;

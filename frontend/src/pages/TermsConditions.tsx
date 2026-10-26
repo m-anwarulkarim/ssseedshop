@@ -149,7 +149,7 @@ export default function TermsConditions() {
   }, [domainInfo, termsCanonical]);
 
   const termsTitle = `ব্যবহারের শর্তাবলী ও নীতিমালা | Ss Seed Shop`;
-  const termsDesc = `Ss Seed Shop (AB Seed)-এ বীজ ও কৃষি পণ্য ক্রয়ের সাধারণ নীতিমালা ও শর্তাবলী বিস্তারিত জানুন।`;
+  const termsDesc = `SS Seed (Ss Seed Shop)-এ বীজ ও কৃষি পণ্য ক্রয়ের সাধারণ নীতিমালা ও শর্তাবলী বিস্তারিত জানুন।`;
 
   return (
     <>

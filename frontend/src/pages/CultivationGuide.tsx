@@ -675,7 +675,7 @@ export default function CultivationGuide() {
   }, [domainInfo, guideCanonical]);
 
   const guideTitle = `বীজ বপন ও আধুনিক চাষাবাদ নির্দেশিকা — কৃষি ও ছাদবাগান গাইড | Ss Seed Shop`;
-  const guideDesc = `সহজ নিয়মে বিভিন্ন ফুল, ফল ও সবজি বীজ বপন, চারা তৈরি, টবের মাটি প্রস্তুত ও সঠিক পরিচর্যার পূর্ণাঙ্গ গাইডলাইন। ঘরে বসেই সফল বাগান গড়ে তুলুন — Ss Seed Shop (AB Seed)।`;
+  const guideDesc = `সহজ নিয়মে বিভিন্ন ফুল, ফল ও সবজি বীজ বপন, চারা তৈরি, টবের মাটি প্রস্তুত ও সঠিক পরিচর্যার পূর্ণাঙ্গ গাইডলাইন। ঘরে বসেই সফল বাগান গড়ে তুলুন — SS Seed (Ss Seed Shop)।`;
 
   return (
     <>

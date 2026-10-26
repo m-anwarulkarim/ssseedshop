@@ -95,7 +95,7 @@ export default function AllProducts() {
   }, [domainInfo, allCanonical, products]);
 
   const allSeoTitle = `সকল বীজ ও কৃষি পণ্য — দেশী ও বিদেশী হাইব্রিড বীজ কালেকশন | Ss Seed Shop`;
-  const allSeoDesc = `উন্নত জাতের ফুল বীজ, সবজি বীজ, ফল বীজ ও হাইব্রিড বীজের বিশাল সমাহার। ১০০% আসল ও পরীক্ষিত বীজ কিনুন সাশ্রয়ী মূল্যে — Ss Seed Shop (AB Seed)। সারাদেশে দ্রুত ক্যাশ অন হোম ডেলিভারি।`;
+  const allSeoDesc = `উন্নত জাতের ফুল বীজ, সবজি বীজ, ফল বীজ ও হাইব্রিড বীজের বিশাল সমাহার। ১০০% আসল ও পরীক্ষিত বীজ কিনুন সাশ্রয়ী মূল্যে — SS Seed (Ss Seed Shop)। সারাদেশে দ্রুত ক্যাশ অন হোম ডেলিভারি।`;
 
   return (
     <div className="min-h-screen bg-background flex flex-col">

@@ -74,7 +74,7 @@ export default function ReturnPolicy() {
   }, [domainInfo, returnCanonical]);
 
   const returnTitle = `রিটার্ন ও রিফান্ড পলিসি — সহজ শর্তে পণ্য ফেরত | Ss Seed Shop`;
-  const returnDesc = `Ss Seed Shop (AB Seed)-এর গ্রাহকবান্ধব রিটার্ন ও রিফান্ড নীতিমালা। নষ্ট বা ভুল পণ্যে সহজ রিপ্লেসমেন্ট সুবিধা।`;
+  const returnDesc = `SS Seed (Ss Seed Shop)-এর গ্রাহকবান্ধব রিটার্ন ও রিফান্ড নীতিমালা। নষ্ট বা ভুল পণ্যে সহজ রিপ্লেসমেন্ট সুবিধা।`;
 
   return (
     <>
