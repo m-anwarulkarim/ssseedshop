@@ -8,7 +8,7 @@ import ProductsSection from "@/components/ProductsSection";
 import CategoryProductsSections from "@/components/CategoryProductsSections";
 import CategoriesShowcase from "@/components/CategoriesShowcase";
 import ProductCard from "@/components/ProductCard";
-import FeaturesSection from "@/components/FeaturesSection";
+// import FeaturesSection from "@/components/FeaturesSection";
 import { useParams, useNavigate } from "react-router-dom";
 import { usePageViewTracker } from "@/hooks/useAnalyticsTracker";
 import SEOHead from "@/components/SEOHead";
@@ -225,7 +225,7 @@ export default function Index() {
           </div>
         </main>
       )}
-      <FeaturesSection />
+      {/* <FeaturesSection /> */}
       <Footer showDevelopedBy={true} />
     </div>
   );
