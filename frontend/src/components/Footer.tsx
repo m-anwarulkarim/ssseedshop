@@ -9,7 +9,6 @@ import {
 import { useQuery } from "@tanstack/react-query";
 import { useLanguage } from "@/contexts/LanguageContext";
 import logoAsset from "@/assets/ssseedshop-logo.png";
-import { toast } from "sonner";
 
 type FooterLink = { label: string; href: string };
 
@@ -46,24 +45,6 @@ function parseLinks(raw: string | null | undefined, fallback: FooterLink[]): Foo
 }
 
 // ─── Custom SVG Icons ───
-function GooglePlayIcon({ className = "w-5 h-5" }: { className?: string }) {
-  return (
-    <svg className={className} viewBox="0 0 24 24" fill="none">
-      <path d="M3.6 1.8 13.5 12 3.6 22.2C3.2 21.7 3 21 3 20.1V3.9c0-.9.2-1.6.6-2.1z" fill="#4285F4" />
-      <path d="M16.8 8.7 13.5 12l3.3 3.3 3.9-2.2c1.3-.7 1.3-2 0-2.8l-3.9-1.6z" fill="#34A853" />
-      <path d="M13.5 12 3.6 22.2c.5.5 1.3.6 2.2.1l11-6.3L13.5 12z" fill="#FBBC05" />
-      <path d="M13.5 12 16.8 8.7 5.8 2.4c-.9-.5-1.7-.4-2.2.1L13.5 12z" fill="#EA4335" />
-    </svg>
-  );
-}
-
-function AppleIcon({ className = "w-5 h-5" }: { className?: string }) {
-  return (
-    <svg className={className} viewBox="0 0 24 24" fill="currentColor">
-      <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M15.97 6.37c.66-.82 1.11-1.96.99-3.1-.96.04-2.12.64-2.8 1.44-.6.69-1.12 1.83-.98 2.94 1.07.08 2.13-.46 2.79-1.28z" />
-    </svg>
-  );
-}
 
 function FacebookIcon({ className = "w-4 h-4" }: { className?: string }) {
   return (
@@ -124,10 +105,6 @@ export default function Footer({ showDevelopedBy }: { showDevelopedBy?: boolean 
   const customerServiceLinks = parseLinks(settings?.footer_quick_links, defaultCustomerServiceLinks);
   const usefulLinks = parseLinks(settings?.footer_categories, defaultUsefulLinks);
 
-  const handleAppClick = () => {
-    toast.info(lang === "bn" ? "অ্যাপ খুব শীঘ্রই আসছে!" : "Mobile app is coming soon!");
-  };
-
   return (
     <footer className="bg-white text-slate-700 border-t border-slate-200">
       {/* ─── 1. MAIN FOUR COLUMNS CONTENT ─── */}
@@ -146,7 +123,7 @@ export default function Footer({ showDevelopedBy }: { showDevelopedBy?: boolean 
                   loading="lazy"
                 />
                 <div>
-                  <div className="font-extrabold text-xl text-orange-600 tracking-tight leading-none group-hover:text-orange-700 transition-colors uppercase">
+                  <div className="font-extrabold text-xl text-primary tracking-tight leading-none group-hover:text-primary/90 transition-colors uppercase">
                     SS SEED SHOP
                   </div>
                   <div className="text-[10px] font-bold text-slate-500 tracking-wider uppercase mt-1">
@@ -163,15 +140,15 @@ export default function Footer({ showDevelopedBy }: { showDevelopedBy?: boolean 
               </p>
             </div>
 
-            {/* Contact Details with Orange Icons */}
+            {/* Contact Details with Brand Icons */}
             <div className="space-y-3 text-xs text-slate-600 border-t border-slate-100 pt-4">
               {/* Phone */}
               <div className="flex items-start gap-3">
-                <Phone className="w-4 h-4 text-orange-500 shrink-0 mt-0.5" />
+                <Phone className="w-4 h-4 text-primary shrink-0 mt-0.5" />
                 <div>
                   <a
                     href="tel:01933819799"
-                    className="font-bold text-sm text-slate-900 hover:text-orange-600 transition-colors block leading-tight"
+                    className="font-bold text-sm text-slate-900 hover:text-primary transition-colors block leading-tight"
                   >
                     01933819799
                   </a>
@@ -181,10 +158,10 @@ export default function Footer({ showDevelopedBy }: { showDevelopedBy?: boolean 
 
               {/* Email */}
               <div className="flex items-center gap-3">
-                <Mail className="w-4 h-4 text-orange-500 shrink-0" />
+                <Mail className="w-4 h-4 text-primary shrink-0" />
                 <a
                   href="mailto:ssseedshop220@gmail.com"
-                  className="text-slate-700 hover:text-orange-600 font-medium transition-colors"
+                  className="text-slate-700 hover:text-primary font-medium transition-colors"
                 >
                   ssseedshop220@gmail.com
                 </a>
@@ -192,7 +169,7 @@ export default function Footer({ showDevelopedBy }: { showDevelopedBy?: boolean 
 
               {/* Location */}
               <div className="flex items-start gap-3">
-                <MapPin className="w-4 h-4 text-orange-500 shrink-0 mt-0.5" />
+                <MapPin className="w-4 h-4 text-primary shrink-0 mt-0.5" />
                 <span className="text-slate-600 leading-snug">
                   {lang === "bn"
                     ? "পরান মণ্ডল টেক, বড় দেওড়া, টঙ্গী, গাজীপুর-১৭১১, বাংলাদেশ"
@@ -214,9 +191,9 @@ export default function Footer({ showDevelopedBy }: { showDevelopedBy?: boolean 
                 <li key={item.label}>
                   <Link
                     to={item.href}
-                    className="flex items-center gap-2 text-slate-700 hover:text-orange-600 hover:translate-x-1 transition-all group font-medium"
+                    className="flex items-center gap-2 text-slate-700 hover:text-primary hover:translate-x-1 transition-all group font-medium"
                   >
-                    <ChevronRight className="w-3.5 h-3.5 text-slate-900 group-hover:text-orange-600 stroke-[2.5] shrink-0" />
+                    <ChevronRight className="w-3.5 h-3.5 text-slate-900 group-hover:text-primary stroke-[2.5] shrink-0" />
                     <span>
                       {lang === "en"
                         ? item.label === "যোগাযোগ করুন" ? "Contact Us"
@@ -246,9 +223,9 @@ export default function Footer({ showDevelopedBy }: { showDevelopedBy?: boolean 
                 <li key={item.label}>
                   <Link
                     to={item.href}
-                    className="flex items-center gap-2 text-slate-700 hover:text-orange-600 hover:translate-x-1 transition-all group font-medium"
+                    className="flex items-center gap-2 text-slate-700 hover:text-primary hover:translate-x-1 transition-all group font-medium"
                   >
-                    <ChevronRight className="w-3.5 h-3.5 text-slate-900 group-hover:text-orange-600 stroke-[2.5] shrink-0" />
+                    <ChevronRight className="w-3.5 h-3.5 text-slate-900 group-hover:text-primary stroke-[2.5] shrink-0" />
                     <span>
                       {lang === "en"
                         ? item.label === "সকল পণ্য" ? "All Products"
@@ -266,7 +243,7 @@ export default function Footer({ showDevelopedBy }: { showDevelopedBy?: boolean 
             </ul>
           </div>
 
-          {/* COLUMN 4: Follow Us & Download App */}
+          {/* COLUMN 4: Follow Us */}
           <div className="lg:pl-8">
             <h3 className="font-extrabold text-base md:text-lg text-slate-900 tracking-tight">
               {lang === "bn" ? "Follow Us" : "Follow Us"}
@@ -276,7 +253,7 @@ export default function Footer({ showDevelopedBy }: { showDevelopedBy?: boolean 
             </p>
 
             {/* Social Media Circular Buttons */}
-            <div className="flex items-center gap-2.5 mb-6">
+            <div className="flex items-center gap-2.5">
               {/* Facebook */}
               <a
                 href="https://www.facebook.com/ssseedshop"
@@ -324,40 +301,6 @@ export default function Footer({ showDevelopedBy }: { showDevelopedBy?: boolean 
               >
                 <InstagramIcon className="w-4 h-4 fill-white" />
               </a>
-            </div>
-
-            {/* DOWNLOAD OUR APP Box */}
-            <div className="border border-orange-200 bg-orange-50/30 rounded-xl p-4 shadow-sm">
-              <div className="text-[11px] font-bold uppercase tracking-wider text-slate-900 mb-3 text-left">
-                {lang === "bn" ? "DOWNLOAD OUR APP" : "DOWNLOAD OUR APP"}
-              </div>
-              <div className="flex flex-col gap-2.5">
-                {/* Google Play Button */}
-                <button
-                  type="button"
-                  onClick={handleAppClick}
-                  className="flex items-center gap-2.5 bg-black hover:bg-slate-900 text-white px-3 py-1.5 rounded-lg transition-transform hover:scale-[1.02] active:scale-95 shadow-sm w-full cursor-pointer"
-                >
-                  <GooglePlayIcon className="w-5 h-5 shrink-0" />
-                  <div className="text-left">
-                    <div className="text-[8px] uppercase leading-none text-slate-300 font-medium">GET IT ON</div>
-                    <div className="text-xs font-bold leading-tight text-white tracking-wide">Google Play</div>
-                  </div>
-                </button>
-
-                {/* App Store Button */}
-                <button
-                  type="button"
-                  onClick={handleAppClick}
-                  className="flex items-center gap-2.5 bg-black hover:bg-slate-900 text-white px-3 py-1.5 rounded-lg transition-transform hover:scale-[1.02] active:scale-95 shadow-sm w-full cursor-pointer"
-                >
-                  <AppleIcon className="w-5 h-5 shrink-0 fill-white" />
-                  <div className="text-left">
-                    <div className="text-[8px] uppercase leading-none text-slate-300 font-medium">Download on the</div>
-                    <div className="text-xs font-bold leading-tight text-white tracking-wide">App Store</div>
-                  </div>
-                </button>
-              </div>
             </div>
           </div>
 
@@ -452,8 +395,8 @@ export default function Footer({ showDevelopedBy }: { showDevelopedBy?: boolean 
         </div>
       </div>
 
-      {/* ─── 3. BOTTOM ORANGE BAR: COPYRIGHT & DESIGN CREDITS ─── */}
-      <div className="bg-[#f06e15] text-white py-3 px-4">
+      {/* ─── 3. BOTTOM BRAND BAR: COPYRIGHT & DESIGN CREDITS ─── */}
+      <div className="bg-primary text-primary-foreground py-3 px-4">
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2 text-xs font-medium">
           <div>
             © {new Date().getFullYear()} Ss Seed Shop. {t("সর্বস্বত্ব সংরক্ষিত।", "All rights reserved.")}
@@ -464,7 +407,7 @@ export default function Footer({ showDevelopedBy }: { showDevelopedBy?: boolean 
                 href="https://wa.me/8801560007230?text=Hello%20HaqPlus%20IT!"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-1 text-white/95 hover:text-white transition-opacity font-medium"
+                className="inline-flex items-center gap-1 text-primary-foreground/95 hover:text-white transition-opacity font-medium"
               >
                 <span>Design & Developed by</span>
                 <span className="font-extrabold underline decoration-white/70 underline-offset-2">HaqPlus IT</span>
