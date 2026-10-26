@@ -1,6 +1,6 @@
 <?php
 // api/backup/import_export.php
-// Ss Seed Shop Full Data Backup, Export & Import API (JSON & CSV)
+// AgroSeed Full Data Backup, Export & Import API (JSON & CSV)
 
 require_once __DIR__ . '/../db.php';
 
@@ -370,38 +370,55 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (is_array($decoded_json)) {
         $rows = $decoded_json;
     } else {
-        // Parse CSV
-        $lines = preg_split("/\r\n|\n|\r/", trim($content));
-        if (count($lines) < 2) {
-            http_response_code(400);
-            echo json_encode(['success' => false, 'error' => 'CSV file has no data rows']);
-            exit;
-        }
+        // Parse CSV stream properly supporting multiline fields enclosed in quotes (RFC 4180)
+        $stream = fopen('php://temp', 'r+');
+        fwrite($stream, $content);
+        rewind($stream);
 
-        $headers = str_getcsv(array_shift($lines));
-        $headers = array_map(function($h) { return trim(preg_replace('/^\xEF\xBB\xBF/', '', $h)); }, $headers);
+        $headers = null;
+        while (($data = fgetcsv($stream)) !== false) {
+            if ($headers === null) {
+                if (empty($data) || (count($data) === 1 && trim($data[0]) === '')) continue;
+                $headers = array_map(function($h) {
+                    return trim(preg_replace('/^\xEF\xBB\xBF/', '', (string)$h));
+                }, $data);
+                continue;
+            }
 
-        foreach ($lines as $line) {
-            if (trim($line) === '') continue;
-            $data = str_getcsv($line);
+            if (empty($data) || (count($data) === 1 && trim($data[0]) === '')) {
+                continue;
+            }
+
             $row = [];
             foreach ($headers as $i => $h) {
+                if (!$h) continue;
                 $val = isset($data[$i]) ? trim($data[$i]) : null;
                 if ($val === null || $val === '') {
                     $row[$h] = null;
-                } elseif (in_array($val, ['true', '1', 'TRUE'], true)) {
+                } elseif (in_array(strtolower($val), ['true', '1'], true)) {
                     $row[$h] = true;
-                } elseif (in_array($val, ['false', '0', 'FALSE'], true)) {
+                } elseif (in_array(strtolower($val), ['false', '0'], true)) {
                     $row[$h] = false;
                 } elseif (is_numeric($val) && strpos($h, 'phone') === false && strpos($h, 'order_id') === false) {
                     $row[$h] = strpos($val, '.') !== false ? floatval($val) : intval($val);
-                } elseif (strpos($val, '|') !== false) {
-                    $row[$h] = array_filter(explode('|', $val));
+                } elseif (in_array($h, ['categories', 'tags', 'image_gallery']) && strpos($val, '|') !== false) {
+                    $row[$h] = array_values(array_filter(explode('|', $val)));
                 } else {
                     $row[$h] = $val;
                 }
             }
-            $rows[] = $row;
+
+            // Guard: ensure row has at least an id, sku, name, order_id, phone, or code
+            if (!empty($row['name']) || !empty($row['sku']) || !empty($row['id']) || !empty($row['order_id']) || !empty($row['phone']) || !empty($row['code'])) {
+                $rows[] = $row;
+            }
+        }
+        fclose($stream);
+
+        if (count($rows) === 0) {
+            http_response_code(400);
+            echo json_encode(['success' => false, 'error' => 'CSV file has no valid data rows']);
+            exit;
         }
     }
 
@@ -409,6 +426,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $updated  = 0;
     $errors   = 0;
     $total    = count($rows);
+
+    // Auto-backup current data before import
+    try {
+        $backup_dir = __DIR__ . '/../database/backups';
+        if (!is_dir($backup_dir)) @mkdir($backup_dir, 0755, true);
+        $curr_data = getJsonData("{$table}.json");
+        if (!empty($curr_data)) {
+            $bk_name = $backup_dir . "/pre_import_{$table}_" . date('Ymd_His') . ".json";
+            @file_put_contents($bk_name, json_encode($curr_data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+        }
+    } catch (\Exception $e) {}
 
     // Merge into target table
     if ($table === 'products') {
@@ -420,6 +448,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         foreach ($rows as $r) {
+            // Guard: skip empty or corrupted html fragment rows
+            if (empty($r['name']) && empty($r['sku'])) continue;
+            if (!empty($r['name']) && in_array(trim($r['name']), ['</ul>', '</li>', '</div>', '<p>', '</p>'])) continue;
+
             $sku = trim(strtolower($r['sku'] ?? $r['id'] ?? ''));
             if ($sku && isset($map[$sku])) {
                 $existing[$map[$sku]] = array_merge($existing[$map[$sku]], $r);

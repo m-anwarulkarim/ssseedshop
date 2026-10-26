@@ -114,12 +114,6 @@ if ($pdo) {
     add_column_if_missing($pdo, 'products', 'available_stock', 'INT DEFAULT 0 AFTER `in_stock`');
     add_column_if_missing($pdo, 'products', 'position', 'INT DEFAULT 0 AFTER `stock`');
     add_column_if_missing($pdo, 'products', 'is_hidden', 'TINYINT(1) DEFAULT 0 AFTER `position`');
-    add_column_if_missing($pdo, 'products', 'package_tiers', 'LONGTEXT DEFAULT NULL AFTER `variations`');
-    add_column_if_missing($pdo, 'products', 'highlight_features', 'TEXT DEFAULT NULL AFTER `package_tiers`');
-    add_column_if_missing($pdo, 'products', 'trust_card_1_title', 'VARCHAR(255) DEFAULT NULL AFTER `highlight_features`');
-    add_column_if_missing($pdo, 'products', 'trust_card_1_text', 'TEXT DEFAULT NULL AFTER `trust_card_1_title`');
-    add_column_if_missing($pdo, 'products', 'trust_card_2_title', 'VARCHAR(255) DEFAULT NULL AFTER `trust_card_1_text`');
-    add_column_if_missing($pdo, 'products', 'trust_card_2_text', 'TEXT DEFAULT NULL AFTER `trust_card_2_title`');
 
     add_index_if_missing($pdo, 'products', 'idx_prod_slug', '`slug`');
     add_index_if_missing($pdo, 'products', 'idx_prod_hidden', '`is_hidden`');
@@ -201,7 +195,52 @@ if ($pdo) {
         log_msg('error', "SMS গেটওয়ে টেস্ট এরর: " . htmlspecialchars($e->getMessage()));
     }
 
-    // 8. Handle Live MySQL -> JSON Sync if requested
+    // 8. Handle Restore Clean Products from database/products.json
+    if (isset($_GET['action']) && $_GET['action'] === 'restore_clean_products') {
+        $clean_file = __DIR__ . '/database/products.json';
+        if (file_exists($clean_file)) {
+            $raw_json = file_get_contents($clean_file);
+            $prods = json_decode($raw_json, true);
+            if (is_array($prods) && count($prods) > 0) {
+                try {
+                    $pdo->exec("DELETE FROM `products`");
+                    $validCols = DB::getTableColumns('products');
+                    $inserted = 0;
+                    foreach ($prods as $item) {
+                        if (!is_array($item)) continue;
+                        $filtered = [];
+                        foreach ($item as $k => $v) {
+                            if (empty($validCols) || in_array($k, $validCols)) {
+                                $filtered[$k] = $v;
+                            }
+                        }
+                        $encoded = DB::encodeRow('products', $filtered);
+                        $cols = array_keys($encoded);
+                        if (empty($cols)) continue;
+                        $placeholders = array_map(function($c) { return ":$c"; }, $cols);
+                        $sql = "INSERT INTO `products` (`" . implode('`, `', $cols) . "`) VALUES (" . implode(', ', $placeholders) . ")";
+                        $stmt = $pdo->prepare($sql);
+                        $params = [];
+                        foreach ($encoded as $k => $v) {
+                            if (is_bool($v)) $v = $v ? 1 : 0;
+                            $params[":$k"] = $v;
+                        }
+                        $stmt->execute($params);
+                        $inserted++;
+                    }
+                    log_msg('success', "🎉 <strong>সফলভাবে {$inserted}টি মূল ও নির্ভুল পণ্য ডাটাবেজে রিস্টোর করা হয়েছে!</strong> আপনার সকল পণ্যের নাম, ছবি, ডেসক্রিপশন, স্টক ও ক্যাটাগরি পূর্বের মূল অবস্থায় ফিরে এসেছে।");
+                } catch (Exception $e) {
+                    log_msg('error', "প্রোডাক্ট রিস্টোর এরর: " . htmlspecialchars($e->getMessage()));
+                }
+            } else {
+                log_msg('error', "database/products.json ফাইলে ভ্যালিড ডাটা পাওয়া যায়নি।");
+            }
+        } else {
+            log_msg('error', "database/products.json ফাইল পাওয়া যায়নি।");
+        }
+    }
+
+    // 8.1 Handle Live MySQL -> JSON Sync if requested
     if (isset($_GET['action']) && $_GET['action'] === 'sync_json') {
         $sync_tables = [
             'admins'            => ['permissions'],
@@ -379,6 +418,7 @@ if ($pdo) {
 
         <div class="actions">
             <a href="cpanel_database_update.php" class="btn">🔄 পুনরায় পরীক্ষা ও স্কিমা আপডেট</a>
+            <a href="cpanel_database_update.php?action=restore_clean_products" class="btn" style="background:#e11d48; color:#fff;" onclick="return confirm('আপনি কি নিশ্চিত যে মূল ১৯৯টি পণ্য রিস্টোর করতে চান? এতে ত্রুটিযুক্ত প্রোডাক্ট মুছে মূল ১৯৯টি পণ্য সফলভাবে ফিরে আসবে।');">✨ মূল ১৯৯টি প্রোডাক্ট ডেটাবেজে রিস্টোর করুন</a>
             <a href="cpanel_database_update.php?action=sync_json" class="btn btn-outline" style="border-color: #10b981; color: #a7f3d0;">💾 MySQL থেকে JSON ব্যাকআপ সিঙ্ক</a>
             <a href="products/get.php" target="_blank" class="btn btn-outline">⚡ প্রোডাক্ট API টেস্ট করুন</a>
         </div>
