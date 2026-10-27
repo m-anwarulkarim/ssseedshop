@@ -110,7 +110,7 @@ class DB {
     /**
      * Decode JSON string columns for a table row
      */
-    private static function decodeRow(string $table, array $row): array {
+    public static function decodeRow(string $table, array $row): array {
         $cols = self::$jsonCols[$table] ?? [];
         foreach ($cols as $c) {
             if (isset($row[$c]) && is_string($row[$c])) {
@@ -192,7 +192,6 @@ class DB {
     public static function all(string $table, string $orderBy = ''): array {
         $pdo = self::pdo();
         if ($pdo) {
-            self::ensureTableSchema($table, $pdo);
             try {
                 $sql = "SELECT * FROM `$table`" . (!empty($orderBy) ? " ORDER BY $orderBy" : "");
                 $stmt = $pdo->query($sql);
@@ -201,7 +200,17 @@ class DB {
                     return self::decodeRow($table, $r);
                 }, $rows);
             } catch (Exception $e) {
-                // Fall through to JSON on table error
+                // Self-heal on column mismatch error then retry once
+                try {
+                    self::ensureTableSchema($table, $pdo);
+                    $stmt = $pdo->query("SELECT * FROM `$table`" . (!empty($orderBy) ? " ORDER BY $orderBy" : ""));
+                    $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                    return array_map(function($r) use ($table) {
+                        return self::decodeRow($table, $r);
+                    }, $rows);
+                } catch (Exception $e2) {
+                    // Fall through to JSON on table error
+                }
             }
         }
 
@@ -219,7 +228,6 @@ class DB {
     public static function find(string $table, $value, string $column = 'id'): ?array {
         $pdo = self::pdo();
         if ($pdo) {
-            self::ensureTableSchema($table, $pdo);
             try {
                 $stmt = $pdo->prepare("SELECT * FROM `$table` WHERE `$column` = ? LIMIT 1");
                 $stmt->execute([$value]);
