@@ -115,3 +115,4 @@ try {
 } catch (Exception $e) {}
 
 echo json_encode($report, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+

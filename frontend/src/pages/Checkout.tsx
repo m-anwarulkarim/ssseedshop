@@ -360,6 +360,7 @@ export default function Checkout() {
         phone,
         customerName: name,
         items: items.map((item) => ({
+          id: item.id,
           sku: skuMap.get(item.id) || item.sku,
           quantity: item.quantity,
           price: item.price,

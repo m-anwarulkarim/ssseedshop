@@ -2,7 +2,16 @@
 import { API_URL } from "@/config/env";
 import { useEffect, useRef, useState } from "react";
 import { useLocation } from "react-router-dom";
-import { supabase } from "@/integrations/supabase/client";
+// Helper to fire server-side Conversions API (CAPI) events via PHP backend
+function sendToCapi(body: Record<string, unknown>) {
+  try {
+    fetch(`${API_URL}/tracking/meta_capi.php`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    }).catch(() => {});
+  } catch {}
+}
 
 // Prevent duplicate script injection across re-renders
 let pixelInitialized = false;
@@ -86,11 +95,11 @@ export default function TrackingScripts() {
         let foundGtm: string | null = null;
         if (Array.isArray(data)) {
           data.forEach((r: any) => {
-            if (r?.key === "meta_pixel_id" && typeof r?.value === "string" && r.value.trim()) {
-              foundPixel = r.value.trim();
+            if (r?.key === "meta_pixel_id" && r?.value != null && String(r.value).trim()) {
+              foundPixel = String(r.value).trim();
             }
-            if (r?.key === "gtm_id" && typeof r?.value === "string" && r.value.trim()) {
-              foundGtm = r.value.trim();
+            if (r?.key === "gtm_id" && r?.value != null && String(r.value).trim()) {
+              foundGtm = String(r.value).trim();
             }
           });
         }
@@ -106,14 +115,12 @@ export default function TrackingScripts() {
   // Fire PageView via server-side CAPI (deduped with browser pixel via event_id),
   // enriched with fbp / fbc / external_id / cached customer info.
   const sendPageViewCAPI = (eventId: string) => {
-    supabase.functions.invoke("meta-capi", {
-      body: {
-        event_name: "PageView",
-        event_id: eventId,
-        event_source_url: window.location.href,
-        user_data: getEnrichedUserData(),
-      },
-    }).catch((err) => console.warn("CAPI PageView failed:", err));
+    sendToCapi({
+      event_name: "PageView",
+      event_id: eventId,
+      event_source_url: window.location.href,
+      user_data: getEnrichedUserData(),
+    });
   };
 
   // Meta Pixel — inject standard snippet ONCE
@@ -202,15 +209,13 @@ export function trackPurchase(orderId: string, value: number, currency = "BDT", 
     if (parts.length > 1) userData.ln = parts.slice(1).join(" ");
   }
 
-  supabase.functions.invoke("meta-capi", {
-    body: {
-      event_name: "Purchase",
-      event_id: eventId,
-      event_source_url: window.location.href,
-      custom_data: { value, currency, content_type: "product" },
-      user_data: userData,
-    },
-  }).catch((err) => console.warn("CAPI Purchase event failed:", err));
+  sendToCapi({
+    event_name: "Purchase",
+    event_id: eventId,
+    event_source_url: window.location.href,
+    custom_data: { value, currency, content_type: "product" },
+    user_data: userData,
+  });
 }
 
 /**
@@ -230,15 +235,13 @@ export function trackAddToCart(product: { id: string; sku?: string | null }, val
     }, { eventID: eventId });
   }
 
-  supabase.functions.invoke("meta-capi", {
-    body: {
-      event_name: "AddToCart",
-      event_id: eventId,
-      event_source_url: window.location.href,
-      custom_data: { value, currency, content_ids: [contentId], content_type: "product" },
-      user_data: getEnrichedUserData(),
-    },
-  }).catch((err) => console.warn("CAPI AddToCart event failed:", err));
+  sendToCapi({
+    event_name: "AddToCart",
+    event_id: eventId,
+    event_source_url: window.location.href,
+    custom_data: { value, currency, content_ids: [contentId], content_type: "product" },
+    user_data: getEnrichedUserData(),
+  });
 }
 
 /**
@@ -257,15 +260,13 @@ export function trackInitiateCheckout(value: number, numItems: number, currency 
     }, { eventID: eventId });
   }
 
-  supabase.functions.invoke("meta-capi", {
-    body: {
-      event_name: "InitiateCheckout",
-      event_id: eventId,
-      event_source_url: window.location.href,
-      custom_data: { value, currency, num_items: numItems, content_type: "product" },
-      user_data: getEnrichedUserData(),
-    },
-  }).catch((err) => console.warn("CAPI InitiateCheckout event failed:", err));
+  sendToCapi({
+    event_name: "InitiateCheckout",
+    event_id: eventId,
+    event_source_url: window.location.href,
+    custom_data: { value, currency, num_items: numItems, content_type: "product" },
+    user_data: getEnrichedUserData(),
+  });
 }
 
 /**
@@ -287,21 +288,19 @@ export function trackViewContent(product: { id: string; sku?: string | null; nam
     }, { eventID: eventId });
   }
 
-  supabase.functions.invoke("meta-capi", {
-    body: {
-      event_name: "ViewContent",
-      event_id: eventId,
-      event_source_url: window.location.href,
-      custom_data: {
-        value,
-        currency,
-        content_ids: [contentId],
-        content_type: "product",
-        content_name: product.name,
-        content_category: product.category,
-      },
-      user_data: getEnrichedUserData(),
+  sendToCapi({
+    event_name: "ViewContent",
+    event_id: eventId,
+    event_source_url: window.location.href,
+    custom_data: {
+      value,
+      currency,
+      content_ids: [contentId],
+      content_type: "product",
+      content_name: product.name,
+      content_category: product.category,
     },
-  }).catch((err) => console.warn("CAPI ViewContent event failed:", err));
+    user_data: getEnrichedUserData(),
+  });
 }
 // 🔒 DO_NOT_MODIFY_END

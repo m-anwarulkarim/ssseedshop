@@ -579,7 +579,7 @@ export default function ProductDetail() {
         value: activeGrandTotal,
         phone,
         customerName: name,
-        items: [{ sku: product.sku, quantity: tierQty, price: activeTierPrice }],
+        items: [{ id: product.id, sku: product.sku, quantity: tierQty, price: activeTierPrice }],
       });
 
       navigate(`/order-confirmed/${order.order_id}`);

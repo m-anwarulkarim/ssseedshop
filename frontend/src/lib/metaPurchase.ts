@@ -1,5 +1,5 @@
 import { getEnrichedUserData } from "@/components/TrackingScripts";
-import { supabase } from "@/integrations/supabase/client";
+import { API_URL } from "@/config/env";
 
 interface CatalogPurchaseItem {
   sku: string | null | undefined;
@@ -81,19 +81,23 @@ function firePurchase({
     if (parts.length > 1) userData.ln = parts.slice(1).join(" ");
   }
 
-  supabase.functions.invoke("meta-capi", {
-    body: {
-      event_name: "Purchase",
-      event_id: eventId,
-      event_source_url: window.location.href,
-      custom_data: {
-        value,
-        currency,
-        content_ids: contentIds.length > 0 ? contentIds : ["order_" + orderId],
-        contents,
-        content_type: "product",
-      },
-      user_data: userData,
-    },
-  }).catch((err) => console.warn("CAPI Purchase event failed:", err));
+  try {
+    fetch(`${API_URL}/tracking/meta_capi.php`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        event_name: "Purchase",
+        event_id: eventId,
+        event_source_url: window.location.href,
+        custom_data: {
+          value,
+          currency,
+          content_ids: contentIds.length > 0 ? contentIds : ["order_" + orderId],
+          contents,
+          content_type: "product",
+        },
+        user_data: userData,
+      }),
+    }).catch(() => {});
+  } catch {}
 }
