@@ -3,7 +3,13 @@
 require_once __DIR__ . '/../db.php';
 
 header('Content-Type: application/json; charset=UTF-8');
-header('Cache-Control: public, max-age=60, stale-while-revalidate=300');
+if (isset($_GET['admin']) || isset($_GET['_t']) || isset($_GET['nocache'])) {
+    header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
+    header('Pragma: no-cache');
+    header('Expires: 0');
+} else {
+    header('Cache-Control: public, max-age=60, stale-while-revalidate=300');
+}
 
 $slug = trim($_GET['slug'] ?? '');
 $id = trim($_GET['id'] ?? '');

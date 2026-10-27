@@ -43,7 +43,7 @@ export default function DeletedOrders() {
       const searchParam = search.trim() ? `&search=${encodeURIComponent(search.trim())}` : "";
       const since = getDateRangeISO(dateRange);
       const sinceParam = since ? `&since=${encodeURIComponent(since)}` : "";
-      const res = await fetch(`${url}/orders/get.php?deleted_only=1${searchParam}${sinceParam}`);
+      const res = await fetch(`${url}/orders/get.php?deleted_only=1&admin=1&_t=${Date.now()}${searchParam}${sinceParam}`, { cache: "no-store" });
       let data = await res.json();
       if (!Array.isArray(data)) return [];
 
@@ -68,13 +68,20 @@ export default function DeletedOrders() {
       const res = await fetch(`${url}/orders/update.php`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        cache: "no-store",
         body: JSON.stringify({ ids, is_deleted: false }),
       });
-      const data = await res.json();
-      if (!res.ok || data.error) throw new Error(data.error || "Restore failed");
+      const data = await res.json().catch(() => null);
+      if (!res.ok || (data && data.error)) throw new Error(data?.error || "Restore failed");
+      return ids;
     },
-    onSuccess: () => {
+    onSuccess: (restoredIds) => {
+      queryClient.setQueriesData(
+        { queryKey: ["deleted-orders"] },
+        (old: any) => Array.isArray(old) ? old.filter((o: any) => !restoredIds.includes(o.id)) : old
+      );
       queryClient.invalidateQueries({ queryKey: ["deleted-orders"] });
+      queryClient.invalidateQueries({ queryKey: ["order-list-data"] });
       queryClient.invalidateQueries({ queryKey: ["web-orders"] });
       queryClient.invalidateQueries({ queryKey: ["web-orders-counts"] });
       queryClient.invalidateQueries({ queryKey: ["confirmed-orders"] });
@@ -91,15 +98,21 @@ export default function DeletedOrders() {
       const res = await fetch(`${url}/orders/delete.php`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        cache: "no-store",
         body: JSON.stringify({ ids, permanent: true }),
       });
-      const data = await res.json();
-      if (!res.ok || data.error) throw new Error(data.error || "Permanent delete failed");
+      const data = await res.json().catch(() => null);
+      if (!res.ok || (data && data.error)) throw new Error(data?.error || "Permanent delete failed");
+      return ids;
     },
-    onSuccess: () => {
+    onSuccess: (deletedIds) => {
+      queryClient.setQueriesData(
+        { queryKey: ["deleted-orders"] },
+        (old: any) => Array.isArray(old) ? old.filter((o: any) => !deletedIds.includes(o.id)) : old
+      );
       queryClient.invalidateQueries({ queryKey: ["deleted-orders"] });
       toast.success(t("অর্ডার স্থায়ীভাবে মুছে ফেলা হয়েছে", "Orders permanently deleted"));
-      setSelected((prev) => prev.filter((id) => !deleteTargetId || id !== deleteTargetId));
+      setSelected((prev) => prev.filter((id) => !deletedIds.includes(id)));
       setDeleteTargetId(null);
       setShowBulkDeleteConfirm(false);
     },
@@ -297,15 +310,24 @@ export default function DeletedOrders() {
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>{t("বাতিল", "Cancel")}</AlertDialogCancel>
-            <AlertDialogAction
+            <Button
               id="confirm-perm-delete-btn"
-              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              variant="destructive"
+              disabled={permanentDeleteMutation.isPending}
               onClick={() => {
                 if (deleteTargetId) permanentDeleteMutation.mutate([deleteTargetId]);
               }}
+              className="gap-2"
             >
-              {t("হ্যাঁ, চিরতরে মুছুন", "Yes, Erase Forever")}
-            </AlertDialogAction>
+              {permanentDeleteMutation.isPending ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  <span>{t("মুছে ফেলা হচ্ছে...", "Deleting...")}</span>
+                </>
+              ) : (
+                t("হ্যাঁ, চিরতরে মুছুন", "Yes, Erase Forever")
+              )}
+            </Button>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
@@ -327,12 +349,21 @@ export default function DeletedOrders() {
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>{t("বাতিল", "Cancel")}</AlertDialogCancel>
-            <AlertDialogAction
-              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            <Button
+              variant="destructive"
+              disabled={permanentDeleteMutation.isPending}
               onClick={() => permanentDeleteMutation.mutate(selected)}
+              className="gap-2"
             >
-              {t("হ্যাঁ, সব মুছে ফেলুন", "Yes, Delete All")}
-            </AlertDialogAction>
+              {permanentDeleteMutation.isPending ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  <span>{t("মুছে ফেলা হচ্ছে...", "Deleting...")}</span>
+                </>
+              ) : (
+                t("হ্যাঁ, সব মুছে ফেলুন", "Yes, Delete All")
+              )}
+            </Button>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>

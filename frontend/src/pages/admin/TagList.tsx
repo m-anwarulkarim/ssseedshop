@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { toast } from "sonner";
-import { icons, Plus, Pencil, Trash2, Tag as TagIcon } from "lucide-react";
+import { icons, Plus, Pencil, Trash2, Tag as TagIcon, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -69,7 +69,7 @@ export default function TagList() {
   const { data: tags = [], isLoading } = useQuery({
     queryKey: ["admin-tags"],
     queryFn: async () => {
-      const res = await fetch(`${API_BASE}/tags/get.php`);
+      const res = await fetch(`${API_BASE}/tags/get.php?admin=1&_t=${Date.now()}`, { cache: "no-store" });
       const data = await res.json();
       return (data || []) as TagRow[];
     },
@@ -130,18 +130,26 @@ export default function TagList() {
 
   const remove = async (row: TagRow) => {
     if (!confirm(t(`"${row.name}" ব্যাজটি মুছবেন?`, `Delete badge "${row.name}"?`))) return;
+    setDeletingTagId(row.id);
     try {
       const res = await fetch(`${API_BASE}/tags/delete.php`, {
         method: "POST", headers: { "Content-Type": "application/json" },
+        cache: "no-store",
         body: JSON.stringify({ id: row.id })
       });
-      const data = await res.json();
-      if (data.error) throw new Error(data.error);
+      const data = await res.json().catch(() => null);
+      if (!res.ok || (data && data.error)) throw new Error(data?.error || "Error");
+      qc.setQueriesData(
+        { queryKey: ["admin-tags"] },
+        (old: any) => Array.isArray(old) ? old.filter((t: any) => t.id !== row.id) : old
+      );
       toast.success(t("মুছে ফেলা হয়েছে", "Deleted"));
       qc.invalidateQueries({ queryKey: ["admin-tags"] });
       qc.invalidateQueries({ queryKey: ["all-tags"] });
     } catch (e: any) {
       toast.error(e.message || "Error");
+    } finally {
+      setDeletingTagId(null);
     }
   };
 
@@ -181,8 +189,19 @@ export default function TagList() {
                 <Button variant="ghost" size="sm" onClick={() => openEdit(tg)} className="h-8 w-8 p-0">
                   <Pencil className="w-4 h-4" />
                 </Button>
-                <Button variant="ghost" size="sm" onClick={() => remove(tg)} className="h-8 w-8 p-0 text-red-600 hover:text-red-700 hover:bg-red-50">
-                  <Trash2 className="w-4 h-4" />
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => remove(tg)}
+                  disabled={deletingTagId === tg.id}
+                  className="h-8 w-8 p-0 text-red-600 hover:text-red-700 hover:bg-red-50"
+                  title={t("মুছে ফেলুন", "Delete")}
+                >
+                  {deletingTagId === tg.id ? (
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                  ) : (
+                    <Trash2 className="w-4 h-4" />
+                  )}
                 </Button>
               </div>
             </div>

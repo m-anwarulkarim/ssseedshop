@@ -6,7 +6,13 @@ require_once __DIR__ . '/../db.php';
 $json_file = __DIR__ . '/../database/settings.json';
 
 header('Content-Type: application/json; charset=utf-8');
-header('Cache-Control: public, max-age=300, stale-while-revalidate=1800');
+if (isset($_GET['admin']) || isset($_GET['_t']) || isset($_GET['nocache'])) {
+    header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
+    header('Pragma: no-cache');
+    header('Expires: 0');
+} else {
+    header('Cache-Control: public, max-age=300, stale-while-revalidate=1800');
+}
 
 $settings = DB::all('settings');
 
@@ -46,7 +52,13 @@ if (!$include_ledger) {
     });
 }
 
-header_remove('Pragma');
-header_remove('Expires');
-header('Cache-Control: public, max-age=300, s-maxage=600, stale-while-revalidate=1800');
+if (isset($_GET['admin']) || isset($_GET['_t']) || isset($_GET['nocache'])) {
+    header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
+    header('Pragma: no-cache');
+    header('Expires: 0');
+} else {
+    header_remove('Pragma');
+    header_remove('Expires');
+    header('Cache-Control: public, max-age=300, s-maxage=600, stale-while-revalidate=1800');
+}
 echo json_encode(array_values($settings), JSON_UNESCAPED_UNICODE);

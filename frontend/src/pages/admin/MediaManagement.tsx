@@ -83,7 +83,7 @@ export default function MediaManagement() {
 
       // 1. Fetch from PHP media/list.php
       try {
-        const res = await fetch(`${API_BASE}/media/list.php`);
+        const res = await fetch(`${API_BASE}/media/list.php?admin=1&_t=${Date.now()}`, { cache: "no-store" });
         if (res.ok) {
           const listData = await res.json();
           if (Array.isArray(listData)) {

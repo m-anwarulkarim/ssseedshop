@@ -107,6 +107,7 @@ export default function ProductList() {
   const [selectedCategory, setSelectedCategory] = useState<string>(searchParams.get("category") || "all");
   const [visibilityFilter, setVisibilityFilter] = useState<string>("visible");
   const [page, setPage] = useState(0);
+  const [productToDelete, setProductToDelete] = useState<ProductRow | null>(null);
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
@@ -116,7 +117,7 @@ export default function ProductList() {
   const { data: categories } = useQuery({
     queryKey: ["categories"],
     queryFn: async () => {
-      const res = await fetch(`${API_BASE}/categories/get.php`);
+      const res = await fetch(`${API_BASE}/categories/get.php?admin=1&_t=${Date.now()}`, { cache: "no-store" });
       let data = await res.json();
       data = data.sort((a: any, b: any) => (a.position || 0) - (b.position || 0) || (a.name || "").localeCompare(b.name || ""));
       return data;
@@ -129,7 +130,7 @@ export default function ProductList() {
     staleTime: 0,
     refetchOnMount: "always",
     queryFn: async () => {
-      const res = await fetch(`${API_BASE}/products/get.php`);
+      const res = await fetch(`${API_BASE}/products/get.php?admin=1&_t=${Date.now()}`, { cache: "no-store" });
       if (!res.ok) return 0;
       let data = await res.json();
 
@@ -161,7 +162,7 @@ export default function ProductList() {
     staleTime: 0,
     refetchOnMount: "always",
     queryFn: async (): Promise<ProductRow[]> => {
-      const res = await fetch(`${API_BASE}/products/get.php`);
+      const res = await fetch(`${API_BASE}/products/get.php?admin=1&_t=${Date.now()}`, { cache: "no-store" });
       if (!res.ok) return [];
       let data = await res.json();
 
@@ -263,16 +264,36 @@ export default function ProductList() {
       const res = await fetch(`${API_BASE}/products/delete.php`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        cache: "no-store",
         body: JSON.stringify({ id })
       });
-      if (!res.ok) throw new Error("Failed to delete product");
+      const data = await res.json().catch(() => null);
+      if (!res.ok || (data && data.success === false)) {
+        throw new Error(data?.error || data?.message || "পণ্য মুছে ফেলতে ব্যর্থ হয়েছে");
+      }
+      return id;
     },
-    onSuccess: () => {
+    onSuccess: (deletedId) => {
+      // Instant UI removal (0 ms delay)
+      queryClient.setQueriesData(
+        { queryKey: ["admin-products-php"] },
+        (old: any) => Array.isArray(old) ? old.filter((p: any) => p.id !== deletedId) : old
+      );
+      queryClient.setQueriesData(
+        { queryKey: ["admin-products-count-php"] },
+        (old: any) => typeof old === "number" ? Math.max(0, old - 1) : old
+      );
+      setProductToDelete(null);
+      // Background query invalidation
       queryClient.invalidateQueries({ queryKey: ["admin-products-php"] });
       queryClient.invalidateQueries({ queryKey: ["admin-products-count-php"] });
-      toast.success(t("পণ্য মুছে ফেলা হয়েছে", "Product deleted"));
+      queryClient.invalidateQueries({ queryKey: ["products"] });
+      queryClient.invalidateQueries({ queryKey: ["shop-products"] });
+      toast.success(t("পণ্যটি সফলভাবে মুছে ফেলা হয়েছে", "Product deleted successfully"));
     },
-    onError: (err: Error) => toast.error(err.message),
+    onError: (err: Error) => {
+      toast.error(err.message || t("পণ্য মুছে ফেলতে সমস্যা হয়েছে", "Failed to delete product"));
+    },
   });
 
   const toggleStockMutation = useMutation({
@@ -281,13 +302,27 @@ export default function ProductList() {
       const res = await fetch(`${API_BASE}/products/update.php`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        cache: "no-store",
         body: JSON.stringify({ id: prod.id, stock: newStock, in_stock: newStock > 0 })
       });
-      if (!res.ok) throw new Error("স্টক আপডেট ব্যর্থ হয়েছে");
+      const data = await res.json().catch(() => null);
+      if (!res.ok || (data && data.success === false)) {
+        throw new Error(data?.error || data?.message || "স্টক আপডেট ব্যর্থ হয়েছে");
+      }
+      return { id: prod.id, newStock };
     },
-    onSuccess: () => {
+    onSuccess: ({ id, newStock }) => {
+      // Instant UI update
+      queryClient.setQueriesData(
+        { queryKey: ["admin-products-php"] },
+        (old: any) => Array.isArray(old)
+          ? old.map((p: any) => p.id === id ? { ...p, stock: newStock, available_stock: newStock, in_stock: newStock > 0 } : p)
+          : old
+      );
       queryClient.invalidateQueries({ queryKey: ["admin-products-php"] });
-      toast.success(t("স্টক স্ট্যাটাস আপডেট হয়েছে", "Stock status updated"));
+      queryClient.invalidateQueries({ queryKey: ["products"] });
+      queryClient.invalidateQueries({ queryKey: ["shop-products"] });
+      toast.success(t("স্টক স্ট্যাটাস সফলভাবে আপডেট হয়েছে", "Stock status updated successfully"));
     },
     onError: (err: Error) => toast.error(err.message),
   });
@@ -469,15 +504,23 @@ export default function ProductList() {
                           <TableCell className="text-right">
                             {(() => {
                               const avail = Math.max(0, product.stock - (product.reserved_stock || 0));
+                              const isToggling = toggleStockMutation.isPending && (toggleStockMutation.variables as any)?.id === product.id;
                               return (
                                 <div
                                   id={`stock-badge-${product.id}`}
-                                  className="cursor-pointer inline-block"
-                                  onClick={() => toggleStockMutation.mutate(product)}
+                                  className={`inline-block ${isToggling ? "opacity-60 pointer-events-none" : "cursor-pointer"}`}
+                                  onClick={() => !isToggling && toggleStockMutation.mutate(product)}
                                   title={t("ক্লিক করে স্টক টগল করুন", "Click to toggle stock")}
                                 >
-                                  <Badge variant={avail > 0 ? "default" : "destructive"} className="hover:opacity-80 transition">
-                                    {avail > 0 ? avail : t("স্টক আউট", "Out of stock")}
+                                  <Badge variant={avail > 0 ? "default" : "destructive"} className="hover:opacity-80 transition inline-flex items-center gap-1">
+                                    {isToggling ? (
+                                      <>
+                                        <Loader2 className="w-3 h-3 animate-spin" />
+                                        <span>{t("আপডেট হচ্ছে...", "Updating...")}</span>
+                                      </>
+                                    ) : (
+                                      avail > 0 ? avail : t("স্টক আউট", "Out of stock")
+                                    )}
                                   </Badge>
                                   {(product.reserved_stock || 0) > 0 && (
                                     <div className="text-[10px] text-muted-foreground mt-0.5" title={`মোট স্টক: ${product.stock}, অর্ডারে রিজার্ভ: ${product.reserved_stock}`}>
@@ -506,27 +549,19 @@ export default function ProductList() {
                               >
                                 <Pencil className="w-4 h-4" />
                               </Button>
-                              <AlertDialog>
-                                <AlertDialogTrigger asChild>
-                                  <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive">
-                                    <Trash2 className="w-4 h-4" />
-                                  </Button>
-                                </AlertDialogTrigger>
-                                <AlertDialogContent>
-                                  <AlertDialogHeader>
-                                    <AlertDialogTitle>{t("পণ্য মুছে ফেলুন?", "Delete product?")}</AlertDialogTitle>
-                                    <AlertDialogDescription>
-                                      "{product.name}" {t("মুছে ফেলা হবে। এটি ফেরত আনা যাবে না।", "will be deleted. This cannot be undone.")}
-                                    </AlertDialogDescription>
-                                  </AlertDialogHeader>
-                                  <AlertDialogFooter>
-                                    <AlertDialogCancel>{t("বাতিল", "Cancel")}</AlertDialogCancel>
-                                    <AlertDialogAction onClick={() => deleteMutation.mutate(product.id)}>
-                                      {t("মুছে ফেলুন", "Delete")}
-                                    </AlertDialogAction>
-                                  </AlertDialogFooter>
-                                </AlertDialogContent>
-                              </AlertDialog>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="text-destructive hover:text-destructive"
+                                disabled={deleteMutation.isPending && deleteMutation.variables === product.id}
+                                onClick={() => setProductToDelete(product)}
+                              >
+                                {deleteMutation.isPending && deleteMutation.variables === product.id ? (
+                                  <Loader2 className="w-4 h-4 animate-spin" />
+                                ) : (
+                                  <Trash2 className="w-4 h-4" />
+                                )}
+                              </Button>
                             </div>
                           </TableCell>
                         </SortableRow>
@@ -577,6 +612,46 @@ export default function ProductList() {
           )}
         </CardContent>
       </Card>
+
+      {/* Centralized Delete Confirmation Dialog */}
+      <AlertDialog
+        open={!!productToDelete}
+        onOpenChange={(open) => {
+          if (!deleteMutation.isPending && !open) setProductToDelete(null);
+        }}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{t("পণ্য মুছে ফেলুন?", "Delete product?")}</AlertDialogTitle>
+            <AlertDialogDescription>
+              "{productToDelete?.name}" {t("মুছে ফেলা হবে। এটি ফেরত আনা যাবে না।", "will be deleted. This cannot be undone.")}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={deleteMutation.isPending}>
+              {t("বাতিল", "Cancel")}
+            </AlertDialogCancel>
+            <Button
+              variant="destructive"
+              disabled={deleteMutation.isPending}
+              onClick={() => productToDelete && deleteMutation.mutate(productToDelete.id)}
+              className="gap-2"
+            >
+              {deleteMutation.isPending ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  <span>{t("মুছে ফেলা হচ্ছে...", "Deleting...")}</span>
+                </>
+              ) : (
+                <>
+                  <Trash2 className="w-4 h-4" />
+                  <span>{t("মুছে ফেলুন", "Delete")}</span>
+                </>
+              )}
+            </Button>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

@@ -108,6 +108,7 @@ export default function OrderList() {
   const [customFrom, setCustomFrom] = useState("");
   const [customTo, setCustomTo] = useState("");
   const [syncingCourier, setSyncingCourier] = useState(false);
+  const [updatingOrderId, setUpdatingOrderId] = useState<string | null>(null);
 
   const syncCourierStatus = async (silent = false, specificId?: string) => {
     setSyncingCourier(true);
@@ -201,7 +202,7 @@ export default function OrderList() {
     queryFn: async () => {
       const isGlobalSearch = !!normalizedSearch;
       const url = API_BASE;
-      const res = await fetch(`${url}/orders/get.php`);
+      const res = await fetch(`${url}/orders/get.php?admin=1&_t=${Date.now()}`, { cache: "no-store" });
       let data = await res.json();
       data = data.filter((o: any) => !o.is_deleted);
 
@@ -263,7 +264,7 @@ export default function OrderList() {
 
     queryFn: async () => {
       const url = API_BASE;
-      const res = await fetch(`${url}/orders/get.php`);
+      const res = await fetch(`${url}/orders/get.php?admin=1&_t=${Date.now()}`, { cache: "no-store" });
       let data = await res.json();
       data = data.filter((o: any) => !o.is_deleted);
 
@@ -360,7 +361,7 @@ export default function OrderList() {
     enabled: allOrderPhones.length > 0,
     queryFn: async () => {
       const url = API_BASE;
-      const res = await fetch(`${url}/orders/get.php`);
+      const res = await fetch(`${url}/orders/get.php?admin=1&_t=${Date.now()}`, { cache: "no-store" });
       let data = await res.json();
       const counts: Record<string, number> = {};
       data?.forEach((o: any) => { 
@@ -410,7 +411,7 @@ export default function OrderList() {
     enabled: allVisitorIds.length > 0,
     queryFn: async () => {
       const url = API_BASE;
-      const res = await fetch(`${url}/orders/get.php`);
+      const res = await fetch(`${url}/orders/get.php?admin=1&_t=${Date.now()}`, { cache: "no-store" });
       let data = await res.json();
       const counts: Record<string, number> = {};
       data?.forEach((o: any) => { 
@@ -695,6 +696,7 @@ export default function OrderList() {
       applyStatusChange(currentStatus, newStatus);
     }
     const url = API_URL;
+    setUpdatingOrderId(orderId);
 
     try {
       const res = await fetch(`${url}/orders/update.php`, {
@@ -739,6 +741,8 @@ export default function OrderList() {
     } catch (err: any) {
       toast.error(err.message || "Failed to update status");
       queryClient.invalidateQueries({ queryKey: ["order-list-data"] });
+    } finally {
+      setUpdatingOrderId(null);
     }
   };
 
@@ -1063,12 +1067,20 @@ export default function OrderList() {
                         <div className="flex items-center justify-center gap-1.5">
                           <Select
                             value={order.status}
+                            disabled={updatingOrderId === order.id}
                             onValueChange={(val) => updateSingleOrderStatus(order.id, val, order.status)}
                           >
-                            <SelectTrigger className={`h-7 min-w-[105px] max-w-[130px] text-[11px] font-semibold border ${gs.color} px-2 py-0.5 focus:ring-0`}>
-                              <SelectValue>
-                                {t(gs.labelBn, gs.labelEn)}
-                              </SelectValue>
+                            <SelectTrigger className={`h-7 min-w-[105px] max-w-[130px] text-[11px] font-semibold border ${gs.color} px-2 py-0.5 focus:ring-0 ${updatingOrderId === order.id ? "opacity-60 cursor-not-allowed" : ""}`}>
+                              {updatingOrderId === order.id ? (
+                                <span className="flex items-center gap-1">
+                                  <Loader2 className="w-3 h-3 animate-spin" />
+                                  <span className="text-[10px]">{t("আপডেট...", "Updating...")}</span>
+                                </span>
+                              ) : (
+                                <SelectValue>
+                                  {t(gs.labelBn, gs.labelEn)}
+                                </SelectValue>
+                              )}
                             </SelectTrigger>
                             <SelectContent align="center">
                               {STATUS_OPTIONS.map((opt) => {

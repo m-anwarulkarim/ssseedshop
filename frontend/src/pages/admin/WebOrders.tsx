@@ -118,6 +118,7 @@ export default function WebOrders() {
   const [page, setPage] = useState(0);
   const [preDateDialog, setPreDateDialog] = useState<{ orderId: string; oldStatus: string; phone?: string } | null>(null);
   const [preDateValue, setPreDateValue] = useState("");
+  const [deletingOrderId, setDeletingOrderId] = useState<string | null>(null);
 
   useEffect(() => { setPage(0); }, [search, statusFilter, dateRange, customFrom, customTo]);
 
@@ -164,7 +165,7 @@ export default function WebOrders() {
     refetchInterval: 10000,
     queryFn: async () => {
       const url = API_URL;
-      const res = await fetch(`${url}/orders/get.php`);
+      const res = await fetch(`${url}/orders/get.php?admin=1&_t=${Date.now()}`, { cache: "no-store" });
       let data = await res.json();
       data = data.filter((o: any) => !o.is_deleted);
 
@@ -219,7 +220,7 @@ export default function WebOrders() {
     refetchInterval: 10000,
     queryFn: async () => {
       const url = API_URL;
-      const res = await fetch(`${url}/orders/get.php`);
+      const res = await fetch(`${url}/orders/get.php?admin=1&_t=${Date.now()}`, { cache: "no-store" });
       let data = await res.json();
       data = data.filter((o: any) => !o.is_deleted && WEB_STATUS_VALUES.includes(o.status));
 
@@ -412,6 +413,7 @@ export default function WebOrders() {
   // Delete order mutation via PHP API
   const deleteOrderMutation = useMutation({
     mutationFn: async (id: string) => {
+      setDeletingOrderId(id);
       const apiUrl = API_URL;
       const res = await fetch(`${apiUrl}/orders/delete.php`, {
         method: "POST",
@@ -420,13 +422,23 @@ export default function WebOrders() {
       });
       const result = await res.json();
       if (!res.ok || result.error) throw new Error(result.error || "Failed to delete order");
+      return id;
     },
-    onSuccess: () => {
+    onSuccess: (deletedId) => {
+      queryClient.setQueriesData({ queryKey: ["web-orders"] }, (old: any) => {
+        if (!old) return old;
+        return {
+          ...old,
+          orders: (old.orders || []).filter((o: any) => o.id !== deletedId),
+          totalCount: Math.max(0, (old.totalCount || 1) - 1),
+        };
+      });
       queryClient.invalidateQueries({ queryKey: ["web-orders"] });
       queryClient.invalidateQueries({ queryKey: ["web-orders-counts"] });
       toast.success(t("অর্ডারটি মুছে ফেলা হয়েছে", "Order deleted"));
     },
     onError: (err: Error) => toast.error(err.message),
+    onSettled: () => setDeletingOrderId(null),
   });
 
   // Incomplete orders query
@@ -434,7 +446,7 @@ export default function WebOrders() {
     queryKey: ["incomplete-orders", dateRange],
     queryFn: async () => {
       const apiUrl = API_URL;
-      const res = await fetch(`${apiUrl}/orders/incomplete.php`);
+      const res = await fetch(`${apiUrl}/orders/incomplete.php?admin=1&_t=${Date.now()}`, { cache: "no-store" });
       const result = await res.json();
       if (!result.success) throw new Error(result.error || result.message || "Failed to load incomplete orders");
       let data = result.data || [];
@@ -829,7 +841,7 @@ export default function WebOrders() {
                                 }
                               }}
                             >
-                              <Trash2 className="w-3.5 h-3.5" />
+                              {deletingOrderId === order.id ? <Loader2 className="w-3.5 h-3.5 animate-spin text-destructive" /> : <Trash2 className="w-3.5 h-3.5" />}
                             </Button>
                           </div>
                           {order.note && (

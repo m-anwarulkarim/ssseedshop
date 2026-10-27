@@ -145,7 +145,7 @@ export default function ProductForm() {
 
   const loadProduct = async () => {
     try {
-      const res = await fetch(`${API_BASE}/products/get_single.php?id=${id}`);
+      const res = await fetch(`${API_BASE}/products/get_single.php?id=${id}&admin=1&_t=${Date.now()}`, { cache: "no-store" });
       if (!res.ok) throw new Error("Failed to fetch");
       const data = await res.json();
       
@@ -361,7 +361,7 @@ export default function ProductForm() {
   const handleDuplicate = async () => {
     if (!id) return;
     try {
-      const res = await fetch(`${API_BASE}/products/get_single.php?id=${id}`);
+      const res = await fetch(`${API_BASE}/products/get_single.php?id=${id}&admin=1&_t=${Date.now()}`, { cache: "no-store" });
       if (!res.ok) throw new Error("Failed to fetch");
       const data = await res.json();
       if (!data || data.error) throw new Error(data.error || "Not found");

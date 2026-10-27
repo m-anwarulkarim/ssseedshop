@@ -39,11 +39,12 @@ export default function CategoryList() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState<CategoryFormData>(emptyForm);
   const [imagePickerOpen, setImagePickerOpen] = useState(false);
+  const [categoryToDelete, setCategoryToDelete] = useState<any | null>(null);
 
   const { data: categories, isLoading } = useQuery({
     queryKey: ["categories"],
     queryFn: async () => {
-      const res = await fetch(`${API_BASE}/categories/get.php`);
+      const res = await fetch(`${API_BASE}/categories/get.php?admin=1&_t=${Date.now()}`, { cache: "no-store" });
       let data = await res.json();
       data = data.sort((a: any, b: any) => (a.position || 0) - (b.position || 0) || new Date(a.created_at).getTime() - new Date(b.created_at).getTime());
       return data;
@@ -64,6 +65,7 @@ export default function CategoryList() {
         const res = await fetch(`${API_BASE}/categories/update.php`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
+          cache: "no-store",
           body: JSON.stringify({ id: data.id, ...payload })
         });
         const json = await res.json();
@@ -72,6 +74,7 @@ export default function CategoryList() {
         const res = await fetch(`${API_BASE}/categories/create.php`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
+          cache: "no-store",
           body: JSON.stringify(payload)
         });
         const json = await res.json();
@@ -92,17 +95,24 @@ export default function CategoryList() {
       const res = await fetch(`${API_BASE}/categories/delete.php`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        cache: "no-store",
         body: JSON.stringify({ id })
       });
-      const json = await res.json();
-      if (!res.ok || json.error) throw new Error(json.error || "Delete failed");
+      const json = await res.json().catch(() => null);
+      if (!res.ok || (json && json.error)) throw new Error(json?.error || "Delete failed");
+      return id;
     },
-    onSuccess: () => {
+    onSuccess: (deletedId) => {
+      queryClient.setQueriesData(
+        { queryKey: ["categories"] },
+        (old: any) => Array.isArray(old) ? old.filter((c: any) => c.id !== deletedId) : old
+      );
+      setCategoryToDelete(null);
       queryClient.invalidateQueries({ queryKey: ["categories"] });
       queryClient.invalidateQueries({ queryKey: ["public-categories"] });
-      toast.success(t("ক্যাটাগরি মুছে ফেলা হয়েছে", "Category deleted"));
+      toast.success(t("ক্যাটাগরি সফলভাবে মুছে ফেলা হয়েছে", "Category deleted successfully"));
     },
-    onError: (err: Error) => toast.error(err.message),
+    onError: (err: Error) => toast.error(err.message || t("ক্যাটাগরি মুছতে ব্যর্থ হয়েছে", "Failed to delete category")),
   });
 
   const openCreate = () => { setEditingId(null); setForm(emptyForm); setDialogOpen(true); };
@@ -159,27 +169,18 @@ export default function CategoryList() {
                 <button onClick={() => openEdit(cat)} className="p-1.5 rounded-lg hover:bg-muted text-muted-foreground hover:text-foreground transition-colors">
                   <Pencil className="w-3.5 h-3.5" />
                 </button>
-                <AlertDialog>
-                  <AlertDialogTrigger asChild>
-                    <button className="p-1.5 rounded-lg hover:bg-destructive/10 text-muted-foreground hover:text-destructive transition-colors">
-                      <Trash2 className="w-3.5 h-3.5" />
-                    </button>
-                  </AlertDialogTrigger>
-                  <AlertDialogContent>
-                    <AlertDialogHeader>
-                      <AlertDialogTitle>{t("ক্যাটাগরি মুছে ফেলুন?", "Delete category?")}</AlertDialogTitle>
-                      <AlertDialogDescription>
-                        "{cat.name}" {t("ক্যাটাগরিটি মুছে ফেলা হবে।", "category will be deleted.")}
-                      </AlertDialogDescription>
-                    </AlertDialogHeader>
-                    <AlertDialogFooter>
-                      <AlertDialogCancel>{t("বাতিল", "Cancel")}</AlertDialogCancel>
-                      <AlertDialogAction onClick={() => deleteMutation.mutate(cat.id)}>
-                        {t("মুছে ফেলুন", "Delete")}
-                      </AlertDialogAction>
-                    </AlertDialogFooter>
-                  </AlertDialogContent>
-                </AlertDialog>
+                <button
+                  onClick={() => setCategoryToDelete(cat)}
+                  disabled={deleteMutation.isPending && deleteMutation.variables === cat.id}
+                  className="p-1.5 rounded-lg hover:bg-destructive/10 text-muted-foreground hover:text-destructive transition-colors disabled:opacity-50"
+                  title={t("মুছে ফেলুন", "Delete")}
+                >
+                  {deleteMutation.isPending && deleteMutation.variables === cat.id ? (
+                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                  ) : (
+                    <Trash2 className="w-3.5 h-3.5" />
+                  )}
+                </button>
               </div>
             </div>
           ))}
@@ -250,6 +251,44 @@ export default function CategoryList() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Centralized Category Delete Dialog */}
+      <AlertDialog
+        open={!!categoryToDelete}
+        onOpenChange={(open) => {
+          if (!deleteMutation.isPending && !open) setCategoryToDelete(null);
+        }}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{t("ক্যাটাগরি মুছে ফেলুন?", "Delete category?")}</AlertDialogTitle>
+            <AlertDialogDescription>
+              "{categoryToDelete?.name}" {t("ক্যাটাগরিটি মুছে ফেলা হবে।", "category will be deleted.")}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={deleteMutation.isPending}>{t("বাতিল", "Cancel")}</AlertDialogCancel>
+            <Button
+              variant="destructive"
+              disabled={deleteMutation.isPending}
+              onClick={() => categoryToDelete && deleteMutation.mutate(categoryToDelete.id)}
+              className="gap-2"
+            >
+              {deleteMutation.isPending ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  <span>{t("মুছে ফেলা হচ্ছে...", "Deleting...")}</span>
+                </>
+              ) : (
+                <>
+                  <Trash2 className="w-4 h-4" />
+                  <span>{t("মুছে ফেলুন", "Delete")}</span>
+                </>
+              )}
+            </Button>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

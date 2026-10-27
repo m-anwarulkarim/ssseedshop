@@ -2,9 +2,15 @@
 // api/products/get.php
 require_once __DIR__ . '/../db.php';
 
-header_remove('Pragma');
-header_remove('Expires');
-header('Cache-Control: public, max-age=60, s-maxage=300, stale-while-revalidate=600');
+if (isset($_GET['admin']) || isset($_GET['_t']) || isset($_GET['nocache'])) {
+    header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
+    header('Pragma: no-cache');
+    header('Expires: 0');
+} else {
+    header_remove('Pragma');
+    header_remove('Expires');
+    header('Cache-Control: public, max-age=60, s-maxage=300, stale-while-revalidate=600');
+}
 
 try {
     // Query single product by id
