@@ -29,6 +29,31 @@ if (empty($input)) {
     exit();
 }
 
+// Proactively ensure new landing and package tier columns exist in MySQL
+if ($pdo = DB::pdo()) {
+    $neededCols = [
+        'package_tiers'      => 'LONGTEXT DEFAULT NULL',
+        'highlight_features' => 'TEXT DEFAULT NULL',
+        'trust_card_1_title' => 'VARCHAR(255) DEFAULT NULL',
+        'trust_card_1_text'  => 'TEXT DEFAULT NULL',
+        'trust_card_2_title' => 'VARCHAR(255) DEFAULT NULL',
+        'trust_card_2_text'  => 'TEXT DEFAULT NULL',
+    ];
+    foreach ($neededCols as $col => $def) {
+        try {
+            $pdo->exec("ALTER TABLE `products` ADD COLUMN `$col` $def");
+        } catch (Exception $e) {}
+    }
+}
+
+if (array_key_exists('package_tiers', $input)) {
+    $tiers = $input['package_tiers'];
+    if (is_string($tiers)) {
+        $decoded = json_decode($tiers, true);
+        $input['package_tiers'] = is_array($decoded) ? $decoded : [];
+    }
+}
+
 $target_id = isset($input['id']) && !empty($input['id']) ? (string)$input['id'] : null;
 $existing = null;
 

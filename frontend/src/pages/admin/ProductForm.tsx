@@ -207,7 +207,17 @@ export default function ProductForm() {
           if (Array.isArray(parsed)) loadedTiers = parsed;
         } catch {}
       }
-      setPackageTiers(loadedTiers);
+      const normalizedLoadedTiers = loadedTiers.map((t: any, i: number) => ({
+        id: t.id || `tier-${Date.now()}-${i + 1}`,
+        name: t.name || `${t.quantity || i + 1} প্যাকেট`,
+        quantity: Math.max(1, Number(t.quantity) || 1),
+        regular_price: Number(t.regular_price) || 0,
+        offer_price: Number(t.offer_price) || 0,
+        delivery_charge: t.is_free_delivery ? 0 : (Number(t.delivery_charge) || 0),
+        is_free_delivery: Boolean(t.is_free_delivery),
+        badge: t.badge || "",
+      }));
+      setPackageTiers(normalizedLoadedTiers);
       setHighlightFeatures(data.highlight_features || "");
       setTrustCard1Title(data.trust_card_1_title || "");
       setTrustCard1Text(data.trust_card_1_text || "");
@@ -287,6 +297,17 @@ export default function ProductForm() {
     const finalSku = values.sku?.trim() || `SKU-${Date.now().toString().slice(-6)}`;
     const slugValue = values.slug?.trim() || values.name.trim().toLowerCase().replace(/[^a-z0-9\u0980-\u09FF]+/g, "-").replace(/^-+|-+$/g, "") || `prod-${Date.now().toString().slice(-6)}`;
 
+    const sanitizedPackageTiers = packageTiers.map((tier, idx) => ({
+      id: tier.id || `tier-${Date.now()}-${idx + 1}`,
+      name: tier.name ? String(tier.name).trim() : `${tier.quantity || idx + 1} প্যাকেট`,
+      quantity: Math.max(1, Number(tier.quantity) || 1),
+      regular_price: Number(tier.regular_price) || 0,
+      offer_price: Number(tier.offer_price) || 0,
+      delivery_charge: tier.is_free_delivery ? 0 : (Number(tier.delivery_charge) || 0),
+      is_free_delivery: Boolean(tier.is_free_delivery),
+      badge: tier.badge ? String(tier.badge).trim() : "",
+    }));
+
     const productData = {
       name: values.name,
       sku: finalSku,
@@ -306,7 +327,7 @@ export default function ProductForm() {
       is_hidden: isHidden,
       tags: selectedTags,
       variations: variations, // Send variations to PHP API
-      package_tiers: packageTiers,
+      package_tiers: sanitizedPackageTiers,
       highlight_features: highlightFeatures.trim() || null,
       trust_card_1_title: trustCard1Title.trim() || null,
       trust_card_1_text: trustCard1Text.trim() || null,

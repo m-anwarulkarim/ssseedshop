@@ -192,6 +192,7 @@ class DB {
     public static function all(string $table, string $orderBy = ''): array {
         $pdo = self::pdo();
         if ($pdo) {
+            self::ensureTableSchema($table, $pdo);
             try {
                 $sql = "SELECT * FROM `$table`" . (!empty($orderBy) ? " ORDER BY $orderBy" : "");
                 $stmt = $pdo->query($sql);
@@ -218,6 +219,7 @@ class DB {
     public static function find(string $table, $value, string $column = 'id'): ?array {
         $pdo = self::pdo();
         if ($pdo) {
+            self::ensureTableSchema($table, $pdo);
             try {
                 $stmt = $pdo->prepare("SELECT * FROM `$table` WHERE `$column` = ? LIMIT 1");
                 $stmt->execute([$value]);
@@ -238,11 +240,70 @@ class DB {
     }
 
     private static $tableColsCache = [];
+    private static $schemaChecked = [];
+
+    /**
+     * Dynamically auto-heal and verify critical schema columns on MySQL
+     */
+    public static function ensureTableSchema(string $table, ?PDO $pdo = null): void {
+        if (!empty(self::$schemaChecked[$table])) {
+            return;
+        }
+        $pdo = $pdo ?: self::pdo();
+        if (!$pdo) return;
+        self::$schemaChecked[$table] = true;
+
+        try {
+            $stmt = $pdo->query("DESCRIBE `$table`");
+            $cols = $stmt ? $stmt->fetchAll(PDO::FETCH_COLUMN) : [];
+            $cols = is_array($cols) ? $cols : [];
+
+            $needed = [];
+            if ($table === 'products') {
+                $needed = [
+                    'package_tiers'      => 'LONGTEXT DEFAULT NULL',
+                    'highlight_features' => 'TEXT DEFAULT NULL',
+                    'trust_card_1_title' => 'VARCHAR(255) DEFAULT NULL',
+                    'trust_card_1_text'  => 'TEXT DEFAULT NULL',
+                    'trust_card_2_title' => 'VARCHAR(255) DEFAULT NULL',
+                    'trust_card_2_text'  => 'TEXT DEFAULT NULL',
+                    'variations'         => 'LONGTEXT DEFAULT NULL',
+                    'available_stock'    => 'INT DEFAULT 0',
+                    'position'           => 'INT DEFAULT 0',
+                    'is_hidden'          => 'TINYINT(1) DEFAULT 0',
+                ];
+            } elseif ($table === 'categories') {
+                $needed = [
+                    'image'       => 'TEXT DEFAULT NULL',
+                    'description' => 'TEXT DEFAULT NULL',
+                ];
+            } elseif ($table === 'orders') {
+                $needed = [
+                    'is_deleted'          => 'TINYINT(1) DEFAULT 0',
+                    'traffic_source'      => 'VARCHAR(100) DEFAULT \'direct\'',
+                    'pre_date'            => 'VARCHAR(50) DEFAULT NULL',
+                    'created_by_admin_id' => 'VARCHAR(64) DEFAULT NULL',
+                ];
+            }
+
+            foreach ($needed as $col => $type) {
+                if (!in_array($col, $cols)) {
+                    try {
+                        $pdo->exec("ALTER TABLE `$table` ADD COLUMN `$col` $type");
+                        $cols[] = $col;
+                    } catch (Exception $e) {}
+                }
+            }
+
+            self::$tableColsCache[$table] = $cols;
+        } catch (Exception $e) {}
+    }
 
     /**
      * Get list of real column names for a MySQL table
      */
     public static function getTableColumns(string $table): array {
+        self::ensureTableSchema($table);
         if (isset(self::$tableColsCache[$table])) {
             return self::$tableColsCache[$table];
         }

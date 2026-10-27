@@ -286,7 +286,16 @@ export default function ProductDetail() {
 
   const packageTiers: ProductPackageTier[] = useMemo(() => {
     if (rawTiers && rawTiers.length > 0) {
-      return rawTiers;
+      return rawTiers.map((t, idx) => ({
+        ...t,
+        id: t.id || `tier-${idx + 1}`,
+        quantity: Math.max(1, Number(t.quantity) || 1),
+        regular_price: Number(t.regular_price) || 0,
+        offer_price: Number(t.offer_price) || 0,
+        delivery_charge: t.is_free_delivery ? 0 : (Number(t.delivery_charge) || 0),
+        is_free_delivery: Boolean(t.is_free_delivery),
+        badge: t.badge || "",
+      }));
     }
     // Zero-Maintenance Intelligent Auto-Generation:
     // If admin hasn't customized package tiers yet, create 1, 2, and 5 pack offers from the product's price!
