@@ -1,6 +1,8 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState, useMemo } from "react";
 import type { PointerEvent } from "react";
 import { useCategories } from "@/hooks/useCatalog";
+import { useLanguage } from "@/contexts/LanguageContext";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 
 interface CategoryTabsProps {
   activeCategory: string;
@@ -8,67 +10,77 @@ interface CategoryTabsProps {
 }
 
 const CategoryTabs = ({ activeCategory, onCategoryChange }: CategoryTabsProps) => {
+  const { lang } = useLanguage();
   const { data: categories } = useCategories();
-
-  const categoryTabs = [
-    { name: "সকল", display: "সকল" },
-    ...(categories?.map((c) => ({ name: c.name, display: c.display_name || c.name })) || []),
-  ];
-
   const scrollerRef = useRef<HTMLDivElement>(null);
-  const pauseTimer = useRef<number | null>(null);
-  const autoPausedRef = useRef(false);
-  const startedRef = useRef(false);
+  const tabRefs = useRef<{ [key: string]: HTMLButtonElement | null }>({});
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(false);
+
+  // Mouse drag state for desktop
   const isDraggingRef = useRef(false);
-  const hasCapturedRef = useRef(false);
   const dragStartXRef = useRef(0);
   const dragStartScrollRef = useRef(0);
   const hasDraggedRef = useRef(false);
 
-  const pauseAutoScroll = (ms = 4000) => {
-    autoPausedRef.current = true;
-    if (pauseTimer.current) window.clearTimeout(pauseTimer.current);
-    pauseTimer.current = window.setTimeout(() => {
-      autoPausedRef.current = false;
-    }, ms);
-  };
+  const categoryTabs = useMemo(() => {
+    const list = [
+      { name: "সকল", display: lang === "en" ? "All" : "সকল" },
+    ];
+    if (categories && Array.isArray(categories)) {
+      const activeCats = categories
+        .filter((c) => !c.is_hidden)
+        .sort((a, b) => (a.position || 0) - (b.position || 0));
+      for (const c of activeCats) {
+        list.push({
+          name: c.name,
+          display: c.display_name || c.name,
+        });
+      }
+    }
+    return list;
+  }, [categories, lang]);
 
-  // Auto-scroll marquee loop with 3s initial delay
-  useEffect(() => {
+  // Check scroll position for desktop arrows
+  const checkScroll = () => {
     const el = scrollerRef.current;
     if (!el) return;
-    const duration = Math.max(20, categoryTabs.length * 3.5);
-    let raf = 0;
-    let last = performance.now();
-    const startDelay = startedRef.current ? 0 : 3000;
-    const startAt = last + startDelay;
+    setCanScrollLeft(el.scrollLeft > 10);
+    setCanScrollRight(el.scrollLeft < el.scrollWidth - el.clientWidth - 10);
+  };
 
-    const tick = (now: number) => {
-      const dt = (now - last) / 1000;
-      last = now;
-      if (now >= startAt && !autoPausedRef.current && !isDraggingRef.current && el.scrollWidth > el.clientWidth) {
-        startedRef.current = true;
-        const half = el.scrollWidth / 2;
-        const speed = half / duration;
-        let next = el.scrollLeft + speed * dt;
-        if (next >= half) next -= half;
-        el.scrollLeft = next;
-      }
-      raf = requestAnimationFrame(tick);
-    };
-    raf = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(raf);
-  }, [categoryTabs.length]);
+  useEffect(() => {
+    checkScroll();
+    window.addEventListener("resize", checkScroll);
+    return () => window.removeEventListener("resize", checkScroll);
+  }, [categoryTabs]);
 
-  // Desktop mouse drag handling (touch uses native hardware-accelerated scrolling)
+  // Scroll active tab into view smoothly
+  useEffect(() => {
+    const target = tabRefs.current[activeCategory];
+    if (target && scrollerRef.current) {
+      target.scrollIntoView({
+        behavior: "smooth",
+        inline: "center",
+        block: "nearest",
+      });
+    }
+    checkScroll();
+  }, [activeCategory]);
+
+  const scrollBy = (offset: number) => {
+    if (scrollerRef.current) {
+      scrollerRef.current.scrollBy({ left: offset, behavior: "smooth" });
+    }
+  };
+
+  // Mouse drag handling on desktop
   const handlePointerDown = (event: PointerEvent<HTMLDivElement>) => {
     if (event.pointerType === "touch") return;
     const el = scrollerRef.current;
     if (!el) return;
-    pauseAutoScroll();
     isDraggingRef.current = true;
     hasDraggedRef.current = false;
-    hasCapturedRef.current = false;
     dragStartXRef.current = event.clientX;
     dragStartScrollRef.current = el.scrollLeft;
   };
@@ -78,30 +90,16 @@ const CategoryTabs = ({ activeCategory, onCategoryChange }: CategoryTabsProps) =
     const el = scrollerRef.current;
     if (!el) return;
     const deltaX = event.clientX - dragStartXRef.current;
-    if (Math.abs(deltaX) > 10) {
+    if (Math.abs(deltaX) > 5) {
       hasDraggedRef.current = true;
-      if (!hasCapturedRef.current) {
-        try {
-          el.setPointerCapture(event.pointerId);
-          hasCapturedRef.current = true;
-        } catch {}
-      }
       el.scrollLeft = dragStartScrollRef.current - deltaX;
+      checkScroll();
     }
   };
 
   const handlePointerUp = (event: PointerEvent<HTMLDivElement>) => {
     if (event.pointerType === "touch") return;
-    const el = scrollerRef.current;
-    if (el && hasCapturedRef.current) {
-      try {
-        el.releasePointerCapture(event.pointerId);
-      } catch {}
-    }
     isDraggingRef.current = false;
-    hasCapturedRef.current = false;
-    pauseAutoScroll();
-
     if (hasDraggedRef.current) {
       setTimeout(() => {
         hasDraggedRef.current = false;
@@ -109,50 +107,68 @@ const CategoryTabs = ({ activeCategory, onCategoryChange }: CategoryTabsProps) =
     }
   };
 
-  const handleTabClick = (category: string) => {
+  const handleTabClick = (categoryName: string) => {
     if (hasDraggedRef.current) return;
-    pauseAutoScroll(6000);
-    onCategoryChange(category);
-  };
-
-  const renderTab = (tab: { name: string; display: string }, idx: number) => {
-    const isActive = activeCategory === tab.name;
-    return (
-      <button
-        key={`${tab.name}-${idx}`}
-        type="button"
-        onClick={() => handleTabClick(tab.name)}
-        className={`px-5 py-2 rounded-full text-sm font-medium whitespace-nowrap border cursor-pointer select-none transition-all duration-200 ${
-          isActive
-            ? "bg-primary text-primary-foreground border-primary shadow-sm ring-1 ring-primary/40 font-semibold"
-            : "bg-card text-muted-foreground border-border hover:text-foreground hover:border-foreground/30 active:scale-95"
-        }`}
-      >
-        {tab.display}
-      </button>
-    );
+    onCategoryChange(categoryName);
   };
 
   return (
-    <div className="sticky top-[78px] z-30 bg-background border-b border-border shadow-sm">
-      <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="sticky top-[78px] md:top-[128px] z-30 bg-white/95 backdrop-blur-md border-b border-gray-100 shadow-[0_2px_10px_rgba(0,0,0,0.03)]">
+      <div className="max-w-screen-2xl mx-auto relative px-2 sm:px-4">
+        {/* Left Arrow (Desktop only when overflowed) */}
+        {canScrollLeft && (
+          <button
+            type="button"
+            onClick={() => scrollBy(-220)}
+            aria-label="Scroll left"
+            className="hidden md:flex absolute left-1 top-1/2 -translate-y-1/2 z-10 w-8 h-8 rounded-full bg-white/95 shadow-md border border-gray-200 text-gray-700 items-center justify-center hover:bg-gray-50 hover:text-emerald-700 active:scale-95 transition-all"
+          >
+            <ChevronLeft className="w-5 h-5 stroke-[2.2]" />
+          </button>
+        )}
+
+        {/* Categories Horizontal Scroll Row (PC + Mobile) */}
         <div
           ref={scrollerRef}
-          className="flex items-center gap-2 py-2.5 overflow-x-auto scrollbar-hide select-none"
-          style={{ scrollbarWidth: "none", WebkitOverflowScrolling: "touch" }}
-          onMouseEnter={() => (autoPausedRef.current = true)}
-          onMouseLeave={() => (autoPausedRef.current = false)}
+          onScroll={checkScroll}
           onPointerDown={handlePointerDown}
           onPointerMove={handlePointerMove}
           onPointerUp={handlePointerUp}
           onPointerCancel={handlePointerUp}
-          onWheel={() => pauseAutoScroll()}
-          onTouchStart={() => pauseAutoScroll(5000)}
+          className="flex items-center gap-2 sm:gap-3 py-2.5 px-2 sm:px-4 overflow-x-auto scrollbar-hide no-scrollbar select-none scroll-smooth sm:justify-start lg:justify-center"
+          style={{ scrollbarWidth: "none", WebkitOverflowScrolling: "touch" }}
         >
-          {categoryTabs.map((tab, i) => renderTab(tab, i))}
-          {/* Duplicate for seamless loop */}
-          {categoryTabs.map((tab, i) => renderTab(tab, i + categoryTabs.length))}
+          {categoryTabs.map((tab) => {
+            const isActive = activeCategory === tab.name;
+            return (
+              <button
+                key={tab.name}
+                ref={(el) => (tabRefs.current[tab.name] = el)}
+                type="button"
+                onClick={() => handleTabClick(tab.name)}
+                className={`px-5 sm:px-6 py-2 rounded-full text-sm sm:text-[15px] whitespace-nowrap cursor-pointer select-none transition-all duration-200 leading-none shrink-0 inline-flex items-center justify-center ${
+                  isActive
+                    ? "bg-[#1b6b3e] text-white font-bold border border-[#1b6b3e] shadow-sm shadow-emerald-950/20 ring-1 ring-emerald-600/30 scale-[1.02]"
+                    : "bg-white text-slate-700 font-semibold border border-slate-200/90 hover:border-emerald-600/40 hover:text-emerald-700 hover:bg-emerald-50/20 active:scale-95"
+                }`}
+              >
+                {tab.display}
+              </button>
+            );
+          })}
         </div>
+
+        {/* Right Arrow (Desktop only when overflowed) */}
+        {canScrollRight && (
+          <button
+            type="button"
+            onClick={() => scrollBy(220)}
+            aria-label="Scroll right"
+            className="hidden md:flex absolute right-1 top-1/2 -translate-y-1/2 z-10 w-8 h-8 rounded-full bg-white/95 shadow-md border border-gray-200 text-gray-700 items-center justify-center hover:bg-gray-50 hover:text-emerald-700 active:scale-95 transition-all"
+          >
+            <ChevronRight className="w-5 h-5 stroke-[2.2]" />
+          </button>
+        )}
       </div>
     </div>
   );

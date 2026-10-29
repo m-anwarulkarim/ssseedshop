@@ -1,5 +1,5 @@
 import { API_URL } from "@/config/env";
-import { ShoppingCart, Search, Menu, Home, LayoutGrid, ClipboardList, Sprout, UserRoundCog, ArrowRight, HelpCircle, Languages, LogIn, LogOut, User } from "lucide-react";
+import { ShoppingCart, ShoppingBag, Search, Menu, Home, LayoutGrid, ClipboardList, Sprout, UserRoundCog, ArrowRight, HelpCircle, Languages, LogIn, LogOut, User } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { cn } from "@/lib/utils";
@@ -55,20 +55,56 @@ const Navbar = () => {
 
       {/* Top header */}
       <header className="bg-white shadow-sm border-b border-gray-100">
-        {/* Mobile Header: Interactive Search with Attached Floating Popup (PC Style) */}
-        <div className="flex md:hidden items-center gap-2.5 h-14 px-3 w-full">
-          {/* Hamburger Menu Button */}
-          <button
-            onClick={() => setMenuOpen(true)}
-            aria-label="Menu"
-            className="p-1.5 -ml-1 rounded-lg text-gray-700 hover:bg-gray-100 active:scale-95 transition-transform shrink-0"
-          >
-            <Menu className="w-6 h-6 stroke-[2]" />
-          </button>
+        {/* Mobile Header: Reference Style (Circular Logo + Bengali Brand Name on Left | Search + "অর্ডার → [🛍️]¹" Capsule Button on Right) */}
+        <div className="flex md:hidden items-center justify-between h-14 px-3 sm:px-4 w-full bg-white">
+          {/* Left: Logo + Brand Name */}
+          <Link to="/" className="flex items-center gap-2 shrink-0 group">
+            <div className="w-9 h-9 rounded-full ring-2 ring-emerald-600/25 p-0.5 bg-white flex items-center justify-center overflow-hidden shrink-0 shadow-xs group-hover:scale-105 transition-transform">
+              <img
+                src={shikderLogo}
+                alt="Ss Seed Shop"
+                className="w-full h-full object-contain"
+              />
+            </div>
+            <span className="font-extrabold text-[17px] sm:text-lg text-[#155d36] tracking-tight leading-tight">
+              {lang === "en" ? "Ss Seed Shop" : "এস এস সিড শপ"}
+            </span>
+          </Link>
 
-          {/* Interactive Search Bar matching PC style */}
-          <div className="flex-1 min-w-0">
-            <DesktopSearchBar isMobile={true} />
+          {/* Right: Search + "অর্ডার → [🛍️]¹" Capsule Button */}
+          <div className="flex items-center gap-1.5 shrink-0">
+            {/* Search Trigger Button */}
+            <button
+              type="button"
+              onClick={() => setSearchOpen(true)}
+              aria-label="Search"
+              className="p-2 rounded-full text-gray-600 hover:text-[#155d36] hover:bg-emerald-50/50 active:scale-95 transition-all"
+            >
+              <Search className="w-5 h-5 stroke-[2.2]" />
+            </button>
+
+            {/* "অর্ডার → [🛍️]¹" Capsule Button matching reference screenshot */}
+            <button
+              type="button"
+              onClick={openCart}
+              aria-label="Order Cart"
+              className="relative flex items-center gap-1.5 pl-3.5 pr-1.5 py-1.5 rounded-full bg-[#1b6b3e] hover:bg-[#155832] active:scale-95 transition-all shadow-sm shadow-emerald-900/15 text-white select-none"
+            >
+              <span className="font-bold text-sm tracking-tight">
+                {lang === "en" ? "Order" : "অর্ডার"}
+              </span>
+              <ArrowRight className="w-3.5 h-3.5 stroke-[2.5]" />
+              
+              {/* Circular bag icon container with notification badge */}
+              <div className="w-7 h-7 rounded-full bg-white/20 flex items-center justify-center relative ml-0.5 shrink-0">
+                <ShoppingBag className="w-4 h-4 text-white stroke-[2.2]" />
+                {totalItems > 0 && (
+                  <span className="absolute -top-1 -right-1 min-w-[17px] h-[17px] px-1 rounded-full bg-[#f59e0b] text-white text-[10px] font-extrabold flex items-center justify-center ring-1 ring-white shadow-xs">
+                    {totalItems}
+                  </span>
+                )}
+              </div>
+            </button>
           </div>
         </div>
 
