@@ -55,57 +55,44 @@ const Navbar = () => {
 
       {/* Top header */}
       <header className="bg-white shadow-sm border-b border-gray-100">
-        {/* Mobile Header: Reference Style (Circular Logo + Bengali Brand Name on Left | Search + "অর্ডার → [🛍️]¹" Capsule Button on Right) */}
+        {/* Mobile Header: Exact Red-Boxed Style (Circular Logo + Bengali Brand Name on Left | "অর্ডার → [🛍️]¹" Capsule Button on Right) */}
         <div className="flex md:hidden items-center justify-between h-14 px-3 sm:px-4 w-full bg-white">
           {/* Left: Logo + Brand Name */}
-          <Link to="/" className="flex items-center gap-2 shrink-0 group">
-            <div className="w-9 h-9 rounded-full ring-2 ring-emerald-600/25 p-0.5 bg-white flex items-center justify-center overflow-hidden shrink-0 shadow-xs group-hover:scale-105 transition-transform">
+          <Link to="/" className="flex items-center gap-2.5 shrink-0 group">
+            <div className="w-10 h-10 rounded-full ring-2 ring-emerald-600/30 p-0.5 bg-white flex items-center justify-center overflow-hidden shrink-0 shadow-xs group-hover:scale-105 transition-transform">
               <img
                 src={shikderLogo}
                 alt="Ss Seed Shop"
                 className="w-full h-full object-contain"
               />
             </div>
-            <span className="font-extrabold text-[17px] sm:text-lg text-[#155d36] tracking-tight leading-tight">
+            <span className="font-extrabold text-[19px] sm:text-xl text-[#155d36] tracking-tight leading-none">
               {lang === "en" ? "Ss Seed Shop" : "এস এস সিড শপ"}
             </span>
           </Link>
 
-          {/* Right: Search + "অর্ডার → [🛍️]¹" Capsule Button */}
-          <div className="flex items-center gap-1.5 shrink-0">
-            {/* Search Trigger Button */}
-            <button
-              type="button"
-              onClick={() => setSearchOpen(true)}
-              aria-label="Search"
-              className="p-2 rounded-full text-gray-600 hover:text-[#155d36] hover:bg-emerald-50/50 active:scale-95 transition-all"
-            >
-              <Search className="w-5 h-5 stroke-[2.2]" />
-            </button>
-
-            {/* "অর্ডার → [🛍️]¹" Capsule Button matching reference screenshot */}
-            <button
-              type="button"
-              onClick={openCart}
-              aria-label="Order Cart"
-              className="relative flex items-center gap-1.5 pl-3.5 pr-1.5 py-1.5 rounded-full bg-[#1b6b3e] hover:bg-[#155832] active:scale-95 transition-all shadow-sm shadow-emerald-900/15 text-white select-none"
-            >
-              <span className="font-bold text-sm tracking-tight">
-                {lang === "en" ? "Order" : "অর্ডার"}
-              </span>
-              <ArrowRight className="w-3.5 h-3.5 stroke-[2.5]" />
-              
-              {/* Circular bag icon container with notification badge */}
-              <div className="w-7 h-7 rounded-full bg-white/20 flex items-center justify-center relative ml-0.5 shrink-0">
-                <ShoppingBag className="w-4 h-4 text-white stroke-[2.2]" />
-                {totalItems > 0 && (
-                  <span className="absolute -top-1 -right-1 min-w-[17px] h-[17px] px-1 rounded-full bg-[#f59e0b] text-white text-[10px] font-extrabold flex items-center justify-center ring-1 ring-white shadow-xs">
-                    {totalItems}
-                  </span>
-                )}
-              </div>
-            </button>
-          </div>
+          {/* Right: Red-Boxed "অর্ডার → [🛍️]¹" Capsule Button */}
+          <button
+            type="button"
+            onClick={openCart}
+            aria-label="Order Cart"
+            className="relative flex items-center gap-1.5 pl-4 pr-1.5 py-1.5 rounded-full bg-[#1b6b3e] hover:bg-[#165a36] active:scale-95 transition-all shadow-md shadow-emerald-950/20 text-white select-none shrink-0"
+          >
+            <span className="font-bold text-[15px] tracking-tight leading-none">
+              {lang === "en" ? "Order" : "অর্ডার"}
+            </span>
+            <span className="font-bold text-[15px] leading-none select-none">→</span>
+            
+            {/* Circular bag icon container with amber/orange notification badge */}
+            <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-white/20 flex items-center justify-center relative ml-0.5 shrink-0">
+              <ShoppingBag className="w-4 h-4 text-white stroke-[2.2]" />
+              {totalItems > 0 && (
+                <span className="absolute -top-1 -right-1 min-w-[17px] h-[17px] px-1 rounded-full bg-[#f59e0b] text-white text-[10px] font-extrabold flex items-center justify-center ring-1 ring-white shadow-xs">
+                  {totalItems}
+                </span>
+              )}
+            </div>
+          </button>
         </div>
 
         {/* Desktop Header: 2-Tier Modern Layout Matching Reference Screenshot */}

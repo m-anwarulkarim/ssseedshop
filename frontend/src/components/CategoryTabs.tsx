@@ -146,9 +146,9 @@ const CategoryTabs = ({ activeCategory, onCategoryChange }: CategoryTabsProps) =
                 ref={(el) => (tabRefs.current[tab.name] = el)}
                 type="button"
                 onClick={() => handleTabClick(tab.name)}
-                className={`px-5 sm:px-6 py-2 rounded-full text-sm sm:text-[15px] whitespace-nowrap cursor-pointer select-none transition-all duration-200 leading-none shrink-0 inline-flex items-center justify-center ${
+                className={`px-6 sm:px-7 py-2.5 sm:py-3 rounded-full text-[15px] sm:text-base whitespace-nowrap cursor-pointer select-none transition-all duration-200 leading-none shrink-0 inline-flex items-center justify-center ${
                   isActive
-                    ? "bg-[#1b6b3e] text-white font-bold border border-[#1b6b3e] shadow-sm shadow-emerald-950/20 ring-1 ring-emerald-600/30 scale-[1.02]"
+                    ? "bg-[#1b6b3e] text-white font-bold border border-[#1b6b3e] shadow-[0_6px_16px_rgba(27,107,62,0.42)] ring-1 ring-emerald-600/30 scale-[1.02]"
                     : "bg-white text-slate-700 font-semibold border border-slate-200/90 hover:border-emerald-600/40 hover:text-emerald-700 hover:bg-emerald-50/20 active:scale-95"
                 }`}
               >
