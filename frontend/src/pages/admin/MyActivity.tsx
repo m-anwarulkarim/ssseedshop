@@ -21,7 +21,7 @@ import {
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import { format, subDays, eachDayOfInterval } from "date-fns";
 
-const SUPER_ADMIN_EMAIL = "ssseedshop220@gmail.com";
+const SUPER_ADMIN_EMAIL = "ebseedshop@gmail.com";
 
 export default function MyActivity() {
   const { t } = useLanguage();
@@ -43,7 +43,7 @@ export default function MyActivity() {
         if (session?.user) supaUser = session.user;
       } catch {}
 
-      const email = activeUser?.email || (access.status === "authorized" ? access.email : "") || supaUser?.email || "ssseedshop220@gmail.com";
+      const email = activeUser?.email || (access.status === "authorized" ? access.email : "") || supaUser?.email || "ebseedshop@gmail.com";
       const id = activeUser?.id || supaUser?.id || (email ? email.replace(/[^a-zA-Z0-9]/g, "_") : "admin_001");
       const isSuperAdmin = Boolean(
         activeUser?.is_super_admin ||
@@ -243,7 +243,7 @@ export default function MyActivity() {
 
   const user = currentUser || {
     id: "admin_super_001",
-    email: "ssseedshop220@gmail.com",
+    email: "ebseedshop@gmail.com",
     role: "admin",
     isSuperAdmin: true,
     name: "Ss Seed Shop Admin",

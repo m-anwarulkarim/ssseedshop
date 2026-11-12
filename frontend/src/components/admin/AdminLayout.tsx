@@ -35,7 +35,7 @@ import { isLovablePreview } from "@/lib/previewMode";
 
 const PREVIEW_BYPASS = isLovablePreview();
 
-const SUPER_ADMIN_EMAIL = "ssseedshop220@gmail.com";
+const SUPER_ADMIN_EMAIL = "ebseedshop@gmail.com";
 const WEB_ORDER_SOURCE_FILTER = "traffic_source.is.null,traffic_source.neq.ecomdrive";
 
 // URL → permission key mapping (must match AdminSidebar)
@@ -184,7 +184,7 @@ function AdminHeader() {
 
   const activeAdmin = getActiveAdminUser();
   const adminName = activeAdmin?.name || "Admin";
-  const adminEmail = activeAdmin?.email || "ssseedshop220@gmail.com";
+  const adminEmail = activeAdmin?.email || "ebseedshop@gmail.com";
   const adminRole = activeAdmin?.is_super_admin
     ? "Super Admin"
     : activeAdmin?.role === "admin"

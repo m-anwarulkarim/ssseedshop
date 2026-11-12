@@ -36,7 +36,7 @@ import { useSidebar } from "@/components/ui/sidebar";
 import { useState, useRef, useEffect, useCallback, createContext, useContext } from "react";
 import { getCurrentAdminAccess, getActiveAdminUser } from "@/lib/adminAccess";
 
-const SUPER_ADMIN_EMAIL = "ssseedshop220@gmail.com";
+const SUPER_ADMIN_EMAIL = "ebseedshop@gmail.com";
 const WEB_ORDER_SOURCE_FILTER = "traffic_source.is.null,traffic_source.neq.ecomdrive";
 
 // Permission key → sidebar URL mapping

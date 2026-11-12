@@ -36,7 +36,7 @@ interface AdminUser {
   user_metadata: Record<string, any>;
 }
 
-const SUPER_ADMIN_EMAIL = "ssseedshop220@gmail.com";
+const SUPER_ADMIN_EMAIL = "ebseedshop@gmail.com";
 
 const isSuperAdminUser = (admin?: AdminUser | { email?: string; is_super_admin?: boolean } | null) => {
   if (!admin) return false;

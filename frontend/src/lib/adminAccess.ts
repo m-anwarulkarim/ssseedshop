@@ -14,7 +14,7 @@ type AdminAccessResult =
       isSuperAdmin: boolean;
     };
 
-const SUPER_ADMIN_EMAIL = "ssseedshop220@gmail.com";
+const SUPER_ADMIN_EMAIL = "ebseedshop@gmail.com";
 
 export async function getCurrentAdminAccess(): Promise<AdminAccessResult> {
   if (typeof window !== "undefined") {

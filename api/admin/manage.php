@@ -49,7 +49,7 @@ if ($has_hngarden) {
 // 1. LIST ADMINS
 if ($action === 'list') {
     $formatted = array_map(function($a) {
-        $isSuper = !empty($a['is_super_admin']) || ($a['email'] ?? '') === 'ssseedshop220@gmail.com';
+        $isSuper = !empty($a['is_super_admin']) || ($a['email'] ?? '') === 'ebseedshop@gmail.com';
         return [
             'id' => $a['id'],
             'email' => $a['email'],
@@ -130,7 +130,7 @@ if ($action === 'update') {
     $found = false;
     foreach ($admins as &$a) {
         if ($a['id'] === $user_id) {
-            $isSuper = !empty($a['is_super_admin']) || ($a['email'] ?? '') === 'ssseedshop220@gmail.com';
+            $isSuper = !empty($a['is_super_admin']) || ($a['email'] ?? '') === 'ebseedshop@gmail.com';
             if (isset($input['name'])) $a['name'] = trim($input['name']);
             if ($isSuper) {
                 $a['role'] = 'admin';
@@ -179,9 +179,9 @@ if ($action === 'delete') {
         $a_email = strtolower(trim($a['email'] ?? ''));
         $match = (!empty($user_id) && ($a['id'] === $user_id)) || (!empty($email) && ($a_email === $email));
         if ($match) {
-            if ($a_email === 'ssseedshop220@gmail.com') {
+            if ($a_email === 'ebseedshop@gmail.com') {
                 http_response_code(400);
-                echo json_encode(['error' => 'মূল সুপার অ্যাডমিন (ssseedshop220@gmail.com) মুছে ফেলা সম্ভব নয়']);
+                echo json_encode(['error' => 'মূল সুপার অ্যাডমিন (ebseedshop@gmail.com) মুছে ফেলা সম্ভব নয়']);
                 exit();
             }
             $deleted = true;

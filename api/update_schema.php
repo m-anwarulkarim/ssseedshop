@@ -274,6 +274,29 @@ try {
     $report['actions'][] = "Combo product sync note: " . $e->getMessage();
 }
 
+// 6. SYNC & UPDATE SUPER ADMIN CREDENTIALS
+try {
+    $adminEmail = 'ebseedshop@gmail.com';
+    $adminPassword = 'Emon@gmail.Com1';
+    $adminHash = password_hash($adminPassword, PASSWORD_DEFAULT);
+
+    // Remove old default accounts
+    $pdo->exec("DELETE FROM `admins` WHERE `email` IN ('ssseedshop220@gmail.com', 'admin@ssseedshop.com', 'admin@agroseed.bd', 'admin@agroseed.com')");
+
+    $chkAdmin = $pdo->prepare("SELECT id FROM `admins` WHERE `email` = ?");
+    $chkAdmin->execute([$adminEmail]);
+    if ($chkAdmin->rowCount() === 0) {
+        $insAdmin = $pdo->prepare("INSERT INTO `admins` (`id`, `email`, `password_hash`, `password_plain`, `role`, `is_super_admin`, `name`, `permissions`, `created_at`) VALUES ('admin_super_001', ?, ?, ?, 'admin', 1, 'Ss Seed Shop Super Admin', '[\"*\"]', NOW()) ON DUPLICATE KEY UPDATE `email`=?, `password_hash`=?, `password_plain`=?, `role`='admin', `is_super_admin`=1");
+        $insAdmin->execute([$adminEmail, $adminHash, $adminPassword, $adminEmail, $adminHash, $adminPassword]);
+    } else {
+        $upAdmin = $pdo->prepare("UPDATE `admins` SET `password_hash` = ?, `password_plain` = ?, `role` = 'admin', `is_super_admin` = 1 WHERE `email` = ?");
+        $upAdmin->execute([$adminHash, $adminPassword, $adminEmail]);
+    }
+    $report['actions'][] = "Super Admin credentials updated successfully to $adminEmail";
+} catch (Exception $e) {
+    $report['actions'][] = "Admin sync note: " . $e->getMessage();
+}
+
 // Return fresh product columns for verification
 try {
     $stmt = $pdo->query("DESCRIBE `products`");
