@@ -27,7 +27,7 @@ import {
 
 import { useQuery } from "@tanstack/react-query";
 import { useWebCounts } from "@/stores/orderCountsStore";
-import { getCurrentAdminAccess, getActiveAdminUser } from "@/lib/adminAccess";
+import { getCurrentAdminAccess, getActiveAdminUser, clearAdminSessionStorage } from "@/lib/adminAccess";
 import { useKeyboardShortcuts } from "@/hooks/useKeyboardShortcuts";
 import { savePageState, restoreScroll } from "@/lib/adminPageState";
 import { useAuthReady } from "@/hooks/useAuthReady";
@@ -200,11 +200,7 @@ function AdminHeader() {
       .toUpperCase() || "SS";
 
   const handleLogout = () => {
-    localStorage.removeItem("admin_session");
-    localStorage.removeItem("admin_token");
-    localStorage.removeItem("admin_dev_bypass");
-    sessionStorage.removeItem("admin_session");
-    sessionStorage.removeItem("admin_dev_bypass");
+    clearAdminSessionStorage();
     navigate("/admin", { replace: true });
   };
 
@@ -458,9 +454,7 @@ export function AdminLayout() {
     }
 
     if (access.status === "unauthorized") {
-      localStorage.removeItem("admin_session");
-      localStorage.removeItem("admin_token");
-      localStorage.removeItem("admin_dev_bypass");
+      clearAdminSessionStorage();
       navigate("/admin", { replace: true });
       return;
     }

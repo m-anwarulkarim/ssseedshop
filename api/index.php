@@ -8,7 +8,8 @@ echo json_encode([
     'version' => '1.0.0',
     'endpoints' => [
         'products' => '/products/get.php',
-        'login' => '/auth/login.php'
+        'login' => '/auth/login.php',
+        'verify' => '/auth/verify.php'
     ]
 ]);
 ?>

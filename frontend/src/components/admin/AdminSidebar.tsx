@@ -34,7 +34,7 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/component
 import { cn } from "@/lib/utils";
 import { useSidebar } from "@/components/ui/sidebar";
 import { useState, useRef, useEffect, useCallback, createContext, useContext } from "react";
-import { getCurrentAdminAccess, getActiveAdminUser } from "@/lib/adminAccess";
+import { getCurrentAdminAccess, getActiveAdminUser, clearAdminSessionStorage } from "@/lib/adminAccess";
 
 const SUPER_ADMIN_EMAIL = "ebseedshop@gmail.com";
 const WEB_ORDER_SOURCE_FILTER = "traffic_source.is.null,traffic_source.neq.ecomdrive";
@@ -347,8 +347,6 @@ export function AdminSidebar() {
     syncAdminUser?.email === SUPER_ADMIN_EMAIL ||
     syncAdminUser?.permissions?.includes("*") ||
     (typeof window !== "undefined" && (
-      localStorage.getItem("admin_dev_bypass") === "true" ||
-      sessionStorage.getItem("admin_dev_bypass") === "true" ||
       window.location.hostname === "localhost" ||
       window.location.hostname === "127.0.0.1"
     ))
@@ -707,11 +705,7 @@ export function AdminSidebar() {
           <SidebarMenuButton
             className="flex-1 justify-center rounded-xl bg-rose-50 text-rose-600 hover:bg-rose-100 hover:text-rose-700 font-semibold text-xs"
             onClick={async () => {
-              localStorage.removeItem("admin_session");
-              localStorage.removeItem("admin_token");
-              localStorage.removeItem("admin_dev_bypass");
-              sessionStorage.removeItem("admin_session");
-              sessionStorage.removeItem("admin_dev_bypass");
+              clearAdminSessionStorage();
               navigate("/admin", { replace: true });
             }}
           >

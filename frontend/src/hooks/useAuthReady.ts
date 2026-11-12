@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { clearInvalidAdminSession } from "@/lib/adminAccess";
 
 interface AuthReadyState {
   isReady: boolean;
@@ -11,6 +12,10 @@ export function useAuthReady(): AuthReadyState {
 
   useEffect(() => {
     try {
+      if (clearInvalidAdminSession()) {
+        setSession(null);
+        return;
+      }
       const localStr = localStorage.getItem("admin_session") || sessionStorage.getItem("admin_session");
       if (localStr) {
         const u = JSON.parse(localStr);

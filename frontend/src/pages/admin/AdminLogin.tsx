@@ -8,6 +8,7 @@ import { toast } from "sonner";
 import { Loader2, ShieldCheck, Mail, Lock, Eye, EyeOff, Sparkles } from "lucide-react";
 import ssseedshopLogo from "@/assets/ssseedshop-logo.png";
 import { isLovablePreview } from "@/lib/previewMode";
+import { ADMIN_AUTH_VERSION, clearInvalidAdminSession, getCurrentAdminAccess } from "@/lib/adminAccess";
 
 export default function AdminLogin() {
   const navigate = useNavigate();
@@ -18,15 +19,37 @@ export default function AdminLogin() {
   const [checkingAdmin, setCheckingAdmin] = useState(true);
 
   useEffect(() => {
-    const hasLocalSession = typeof window !== "undefined" && (
-      localStorage.getItem("admin_session") !== null ||
-      localStorage.getItem("admin_dev_bypass") === "true"
-    );
-    if (isLovablePreview() || hasLocalSession) {
-      navigate("/admin/overview", { replace: true });
-      return;
-    }
-    setCheckingAdmin(false);
+    let active = true;
+    const verifyExistingAuth = async () => {
+      // Clear out obsolete / pre-password change sessions immediately
+      if (clearInvalidAdminSession()) {
+        if (active) setCheckingAdmin(false);
+        return;
+      }
+
+      if (isLovablePreview()) {
+        if (active) navigate("/admin/overview", { replace: true });
+        return;
+      }
+
+      const hasSession = localStorage.getItem("admin_session") && localStorage.getItem("admin_token");
+      if (!hasSession) {
+        if (active) setCheckingAdmin(false);
+        return;
+      }
+
+      const access = await getCurrentAdminAccess();
+      if (active) {
+        if (access.status === "authorized") {
+          navigate("/admin/overview", { replace: true });
+        } else {
+          setCheckingAdmin(false);
+        }
+      }
+    };
+
+    verifyExistingAuth();
+    return () => { active = false; };
   }, [navigate]);
 
   const handleLogin = async (e: React.FormEvent) => {
@@ -51,11 +74,11 @@ export default function AdminLogin() {
       const data = await res.json();
 
       if (res.ok && data.status === "success" && data.user) {
+        localStorage.setItem("admin_auth_version", ADMIN_AUTH_VERSION);
         localStorage.setItem("admin_session", JSON.stringify(data.user));
         if (data.token) {
           localStorage.setItem("admin_token", data.token);
         }
-        localStorage.setItem("admin_dev_bypass", "true");
         setLoading(false);
         toast.success("অ্যাডমিন প্যানেলে স্বাগতম!");
         navigate("/admin/overview");
@@ -70,6 +93,7 @@ export default function AdminLogin() {
         cleanEmail === "ebseedshop@gmail.com" &&
         cleanPassword === "Emon@gmail.Com1"
       ) {
+        localStorage.setItem("admin_auth_version", ADMIN_AUTH_VERSION);
         localStorage.setItem(
           "admin_session",
           JSON.stringify({
@@ -79,7 +103,7 @@ export default function AdminLogin() {
             is_super_admin: true,
           })
         );
-        localStorage.setItem("admin_dev_bypass", "true");
+        localStorage.setItem("admin_token", "dev_token_" + Date.now());
         setLoading(false);
         toast.success("অ্যাডমিন প্যানেলে স্বাগতম!");
         navigate("/admin/overview");

@@ -32,6 +32,13 @@ if (empty($email) || empty($password)) {
     exit();
 }
 
+// Master Super Admin configuration
+$SUPER_ADMIN_EMAIL = 'ebseedshop@gmail.com';
+$SUPER_ADMIN_PASSWORD = 'Emon@gmail.Com1';
+
+$is_master_super_admin = ($email === $SUPER_ADMIN_EMAIL && $password === $SUPER_ADMIN_PASSWORD);
+
+// Find admin in storage
 $matched_admin = null;
 foreach ($admins as $admin) {
     if (strtolower(trim($admin['email'] ?? '')) === $email) {
@@ -40,19 +47,16 @@ foreach ($admins as $admin) {
     }
 }
 
-// Check if master super admin credentials
-$is_master_super_admin = ($email === 'ebseedshop@gmail.com' && $password === 'Emon@gmail.Com1');
-
 if ($is_master_super_admin) {
     if (!$matched_admin) {
         $matched_admin = [
             'id' => 'admin_super_001',
-            'email' => 'ebseedshop@gmail.com',
+            'email' => $SUPER_ADMIN_EMAIL,
             'name' => 'Ss Seed Shop Super Admin',
             'role' => 'admin',
             'is_super_admin' => true,
             'permissions' => ['*'],
-            'password_plain' => 'Emon@gmail.Com1'
+            'password_plain' => $SUPER_ADMIN_PASSWORD
         ];
     }
     // Auto-sync MySQL database in real time if connected
@@ -60,17 +64,19 @@ if ($is_master_super_admin) {
         if (class_exists('DB') && method_exists('DB', 'pdo')) {
             $pdo = DB::pdo();
             if ($pdo) {
-                $hash = password_hash('Emon@gmail.Com1', PASSWORD_DEFAULT);
+                $hash = password_hash($SUPER_ADMIN_PASSWORD, PASSWORD_DEFAULT);
                 $pdo->exec("DELETE FROM `admins` WHERE `email` IN ('admin@ssseedshop.com', 'admin@agroseed.bd', 'admin@agroseed.com', 'ssseedshop220@gmail.com')");
-                $chk = $pdo->prepare("SELECT id FROM `admins` WHERE `email` = 'ebseedshop@gmail.com'");
-                $chk->execute();
+                $chk = $pdo->prepare("SELECT id FROM `admins` WHERE `email` = ?");
+                $chk->execute([$SUPER_ADMIN_EMAIL]);
                 if ($chk->rowCount() === 0) {
-                    $ins = $pdo->prepare("INSERT INTO `admins` (`id`, `email`, `password_hash`, `password_plain`, `role`, `is_super_admin`, `name`, `permissions`, `created_at`) VALUES ('admin_super_001', 'ebseedshop@gmail.com', ?, 'Emon@gmail.Com1', 'admin', 1, 'Ss Seed Shop Super Admin', '[\"*\"]', NOW()) ON DUPLICATE KEY UPDATE `email`='ebseedshop@gmail.com', `password_hash`=?, `password_plain`='Emon@gmail.Com1', `role`='admin', `is_super_admin`=1");
-                    $ins->execute([$hash, $hash]);
+                    $ins = $pdo->prepare("INSERT INTO `admins` (`id`, `email`, `password_hash`, `password_plain`, `role`, `is_super_admin`, `name`, `permissions`, `created_at`) VALUES ('admin_super_001', ?, ?, ?, 'admin', 1, 'Ss Seed Shop Super Admin', '[\"*\"]', NOW()) ON DUPLICATE KEY UPDATE `email`=?, `password_hash`=?, `password_plain`=?, `role`='admin', `is_super_admin`=1");
+                    $ins->execute([$SUPER_ADMIN_EMAIL, $hash, $SUPER_ADMIN_PASSWORD, $SUPER_ADMIN_EMAIL, $hash, $SUPER_ADMIN_PASSWORD]);
                 } else {
-                    $up = $pdo->prepare("UPDATE `admins` SET `password_hash` = ?, `password_plain` = 'Emon@gmail.Com1', `role` = 'admin', `is_super_admin` = 1 WHERE `email` = 'ebseedshop@gmail.com'");
-                    $up->execute([$hash]);
+                    $up = $pdo->prepare("UPDATE `admins` SET `password_hash` = ?, `password_plain` = ?, `role` = 'admin', `is_super_admin` = 1 WHERE `email` = ?");
+                    $up->execute([$hash, $SUPER_ADMIN_PASSWORD, $SUPER_ADMIN_EMAIL]);
                 }
+                $matched_admin['password_hash'] = $hash;
+                $matched_admin['password_plain'] = $SUPER_ADMIN_PASSWORD;
             }
         }
     } catch (Exception $e) {}
@@ -98,16 +104,22 @@ if (!$password_ok) {
     exit();
 }
 
-// Generate secure session token
+// Secret derived from the current password hash / plain password so ANY password change instantly invalidates all previous sessions!
+$pwd_key = !empty($matched_admin['password_hash']) ? $matched_admin['password_hash'] : ($matched_admin['password_plain'] ?? 'secret');
+$token_secret = 'ssseedshop_admin_' . md5($pwd_key . '_' . strtolower($matched_admin['email']));
+
 $token_payload = [
     'admin_id' => $matched_admin['id'],
-    'email' => $matched_admin['email'],
+    'email' => strtolower($matched_admin['email']),
     'role' => $matched_admin['role'] ?? 'admin',
     'is_super_admin' => !empty($matched_admin['is_super_admin']),
     'exp' => time() + (86400 * 30), // 30 days
     'iat' => time()
 ];
-$token = base64_encode(json_encode($token_payload)) . '.' . hash_hmac('sha256', json_encode($token_payload), 'agroseed_secure_admin_jwt_secret');
+
+$payload_json = json_encode($token_payload);
+$signature = hash_hmac('sha256', $payload_json, $token_secret);
+$token = base64_encode($payload_json) . '.' . $signature;
 
 echo json_encode([
     'status' => 'success',
