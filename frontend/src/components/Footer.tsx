@@ -395,24 +395,11 @@ export default function Footer({ showDevelopedBy }: { showDevelopedBy?: boolean 
         </div>
       </div>
 
-      {/* ─── 3. BOTTOM BRAND BAR: COPYRIGHT & DESIGN CREDITS ─── */}
+      {/* ─── 3. BOTTOM BRAND BAR: COPYRIGHT ─── */}
       <div className="bg-primary text-primary-foreground py-3 px-4">
-        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2 text-xs font-medium">
+        <div className="max-w-7xl mx-auto flex items-center justify-center text-xs font-medium text-center">
           <div>
             © {new Date().getFullYear()} EB Seed Shop. {t("সর্বস্বত্ব সংরক্ষিত।", "All rights reserved.")}
-          </div>
-          <div>
-            {shouldShowDevelopedBy && (
-              <a
-                href="https://wa.me/8801560007230?text=Hello%20HaqPlus%20IT!"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-1 text-primary-foreground/95 hover:text-white transition-opacity font-medium"
-              >
-                <span>Design & Developed by</span>
-                <span className="font-extrabold underline decoration-white/70 underline-offset-2">HaqPlus IT</span>
-              </a>
-            )}
           </div>
         </div>
       </div>
