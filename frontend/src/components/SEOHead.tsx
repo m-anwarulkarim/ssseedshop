@@ -70,6 +70,8 @@ export default function SEOHead({
     let fullTitle = title.trim();
     const hasBrand =
       fullTitle.toLowerCase().includes(primaryName.toLowerCase()) ||
+      fullTitle.toLowerCase().includes("eb seed") ||
+      fullTitle.toLowerCase().includes("ebseedshop") ||
       fullTitle.toLowerCase().includes("ss seed") ||
       fullTitle.includes(primaryBn);
 
@@ -91,6 +93,16 @@ export default function SEOHead({
       keywords.split(",").forEach((k) => k && keywordSet.add(k.trim()));
     }
     // Guarantee inclusion of core seed keywords + primary brands
+    keywordSet.add("EB Seed Shop");
+    keywordSet.add("eb seed shop");
+    keywordSet.add("ebseedshop");
+    keywordSet.add("EB Seed");
+    keywordSet.add("eb seed");
+    keywordSet.add("EB Seeds");
+    keywordSet.add("eb seeds");
+    keywordSet.add("ইবি সিড");
+    keywordSet.add("ইবিসিড");
+    keywordSet.add("ইবি সিড শপ");
     keywordSet.add("SS Seed");
     keywordSet.add("ss seed");
     keywordSet.add("SS Seeds");
@@ -119,7 +131,7 @@ export default function SEOHead({
 
     const keywordString = Array.from(keywordSet).slice(0, 40).join(", ");
     setMeta("keywords", keywordString, true);
-    setMeta("author", `SS Seed / ${primaryName}`, true);
+    setMeta("author", `EB Seed / ${primaryName}`, true);
 
     // 4. Canonical URL (Strips tracking params like ?fbclid=..., ?utm_source=...)
     const rawUrl = url || window.location.href;

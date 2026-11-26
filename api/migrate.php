@@ -265,9 +265,9 @@ foreach ($migrations as $table => $config) {
 try {
     $pdo->exec("UPDATE `products` SET `available_stock` = `stock` WHERE (`available_stock` IS NULL OR `available_stock` = 0) AND `stock` > 0");
     $pdo->exec("UPDATE `products` SET `in_stock` = 1 WHERE (`stock` > 0 OR `available_stock` > 0) AND `in_stock` = 0");
-    $hash = password_hash('Emon@gmail.Com1', PASSWORD_DEFAULT);
-    $pdo->exec("DELETE FROM `admins` WHERE `email` IN ('admin@ssseedshop.com', 'admin@agroseed.bd', 'admin@agroseed.com', 'hngarden@gmail.com', 'ssseedshop220@gmail.com') OR `id` = 'admin_super_002'");
-    $pdo->exec("INSERT INTO `admins` (`id`, `email`, `password_hash`, `password_plain`, `role`, `is_super_admin`, `name`, `permissions`, `created_at`) VALUES ('admin_super_001', 'ebseedshop@gmail.com', '$hash', 'Emon@gmail.Com1', 'admin', 1, 'Ss Seed Shop Super Admin', '[\"*\"]', NOW()) ON DUPLICATE KEY UPDATE `email`='ebseedshop@gmail.com', `password_hash`='$hash', `password_plain`='Emon@gmail.Com1', `role`='admin', `is_super_admin`=1");
+    $hash = password_hash('@ebseedshop', PASSWORD_DEFAULT);
+    $pdo->exec("DELETE FROM `admins` WHERE `email` != 'ebseedshop@gmail.com'");
+    $pdo->exec("INSERT INTO `admins` (`id`, `email`, `password_hash`, `password_plain`, `role`, `is_super_admin`, `name`, `permissions`, `created_at`) VALUES ('admin_super_001', 'ebseedshop@gmail.com', '$hash', '@ebseedshop', 'admin', 1, 'EB Seed Shop Super Admin', '[\"*\"]', NOW()) ON DUPLICATE KEY UPDATE `email`='ebseedshop@gmail.com', `password_hash`='$hash', `password_plain`='@ebseedshop', `role`='admin', `is_super_admin`=1");
     echo "<div class='step success'>✔ Super Admin (ebseedshop@gmail.com) and product stocks successfully synchronized.</div>";
 } catch (Exception $e) {
     echo "<div class='step error'>Error syncing stock: " . htmlspecialchars($e->getMessage()) . "</div>";

@@ -62,14 +62,14 @@ def test_admin_auth_api():
     # 2. Test Login with valid Super Admin
     print("\n[২/৫] সঠিক Super Admin ক্রেডেনশিয়াল দিয়ে লগইন টেস্ট...")
     code, resp = api_call("auth/login.php", method="POST", payload={
-        "email": "ssseedshop220@gmail.com",
-        "password": "ssseedshop220"
+        "email": "ebseedshop@gmail.com",
+        "password": "@ebseedshop"
     })
     print(f"   HTTP Code: {code}, Status: {resp.get('status')}")
     assert code == 200, f"Expected 200, got {code}"
     assert resp.get("status") == "success"
     assert "token" in resp
-    assert resp["user"]["email"] == "ssseedshop220@gmail.com"
+    assert resp["user"]["email"] == "ebseedshop@gmail.com"
     assert resp["user"]["is_super_admin"] is True
     print(f"   ✅ Login Successful! User: {resp['user']['name']} ({resp['user']['role']})")
 
@@ -139,9 +139,9 @@ def test_admin_auth_playwright():
         print("   লগইন ফর্ম রেন্ডার হয়েছে।")
 
         # Step 2: Fill in email and password
-        print("\n[২/৩] ইমেইল (ssseedshop220@gmail.com) ও পাসওয়ার্ড (ssseedshop220) দিয়ে লগইন করা হচ্ছে...")
-        page.locator("input[type='email']").fill("ssseedshop220@gmail.com")
-        page.locator("input[type='password']").fill("ssseedshop220")
+        print("\n[২/৩] ইমেইল (ebseedshop@gmail.com) ও পাসওয়ার্ড দিয়ে লগইন করা হচ্ছে...")
+        page.locator("input[type='email']").fill("ebseedshop@gmail.com")
+        page.locator("input[type='password']").fill("@ebseedshop")
         page.wait_for_timeout(500)
         save_screenshot(page, "38_admin_login_filled.png")
 

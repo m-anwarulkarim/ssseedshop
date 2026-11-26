@@ -1,5 +1,5 @@
 /**
- * Client-side High-Performance Image Compression to WebP Format for Ss Seed Shop.
+ * Client-side High-Performance Image Compression to WebP Format for EB Seed Shop.
  * Uses modern Canvas API to convert any raster image (JPEG, PNG, BMP, etc.)
  * into lightweight, crystal-clear WebP files before uploading, ensuring
  * ultra-fast website loading speeds and minimal storage consumption.

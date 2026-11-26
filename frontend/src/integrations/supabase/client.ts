@@ -1,5 +1,5 @@
 // Local & Offline Safe Supabase Proxy
-// Ss Seed Shop has transitioned to PHP PDO & MySQL Backend (https://api.ssseedshop.com)
+// EB Seed Shop has transitioned to PHP PDO & MySQL Backend (https://api.ebseedshop.com)
 import type { SupabaseClient } from '@supabase/supabase-js';
 import type { Database } from './types';
 import { compressImageToWebP } from '@/lib/imageCompressor';

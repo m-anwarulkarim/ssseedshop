@@ -73,7 +73,7 @@ export default function PublicInvoice() {
   };
 
   const handleShareWhatsApp = () => {
-    const text = `Ss Seed Shop - ইনভয়েস/অর্ডার চালান: ${order?.order_id || orderId}\nলিংক: ${invoiceUrl}`;
+    const text = `EB Seed Shop - ইনভয়েস/অর্ডার চালান: ${order?.order_id || orderId}\nলিংক: ${invoiceUrl}`;
     window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, "_blank");
   };
 

@@ -196,4 +196,4 @@ Disallow: /e/
 Disallow: /ecomah
 Disallow: /admin/
 
-Sitemap: https://ssseedshop.com/sitemap.xml
+Sitemap: https://ebseedshop.com/sitemap.xml

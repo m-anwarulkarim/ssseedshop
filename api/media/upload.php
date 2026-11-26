@@ -142,7 +142,7 @@ $final_size = file_exists($save_result['path']) ? filesize($save_result['path'])
 $is_ssl = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
     || (isset($_SERVER['SERVER_PORT']) && $_SERVER['SERVER_PORT'] == 443)
     || (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https');
-$host = $_SERVER['HTTP_HOST'] ?? 'api.ssseedshop.com';
+$host = $_SERVER['HTTP_HOST'] ?? 'api.ebseedshop.com';
 $is_local = in_array(explode(':', $host)[0], ['localhost', '127.0.0.1']);
 $protocol = ($is_ssl || !$is_local) ? "https://" : "http://";
 

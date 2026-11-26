@@ -3,7 +3,7 @@ import { useState, useEffect, useRef } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { toast } from "sonner";
 import { Loader2, ShieldCheck, Zap, PackageCheck } from "lucide-react";
-import logoAsset from "@/assets/ssseedshop-logo.png";
+import logoAsset from "@/assets/ebseedshop-logo.png";
 import { useLanguage } from "@/contexts/LanguageContext";
 
 declare global {
@@ -148,7 +148,7 @@ export default function CustomerLogin({ onLogin }: Props) {
             <div className="relative">
               <img
                 src={logoAsset}
-                alt="Ss Seed Shop"
+                alt="EB Seed Shop"
                 className="w-16 h-16 rounded-full object-contain p-1 border-2 border-emerald-500/30 bg-white shadow-md"
               />
               <span className="absolute bottom-0 right-0 w-4 h-4 rounded-full bg-emerald-500 ring-2 ring-white"></span>
@@ -157,7 +157,7 @@ export default function CustomerLogin({ onLogin }: Props) {
 
           <div>
             <CardTitle className="text-xl sm:text-2xl font-extrabold text-gray-900 tracking-tight">
-              {t("স্বাগতম Ss Seed Shop-এ", "Welcome to Ss Seed Shop")}
+              {t("স্বাগতম EB Seed Shop-এ", "Welcome to EB Seed Shop")}
             </CardTitle>
             <CardDescription className="text-xs sm:text-sm text-gray-500 mt-1 max-w-xs mx-auto">
               {t(

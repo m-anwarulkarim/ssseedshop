@@ -8,7 +8,7 @@ import {
 } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { useLanguage } from "@/contexts/LanguageContext";
-import logoAsset from "@/assets/ssseedshop-logo.png";
+import logoAsset from "@/assets/ebseedshop-logo.png";
 
 type FooterLink = { label: string; href: string };
 
@@ -118,13 +118,13 @@ export default function Footer({ showDevelopedBy }: { showDevelopedBy?: boolean 
               <Link to="/" className="inline-flex items-center gap-3 mb-3 group">
                 <img
                   src={logoAsset}
-                  alt="Ss Seed Shop"
+                  alt="EB Seed Shop"
                   className="w-12 h-12 object-contain rounded-md drop-shadow-sm group-hover:scale-105 transition-transform"
                   loading="lazy"
                 />
                 <div>
                   <div className="font-extrabold text-xl text-primary tracking-tight leading-none group-hover:text-primary/90 transition-colors uppercase">
-                    SS SEED SHOP
+                    EB SEED SHOP
                   </div>
                   <div className="text-[10px] font-bold text-slate-500 tracking-wider uppercase mt-1">
                     {lang === "bn" ? "সেরা বীজের বিশ্বস্ত ঠিকানা" : "PREMIUM SEEDS STORE"}
@@ -135,8 +135,8 @@ export default function Footer({ showDevelopedBy }: { showDevelopedBy?: boolean 
               {/* Tagline / Bio */}
               <p className="text-xs text-slate-600 leading-relaxed mb-5">
                 {lang === "bn"
-                  ? "Ss Seed Shop একটি বিশ্বস্ত ই-কমার্স প্ল্যাটফর্ম যা প্রতিটি বাগানী ও কৃষকের কাছে আসল, মানসম্মত ও উচ্চ অঙ্কুরোদগমের বীজ পৌঁছে দিতে প্রতিশ্রুতিবদ্ধ।"
-                  : "Ss Seed Shop is an e-commerce platform dedicated to providing authentic, safe, and reliable seeds and gardening supplies to every home."}
+                  ? "EB Seed Shop একটি বিশ্বস্ত ই-কমার্স প্ল্যাটফর্ম যা প্রতিটি বাগানী ও কৃষকের কাছে আসল, মানসম্মত ও উচ্চ অঙ্কুরোদগমের বীজ পৌঁছে দিতে প্রতিশ্রুতিবদ্ধ।"
+                  : "EB Seed Shop is an e-commerce platform dedicated to providing authentic, safe, and reliable seeds and gardening supplies to every home."}
               </p>
             </div>
 
@@ -160,10 +160,10 @@ export default function Footer({ showDevelopedBy }: { showDevelopedBy?: boolean 
               <div className="flex items-center gap-3">
                 <Mail className="w-4 h-4 text-primary shrink-0" />
                 <a
-                  href="mailto:ssseedshop220@gmail.com"
+                  href="mailto:ebseedshop@gmail.com"
                   className="text-slate-700 hover:text-primary font-medium transition-colors"
                 >
-                  ssseedshop220@gmail.com
+                  ebseedshop@gmail.com
                 </a>
               </div>
 
@@ -256,7 +256,7 @@ export default function Footer({ showDevelopedBy }: { showDevelopedBy?: boolean 
             <div className="flex items-center gap-2.5">
               {/* Facebook */}
               <a
-                href="https://www.facebook.com/ssseedshop"
+                href="https://www.facebook.com/ebseedshop"
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="Facebook"
@@ -268,7 +268,7 @@ export default function Footer({ showDevelopedBy }: { showDevelopedBy?: boolean 
 
               {/* X / Twitter */}
               <a
-                href="https://twitter.com/ssseedshop"
+                href="https://twitter.com/ebseedshop"
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="X (Twitter)"
@@ -280,7 +280,7 @@ export default function Footer({ showDevelopedBy }: { showDevelopedBy?: boolean 
 
               {/* YouTube */}
               <a
-                href="https://www.youtube.com/@ssseedshop"
+                href="https://www.youtube.com/@ebseedshop"
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="YouTube"
@@ -292,7 +292,7 @@ export default function Footer({ showDevelopedBy }: { showDevelopedBy?: boolean 
 
               {/* Instagram */}
               <a
-                href="https://www.instagram.com/ssseedshop"
+                href="https://www.instagram.com/ebseedshop"
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="Instagram"
@@ -399,7 +399,7 @@ export default function Footer({ showDevelopedBy }: { showDevelopedBy?: boolean 
       <div className="bg-primary text-primary-foreground py-3 px-4">
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2 text-xs font-medium">
           <div>
-            © {new Date().getFullYear()} Ss Seed Shop. {t("সর্বস্বত্ব সংরক্ষিত।", "All rights reserved.")}
+            © {new Date().getFullYear()} EB Seed Shop. {t("সর্বস্বত্ব সংরক্ষিত।", "All rights reserved.")}
           </div>
           <div>
             {shouldShowDevelopedBy && (

@@ -1,6 +1,6 @@
 // Cloudflare Pages Function: proxies /api/meta-catalog (and /api/meta-catalog.csv)
 // to the live Supabase Edge Function so Meta Commerce Manager can schedule a daily
-// fetch against https://ssseedshop.com/api/meta-catalog.csv.
+// fetch against https://ebseedshop.com/api/meta-catalog.csv.
 // Keys used here are publishable/anon only — safe for client-visible code.
 
 const PROJECT_URL = 'https://mmscnllcjgsqpzzdaeby.supabase.co'

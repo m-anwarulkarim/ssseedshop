@@ -43,7 +43,7 @@ function steadfast_api_request($url, $method = 'GET', $data = null, $api_key = '
         'Content-Type: application/json',
         'Api-Key: ' . $api_key,
         'Secret-Key: ' . $secret_key,
-        'User-Agent: SsSeedShop-Courier/1.0'
+        'User-Agent: EbSeedShop-Courier/1.0'
     ];
     if (function_exists('curl_init')) {
         $ch = curl_init($url);

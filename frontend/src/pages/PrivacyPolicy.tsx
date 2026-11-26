@@ -68,10 +68,10 @@ const sections: Section[] = [
         <p>
           ইমেইল:{" "}
           <a
-            href="mailto:ssseedshop220@gmail.com"
+            href="mailto:ebseedshop@gmail.com"
             className="text-primary hover:underline"
           >
-            ssseedshop220@gmail.com
+            ebseedshop@gmail.com
           </a>
         </p>
       </div>
@@ -104,8 +104,8 @@ export default function PrivacyPolicy() {
     ];
   }, [domainInfo, privacyCanonical]);
 
-  const privacyTitle = `গোপনীয়তা নীতি (Privacy Policy) | Ss Seed Shop`;
-  const privacyDesc = `SS Seed (Ss Seed Shop)-এ আপনার ব্যক্তিগত তথ্য সুরক্ষা, সংগ্রহ ও ব্যবহারের নীতিমালা বিস্তারিত জানুন।`;
+  const privacyTitle = `গোপনীয়তা নীতি (Privacy Policy) | EB Seed Shop`;
+  const privacyDesc = `EB Seed (EB Seed Shop)-এ আপনার ব্যক্তিগত তথ্য সুরক্ষা, সংগ্রহ ও ব্যবহারের নীতিমালা বিস্তারিত জানুন।`;
 
   return (
     <>
@@ -164,7 +164,7 @@ export default function PrivacyPolicy() {
 
             <div className="mt-8 pt-5 border-t border-border/60 text-center">
               <p className="text-sm font-medium text-foreground">
-                Ss Seed Shop — {t("সেরা মানের বীজ, সেরা ফলন", "Best seeds, best harvest")}
+                EB Seed Shop — {t("সেরা মানের বীজ, সেরা ফলন", "Best seeds, best harvest")}
               </p>
             </div>
           </div>

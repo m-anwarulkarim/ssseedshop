@@ -698,7 +698,7 @@ export default function ProductDetail() {
           <div className="absolute top-3 right-3 z-10">
             <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-emerald-950/80 backdrop-blur-xs text-emerald-200 font-bold text-[10px] shadow-md tracking-wide">
               <ShieldCheck className="w-3 h-3 text-emerald-400" />
-              SS SEED SHOP
+              EB SEED SHOP
             </span>
           </div>
 
@@ -1233,12 +1233,12 @@ export default function ProductDetail() {
   const cleanDesc = stripHtml(product.short_description || product.full_description || "");
 
   // Highly optimized title for Google CTR & Seed queries
-  const productSeoTitle = `${cleanName} — উন্নত জাতের ${seoCategoryName} বীজ | Ss Seed Shop`;
+  const productSeoTitle = `${cleanName} — উন্নত জাতের ${seoCategoryName} বীজ | EB Seed Shop`;
 
   // Rich description highlighting price, germination rate, fast delivery, and brand
   const productSeoDesc = cleanDesc.length > 20
-    ? `${cleanName} কিনুন সেরা অফার মূল্যে মাত্র ৳${activeTierPrice}। ${cleanDesc.slice(0, 95)}... শতভাগ আসল বীজ, উচ্চ অঙ্কুরোদগম ও সারাদেশে ক্যাশ অন ডেলিভারি — SS Seed (Ss Seed Shop)।`
-    : `${cleanName} — উন্নত জাতের ${seoCategoryName} বীজ কিনুন ৳${activeTierPrice} মূল্যে। উচ্চ অঙ্কুরোদগম হার (≥৮০%), ক্যাশ অন হোম ডেলিভারি সারাদেশে — SS Seed (Ss Seed Shop)।`;
+    ? `${cleanName} কিনুন সেরা অফার মূল্যে মাত্র ৳${activeTierPrice}। ${cleanDesc.slice(0, 95)}... শতভাগ আসল বীজ, উচ্চ অঙ্কুরোদগম ও সারাদেশে ক্যাশ অন ডেলিভারি — EB Seed (EB Seed Shop)।`
+    : `${cleanName} — উন্নত জাতের ${seoCategoryName} বীজ কিনুন ৳${activeTierPrice} মূল্যে। উচ্চ অঙ্কুরোদগম হার (≥৮০%), ক্যাশ অন হোম ডেলিভারি সারাদেশে — EB Seed (EB Seed Shop)।`;
 
   // Keywords combining product details and universal seed keywords
   const productKeywords = buildDynamicKeywords({
@@ -1276,7 +1276,7 @@ export default function ProductDetail() {
     brand: {
       "@type": "Brand",
       name: domainInfo.primaryBrandName,
-      alternateName: [domainInfo.alternateBrandName, domainInfo.primaryBrandBn, "AB Seed", "Ss Seed Shop"],
+      alternateName: [domainInfo.alternateBrandName, domainInfo.primaryBrandBn, "EB Seed", "EB Seed Shop", "Ss Seed Shop", "AB Seed"],
     },
     offers: {
       "@type": "Offer",

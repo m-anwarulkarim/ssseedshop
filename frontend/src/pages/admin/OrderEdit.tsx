@@ -1298,7 +1298,7 @@ export default function OrderEdit() {
                   variant="ghost"
                   size="sm"
                   onClick={() => {
-                    const msg = `Ss Seed Shop - ইনভয়েস চালান: ${order.order_id}\nলিংক: ${invoiceUrl}`;
+                    const msg = `EB Seed Shop - ইনভয়েস চালান: ${order.order_id}\nলিংক: ${invoiceUrl}`;
                     window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`, "_blank");
                   }}
                   className="h-7 w-7 p-0 rounded-lg text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 dark:hover:bg-emerald-950/40 transition-colors"

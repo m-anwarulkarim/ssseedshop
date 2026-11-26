@@ -178,7 +178,7 @@ export function getActiveAdminUser(): any {
       return {
         id: "admin_super_001",
         email: SUPER_ADMIN_EMAIL,
-        name: "Ss Seed Shop Super Admin",
+        name: "EB Seed Shop Super Admin",
         role: "admin",
         is_super_admin: true,
         permissions: ["*"],

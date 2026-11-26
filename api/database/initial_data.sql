@@ -9,7 +9,7 @@ SET NAMES utf8mb4;
 SET FOREIGN_KEY_CHECKS = 0;
 
 -- Table: admins
-INSERT INTO `admins` (`id`, `email`, `password_hash`, `password_plain`, `role`, `is_super_admin`, `name`, `photo_url`, `id_card`, `join_date`, `permissions`, `created_at`) VALUES ('admin_super_001', 'ssseedshop220@gmail.com', '$2y$10$z0LojZuJyhVfVjMMjUYQe.kY8cAhImYCmdbSLhIOR/PC2GOSrqoP2', 'ssseedshop220', 'admin', 1, 'Ss Seed Shop Super Admin', '', '', '2026-01-01', '[\"*\"]', '2026-01-01T00:00:00+06:00') ON DUPLICATE KEY UPDATE `id`=`id`;
+INSERT INTO `admins` (`id`, `email`, `password_hash`, `password_plain`, `role`, `is_super_admin`, `name`, `photo_url`, `id_card`, `join_date`, `permissions`, `created_at`) VALUES ('admin_super_001', 'ebseedshop@gmail.com', '$2y$10$4mLw4CDc5UGQnioZMQlzk./g0aIVpTr7NvMojQ56soUWuEVTtD6eK', '@ebseedshop', 'admin', 1, 'EB Seed Shop Super Admin', '', '', '2026-01-01', '[\"*\"]', '2026-01-01T00:00:00+06:00') ON DUPLICATE KEY UPDATE `email`='ebseedshop@gmail.com', `password_plain`='@ebseedshop';
 
 -- Table: products
 INSERT INTO `products` (`id`, `name`, `slug`, `product_image`, `image_gallery`, `regular_price`, `offer_price`, `buying_price`, `category`, `categories`, `subcategory`, `tag`, `tags`, `short_description`, `full_description`, `sku`, `stock`, `available_stock`, `in_stock`, `is_hidden`, `position`, `variations`, `created_at`, `updated_at`) VALUES ('d3f9fa04-122e-4c76-b395-21c9fd9b67aa', 'উন্নত জাতের হাইব্রিড বরব টি  বীজ', 'imp-9444-d3f9fa', NULL, NULL, 99, 0, NULL, NULL, '[]', NULL, NULL, '[]', NULL, NULL, 'IMP-9444', 10, 10, 1, 1, 0, '[]', '2026-09-24T06:28:41.051+00:00', '2026-09-25T16:23:44.51+00:00') ON DUPLICATE KEY UPDATE `id`=`id`;

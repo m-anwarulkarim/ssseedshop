@@ -73,8 +73,8 @@ export default function ReturnPolicy() {
     ];
   }, [domainInfo, returnCanonical]);
 
-  const returnTitle = `রিটার্ন ও রিফান্ড পলিসি — সহজ শর্তে পণ্য ফেরত | Ss Seed Shop`;
-  const returnDesc = `SS Seed (Ss Seed Shop)-এর গ্রাহকবান্ধব রিটার্ন ও রিফান্ড নীতিমালা। নষ্ট বা ভুল পণ্যে সহজ রিপ্লেসমেন্ট সুবিধা।`;
+  const returnTitle = `রিটার্ন ও রিফান্ড পলিসি — সহজ শর্তে পণ্য ফেরত | EB Seed Shop`;
+  const returnDesc = `EB Seed (EB Seed Shop)-এর গ্রাহকবান্ধব রিটার্ন ও রিফান্ড নীতিমালা। নষ্ট বা ভুল পণ্যে সহজ রিপ্লেসমেন্ট সুবিধা।`;
 
   return (
     <>
@@ -154,7 +154,7 @@ export default function ReturnPolicy() {
             className="mt-10 text-base"
             style={{ color: "#555555" }}
           >
-            Ss Seed Shop —{" "}
+            EB Seed Shop —{" "}
             <span className="font-bold">
               {t("সেরা মানের বীজ, সেরা ফলন", "Best seeds, best harvest")}
             </span>

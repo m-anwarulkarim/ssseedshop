@@ -148,8 +148,8 @@ export default function TermsConditions() {
     ];
   }, [domainInfo, termsCanonical]);
 
-  const termsTitle = `ব্যবহারের শর্তাবলী ও নীতিমালা | Ss Seed Shop`;
-  const termsDesc = `SS Seed (Ss Seed Shop)-এ বীজ ও কৃষি পণ্য ক্রয়ের সাধারণ নীতিমালা ও শর্তাবলী বিস্তারিত জানুন।`;
+  const termsTitle = `ব্যবহারের শর্তাবলী ও নীতিমালা | EB Seed Shop`;
+  const termsDesc = `EB Seed (EB Seed Shop)-এ বীজ ও কৃষি পণ্য ক্রয়ের সাধারণ নীতিমালা ও শর্তাবলী বিস্তারিত জানুন।`;
 
   return (
     <>
@@ -215,7 +215,7 @@ export default function TermsConditions() {
 
             <div className="mt-8 pt-5 border-t border-border/60 text-center">
               <p className="text-sm font-medium text-foreground">
-                Ss Seed Shop — {t("সেরা মানের বীজ, সেরা ফলন", "Best seeds, best harvest")}
+                EB Seed Shop — {t("সেরা মানের বীজ, সেরা ফলন", "Best seeds, best harvest")}
               </p>
             </div>
           </div>

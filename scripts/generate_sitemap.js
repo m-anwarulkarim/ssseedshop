@@ -36,12 +36,12 @@ function xmlEscape(str) {
 async function run() {
   console.log('Fetching live products and categories for sitemap...');
   const [products, categories] = await Promise.all([
-    fetchJson('https://api.ssseedshop.com/products/get.php').catch(() => []),
-    fetchJson('https://api.ssseedshop.com/categories/get.php').catch(() => []),
+    fetchJson('https://api.ebseedshop.com/products/get.php').catch(() => []),
+    fetchJson('https://api.ebseedshop.com/categories/get.php').catch(() => []),
   ]);
 
   const today = new Date().toISOString().slice(0, 10);
-  const baseUrl = 'https://ssseedshop.com';
+  const baseUrl = 'https://ebseedshop.com';
 
   const statics = [
     { loc: `${baseUrl}/`, pri: '1.0', freq: 'daily' },

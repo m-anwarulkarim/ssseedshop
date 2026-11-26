@@ -246,7 +246,7 @@ export default function MyActivity() {
     email: "ebseedshop@gmail.com",
     role: "admin",
     isSuperAdmin: true,
-    name: "Ss Seed Shop Admin",
+    name: "EB Seed Shop Admin",
     photo: null,
     joining_date: null,
   };

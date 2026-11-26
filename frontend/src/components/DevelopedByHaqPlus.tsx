@@ -8,7 +8,7 @@ interface DevelopedByHaqPlusProps {
 
 export const DevelopedByHaqPlus: React.FC<DevelopedByHaqPlusProps> = ({
   className = "",
-  siteName = "Ss Seed Shop",
+  siteName = "EB Seed Shop",
   theme = "light",
 }) => {
   const whatsappNumber = "8801560007230";

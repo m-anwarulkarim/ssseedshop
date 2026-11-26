@@ -30,7 +30,7 @@ import { format, formatDistanceToNow } from "date-fns";
 import { DateRangeFilter, DateRangeValue, getDateRangeISO } from "@/components/admin/DateRangeFilter";
 import { setListCounts, useListCounts, applyStatusChange } from "@/stores/orderCountsStore";
 import { getActiveAdminId } from "@/lib/adminAccess";
-import ssseedshopLogo from "@/assets/ssseedshop-logo.png";
+import ebseedshopLogo from "@/assets/ebseedshop-logo.png";
 import { InlineFraudBar } from "@/components/admin/InlineFraudBar";
 
 const PAGE_SIZE = 250;
@@ -547,9 +547,9 @@ export default function OrderList() {
           <!-- HEADER -->
           <div style="display:flex;justify-content:space-between;align-items:flex-start">
             <div style="display:flex;align-items:center;gap:12px">
-              <div style="width:54px;height:54px;border-radius:50%;background:#eaf5e3;display:flex;align-items:center;justify-content:center;border:2px solid #d4ead0;overflow:hidden"><img src="${window.location.origin}${ssseedshopLogo}" alt="Ss Seed Shop" style="width:100%;height:100%;object-fit:cover"/></div>
+              <div style="width:54px;height:54px;border-radius:50%;background:#eaf5e3;display:flex;align-items:center;justify-content:center;border:2px solid #d4ead0;overflow:hidden"><img src="${window.location.origin}${ebseedshopLogo}" alt="EB Seed Shop" style="width:100%;height:100%;object-fit:cover"/></div>
               <div>
-                <div style="font-size:22px;font-weight:800;color:#1f2937;letter-spacing:-0.3px">Ss Seed Shop</div>
+                <div style="font-size:22px;font-weight:800;color:#1f2937;letter-spacing:-0.3px">EB Seed Shop</div>
                 <div style="font-size:11px;color:#4b5563;margin-top:2px">সবজি, ফুল, ফল ও ঔষধি বীজের নির্ভরযোগ্য অনলাইন প্ল্যাটফর্ম।</div>
               </div>
             </div>
@@ -564,10 +564,10 @@ export default function OrderList() {
           <div style="display:flex;gap:14px;margin-top:18px">
             <div style="flex:1;background:#eef6ea;border:1px solid #d4ead0;border-radius:10px;padding:12px 14px">
               <div style="font-size:11px;color:#4b5563;margin-bottom:4px">Sender</div>
-              <div style="font-size:14px;font-weight:700;color:#0f172a">Ss Seed Shop</div>
+              <div style="font-size:14px;font-weight:700;color:#0f172a">EB Seed Shop</div>
               <div style="font-size:11px;color:#374151;margin-top:3px;line-height:1.55">Poran Mondol Tak, Boro Dewra, Tongi, Gazipur-1711</div>
               <div style="font-size:11px;color:#374151;margin-top:2px">Phone: <span style="font-family:'Roboto Mono','Courier New',monospace;font-weight:700;color:#0f172a;letter-spacing:0.5px">01933819799</span></div>
-              <div style="font-size:11px;color:#374151;margin-top:2px">Help: ssseedshop.com/help</div>
+              <div style="font-size:11px;color:#374151;margin-top:2px">Help: ebseedshop.com/help</div>
             </div>
             <div style="flex:1;background:#eef6ea;border:1px solid #d4ead0;border-radius:10px;padding:12px 14px">
               <div style="font-size:11px;color:#4b5563;margin-bottom:4px">প্রাপক</div>
@@ -612,8 +612,8 @@ export default function OrderList() {
           <!-- FOOTER -->
           <div style="margin-top:18px;padding-top:12px;border-top:1px dashed #cbd5e1;text-align:center;page-break-inside:avoid;flex-shrink:0">
             <div style="font-size:14px;font-weight:700;color:#0f172a">আমাদের সাথে থাকার জন্য আন্তরিক ধন্যবাদ! 🪴</div>
-            <div style="font-size:11px;color:#4b5563;margin-top:3px">আপনার বাগান সবুজ ও সতেজ হোক — Ss Seed Shop সবসময় আপনার পাশে।</div>
-            <div style="font-size:10px;color:#6b7280;margin-top:8px">এটি একটি কম্পিউটার-জেনারেটেড চালান। যেকোনো জিজ্ঞাসার জন্য যোগাযোগ করুন: <span style="font-family:'Roboto Mono','Courier New',monospace;font-weight:700;font-size:12px;color:#0f172a;letter-spacing:0.5px">01933819799</span> / <span style="font-family:'Roboto Mono','Courier New',monospace;font-weight:600;color:#0f172a">ssseedshop220@gmail.com</span></div>
+            <div style="font-size:11px;color:#4b5563;margin-top:3px">আপনার বাগান সবুজ ও সতেজ হোক — EB Seed Shop সবসময় আপনার পাশে।</div>
+            <div style="font-size:10px;color:#6b7280;margin-top:8px">এটি একটি কম্পিউটার-জেনারেটেড চালান। যেকোনো জিজ্ঞাসার জন্য যোগাযোগ করুন: <span style="font-family:'Roboto Mono','Courier New',monospace;font-weight:700;font-size:12px;color:#0f172a;letter-spacing:0.5px">01933819799</span> / <span style="font-family:'Roboto Mono','Courier New',monospace;font-weight:600;color:#0f172a">ebseedshop@gmail.com</span></div>
           </div>
         </div>`;
     }).join("");

@@ -110,7 +110,7 @@ const queryClient = new QueryClient({
 
 const persister = createSyncStoragePersister({
   storage: window.localStorage,
-  key: "ssseedshop-query-cache-v2",
+  key: "ebseedshop-query-cache-v2",
 });
 
 

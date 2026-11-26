@@ -1,9 +1,9 @@
 /**
- * Add "Ss Seed Shop" watermark to images using Canvas API.
+ * Add "EB Seed Shop" watermark to images using Canvas API.
  * Places watermark text at multiple positions with varying opacity.
  */
 
-const WATERMARK_TEXT = "Ss Seed Shop";
+const WATERMARK_TEXT = "EB Seed Shop";
 
 export async function addWatermarkToImage(file: File): Promise<File> {
   if (!file.type.startsWith("image/")) return file;

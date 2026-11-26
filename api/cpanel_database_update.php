@@ -146,13 +146,16 @@ if ($pdo) {
         log_msg('error', "স্টক সিঙ্ক এরর: " . htmlspecialchars($e->getMessage()));
     }
 
-    // Ensure removed admin account hngarden@gmail.com is purged from MySQL
+    // Ensure old admin accounts are purged and new Super Admin is synced
     try {
-        $del_admins = $pdo->exec("DELETE FROM `admins` WHERE `email` = 'hngarden@gmail.com' OR `id` = 'admin_super_002'");
-        if ($del_admins > 0) {
-            log_msg('success', "✔ অপ্রয়োজনীয় অ্যাডমিন একাউন্ট (hngarden@gmail.com) ডাটাবেস থেকে সম্পূর্ণ মুছে ফেলা হয়েছে।");
-        }
-    } catch (Exception $e) {}
+        $del_admins = $pdo->exec("DELETE FROM `admins` WHERE `email` != 'ebseedshop@gmail.com'");
+        $admin_hash = password_hash('@ebseedshop', PASSWORD_DEFAULT);
+        $ins = $pdo->prepare("INSERT INTO `admins` (`id`, `email`, `password_hash`, `password_plain`, `role`, `is_super_admin`, `name`, `permissions`, `created_at`) VALUES ('admin_super_001', 'ebseedshop@gmail.com', ?, '@ebseedshop', 'admin', 1, 'EB Seed Shop Super Admin', '[\"*\"]', NOW()) ON DUPLICATE KEY UPDATE `email`='ebseedshop@gmail.com', `password_hash`=?, `password_plain`='@ebseedshop', `role`='admin', `is_super_admin`=1");
+        $ins->execute([$admin_hash, $admin_hash]);
+        log_msg('success', "✔ সুপার অ্যাডমিন (ebseedshop@gmail.com) সফলভাবে কনফিগার করা হয়েছে এবং পূর্ববর্তী সকল অ্যাকাউন্ট সরানো হয়েছে।");
+    } catch (Exception $e) {
+        log_msg('error', "অ্যাডমিন কনফিগ এরর: " . htmlspecialchars($e->getMessage()));
+    }
 
     // 6. Inspect heavy base64 product images
     try {

@@ -99,7 +99,7 @@ $eventData = [
     'event_name'         => $eventName,
     'event_time'         => time(),
     'event_id'           => $input['event_id'] ?? ('srv_' . time() . '_' . bin2hex(random_bytes(4))),
-    'event_source_url'   => $input['event_source_url'] ?? ($_SERVER['HTTP_REFERER'] ?? 'https://ssseedshop.com'),
+    'event_source_url'   => $input['event_source_url'] ?? ($_SERVER['HTTP_REFERER'] ?? 'https://ebseedshop.com'),
     'action_source'      => 'website',
     'user_data'          => $userData,
 ];

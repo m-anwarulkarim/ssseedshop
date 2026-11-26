@@ -39,7 +39,7 @@ const DEFAULT_CONFIG: DeveloperContactConfig = {
   whatsapp: "8801560007230",
   email: "dev.anwarul@gmail.com",
   supportHours: "সকাল ৯:০০ – রাত ১১:০০ (জরুরি প্রয়োজনে ২৪/৭)",
-  notes: "Ss Seed Shop এর অফিসিয়াল টেকনিক্যাল পার্টনার",
+  notes: "EB Seed Shop এর অফিসিয়াল টেকনিক্যাল পার্টনার",
 };
 
 interface SupportTicket {
@@ -178,7 +178,7 @@ export default function HelpSupport() {
     const prioObj = PRIORITIES.find(p => p.value === priority);
     const prioLabel = prioObj ? prioObj.labelBn : priority;
 
-    let text = `*🚨 [Ss Seed Shop Support Ticket #${ticketId}]*\n`;
+    let text = `*🚨 [EB Seed Shop Support Ticket #${ticketId}]*\n`;
     text += `*বিষয়:* ${subject || "কারিগরি সহায়তা"}\n`;
     text += `*ক্যাটাগরি:* ${catLabel}\n`;
     text += `*জরুরিত্ব:* ${prioLabel}\n`;
@@ -226,7 +226,7 @@ export default function HelpSupport() {
     
     if (!textToSend) {
       if (!subject && !description) {
-        textToSend = `Hello ${config.developerName}! Ss Seed Shop অ্যাডমিন প্যানেল থেকে বলছি। আমার একটি কারিগরি সহায়তা প্রয়োজন।`;
+        textToSend = `Hello ${config.developerName}! EB Seed Shop অ্যাডমিন প্যানেল থেকে বলছি। আমার একটি কারিগরি সহায়তা প্রয়োজন।`;
       } else {
         const ticketId = `TKT-${Math.floor(1000 + Math.random() * 9000)}`;
         textToSend = generateTicketPayload(ticketId);
@@ -245,7 +245,7 @@ export default function HelpSupport() {
     const ticketBody = generateTicketPayload(ticketId);
     saveTicketToHistory(ticketId);
 
-    const emailSubject = `[Ss Seed Shop Ticket #${ticketId}] [${priority.toUpperCase()}] ${subject || "সাপোর্ট রিকোয়েস্ট"}`;
+    const emailSubject = `[EB Seed Shop Ticket #${ticketId}] [${priority.toUpperCase()}] ${subject || "সাপোর্ট রিকোয়েস্ট"}`;
     const gmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(config.email)}&su=${encodeURIComponent(emailSubject)}&body=${encodeURIComponent(ticketBody)}`;
     
     window.open(gmailUrl, "_blank");
@@ -316,7 +316,7 @@ export default function HelpSupport() {
 
             <p className="text-sm sm:text-base text-slate-300 leading-relaxed font-light">
               {t(
-                "Ss Seed Shop অ্যাডমিন প্যানেল ও স্টোরের যেকোনো সমস্যা, বাগ বা নতুন ফিচারের প্রয়োজনে সরাসরি ডেভেলপারের সাথে কানেক্ট হোন।",
+                "EB Seed Shop অ্যাডমিন প্যানেল ও স্টোরের যেকোনো সমস্যা, বাগ বা নতুন ফিচারের প্রয়োজনে সরাসরি ডেভেলপারের সাথে কানেক্ট হোন।",
                 "Instant developer assistance for bug reports, store management, courier APIs, and technical optimizations."
               )}
             </p>
@@ -327,7 +327,7 @@ export default function HelpSupport() {
               <ShieldCheck className="w-5 h-5" />
             </div>
             <div>
-              <p className="text-[11px] text-slate-400 uppercase tracking-wider font-semibold">Ss Seed Shop Core</p>
+              <p className="text-[11px] text-slate-400 uppercase tracking-wider font-semibold">EB Seed Shop Core</p>
               <p className="text-sm font-bold font-mono text-white">v{CURRENT_VERSION}</p>
             </div>
           </div>
@@ -634,7 +634,7 @@ export default function HelpSupport() {
                         <Monitor className="w-4 h-4" />
                       </div>
                       <span className="truncate text-xs font-mono text-foreground font-medium">
-                        Ss Seed Shop v{diagnostics.version} • {diagnostics.browser} ({diagnostics.os})
+                        EB Seed Shop v{diagnostics.version} • {diagnostics.browser} ({diagnostics.os})
                       </span>
                     </div>
                     <label className="flex items-center gap-2 text-xs text-muted-foreground cursor-pointer select-none shrink-0 font-medium">
@@ -819,7 +819,7 @@ export default function HelpSupport() {
                       {t("ভার্সন আপডেট ও পরিবর্তনসমূহ", "System Release Notes")}
                     </h3>
                     <p className="text-xs text-muted-foreground mt-0.5">
-                      {t("Ss Seed Shop প্যানেলের সাম্প্রতিক ফিচার আপডেট ও ফিক্স লগ", "Changelog and recent system improvements")}
+                      {t("EB Seed Shop প্যানেলের সাম্প্রতিক ফিচার আপডেট ও ফিক্স লগ", "Changelog and recent system improvements")}
                     </p>
                   </div>
                   <Badge variant="outline" className="font-mono text-xs px-2.5 py-1">

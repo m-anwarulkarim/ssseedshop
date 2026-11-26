@@ -1,6 +1,6 @@
 /**
  * @file env.ts
- * @description Centralized, typed environment configuration for Ss Seed Shop.
+ * @description Centralized, typed environment configuration for EB Seed Shop.
  *
  * This module is the SINGLE SOURCE OF TRUTH for all environment variables.
  * Components, pages, and services should NEVER read `import.meta.env` directly
@@ -10,7 +10,7 @@
 export interface AppEnvConfig {
   /**
    * The base URL of the PHP Backend API without trailing slash.
-   * e.g., "https://api.ssseedshop.com" in production or "http://127.0.0.1:8005" in local dev.
+   * e.g., "https://api.ebseedshop.com" in production or "http://127.0.0.1:8005" in local dev.
    */
   readonly apiUrl: string;
 
@@ -38,8 +38,8 @@ export interface AppEnvConfig {
    * Constructs an absolute API endpoint URL safely without duplicate slashes.
    *
    * @example
-   * buildApiUrl("/products/get.php") // "https://api.ssseedshop.com/products/get.php"
-   * buildApiUrl("settings/get.php?keys=meta_pixel_id") // "https://api.ssseedshop.com/settings/get.php?keys=meta_pixel_id"
+   * buildApiUrl("/products/get.php") // "https://api.ebseedshop.com/products/get.php"
+   * buildApiUrl("settings/get.php?keys=meta_pixel_id") // "https://api.ebseedshop.com/settings/get.php?keys=meta_pixel_id"
    */
   readonly buildApiUrl: (endpoint: string) => string;
 }
@@ -57,7 +57,7 @@ function normalizeUrl(url: string): string {
  * 1. When browsing on localhost / 127.0.0.1 or in Vite dev mode, default to local PHP backend ("http://127.0.0.1:8005")
  *    (unless VITE_API_URL explicitly specifies a custom local port).
  * 2. Explicit `VITE_API_URL` set in environment for staging/production.
- * 3. Default production URL ("https://api.ssseedshop.com")
+ * 3. Default production URL ("https://api.ebseedshop.com")
  */
 function resolveApiUrl(): string {
   const isBrowser = typeof window !== "undefined";
@@ -78,7 +78,7 @@ function resolveApiUrl(): string {
     return normalizeUrl(configuredUrl);
   }
 
-  return "https://api.ssseedshop.com";
+  return "https://api.ebseedshop.com";
 }
 
 const resolvedApiUrl = resolveApiUrl();

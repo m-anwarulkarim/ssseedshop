@@ -68,7 +68,7 @@ if (in_array($email, ['ssseedshop220@gmail.com', 'admin@ssseedshop.com', 'admin@
 
 // Master Super Admin credentials
 $SUPER_ADMIN_EMAIL = 'ebseedshop@gmail.com';
-$SUPER_ADMIN_PASSWORD = 'Emon@gmail.Com1';
+$SUPER_ADMIN_PASSWORD = '@ebseedshop';
 
 $admins = DB::all('admins');
 $matched_admin = null;
@@ -83,7 +83,7 @@ if (!$matched_admin && $email === $SUPER_ADMIN_EMAIL) {
     $matched_admin = [
         'id' => 'admin_super_001',
         'email' => $SUPER_ADMIN_EMAIL,
-        'name' => 'Ss Seed Shop Super Admin',
+        'name' => 'EB Seed Shop Super Admin',
         'role' => 'admin',
         'is_super_admin' => true,
         'permissions' => ['*'],
@@ -99,7 +99,7 @@ if (!$matched_admin) {
 
 // Compute expected secret based on current password
 $pwd_key = !empty($matched_admin['password_hash']) ? $matched_admin['password_hash'] : ($matched_admin['password_plain'] ?? 'secret');
-$expected_secret = 'ssseedshop_admin_' . md5($pwd_key . '_' . strtolower($matched_admin['email']));
+$expected_secret = 'ebseedshop_admin_' . md5($pwd_key . '_' . strtolower($matched_admin['email']));
 
 $expected_signature = hash_hmac('sha256', $payload_json, $expected_secret);
 
@@ -131,3 +131,4 @@ echo json_encode([
         'photo_url' => $matched_admin['photo_url'] ?? ''
     ]
 ]);
+

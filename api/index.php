@@ -4,7 +4,7 @@ header('Content-Type: application/json; charset=utf-8');
 
 echo json_encode([
     'status' => 'success',
-    'message' => 'Welcome to Ss Seed Shop PHP API',
+    'message' => 'Welcome to EB Seed Shop PHP API',
     'version' => '1.0.0',
     'endpoints' => [
         'products' => '/products/get.php',

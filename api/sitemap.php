@@ -2,7 +2,7 @@
 /**
  * Dynamic XML Sitemap Generator
  * Automatically queries products and categories from MySQL database
- * Dynamically resolves domain (e.g. ssseedshop.com or abseed.com.bd)
+ * Dynamically resolves domain (e.g. ebseedshop.com or custom domain)
  * Includes Google Image Sitemap extensions for maximum image SEO visibility.
  */
 
@@ -18,7 +18,7 @@ function xmlEscape(string $str): string {
 }
 
 // 1. Resolve host and base frontend URL
-$rawHost = $_SERVER['HTTP_X_FORWARDED_HOST'] ?? $_SERVER['HTTP_HOST'] ?? 'ssseedshop.com';
+$rawHost = $_SERVER['HTTP_X_FORWARDED_HOST'] ?? $_SERVER['HTTP_HOST'] ?? 'ebseedshop.com';
 $rawHost = preg_replace('/:\d+$/', '', trim($rawHost));
 
 $isHttps = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ||

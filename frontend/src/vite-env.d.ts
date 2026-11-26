@@ -1,13 +1,13 @@
 /// <reference types="vite/client" />
 
 /**
- * Strongly typed interface for Vite environment variables in Ss Seed Shop.
+ * Strongly typed interface for Vite environment variables in EB Seed Shop.
  * Add any new VITE_* variables here to ensure autocompletion and type-safety.
  */
 interface ImportMetaEnv {
   /**
    * Primary PHP Backend API Base URL
-   * e.g. "https://api.ssseedshop.com" or "http://127.0.0.1:8005"
+   * e.g. "https://api.ebseedshop.com" or "http://127.0.0.1:8005"
    */
   readonly VITE_API_URL?: string;
 

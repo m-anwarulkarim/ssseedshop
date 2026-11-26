@@ -2,7 +2,7 @@ import { API_URL } from "@/config/env";
 import { useLocation, useNavigate } from "react-router-dom";
 import { isLovablePreview } from "@/lib/previewMode";
 import { getSavedPath } from "@/lib/adminPageState";
-import ssseedshopLogo from "@/assets/ssseedshop-logo.png";
+import ebseedshopLogo from "@/assets/ebseedshop-logo.png";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useWebCounts, useListCounts } from "@/stores/orderCountsStore";
@@ -624,10 +624,10 @@ export function AdminSidebar() {
         <div className="flex items-center justify-between gap-3">
           <div className="flex items-center gap-3 min-w-0">
             <div className="w-10 h-10 rounded-full overflow-hidden bg-white border border-slate-200 shadow-sm flex items-center justify-center shrink-0 p-0.5">
-              <img src={ssseedshopLogo} alt="Ss Seed Shop" className="w-full h-full object-contain" />
+              <img src={ebseedshopLogo} alt="EB Seed Shop" className="w-full h-full object-contain" />
             </div>
             <div className="group-data-[collapsible=icon]:hidden min-w-0">
-              <h2 className="font-bold text-[15px] text-slate-900 tracking-tight truncate leading-tight">Ss Seed Shop</h2>
+              <h2 className="font-bold text-[15px] text-slate-900 tracking-tight truncate leading-tight">EB Seed Shop</h2>
               <p className="text-[11px] font-medium text-slate-400 truncate leading-tight mt-0.5">{t("অ্যাডমিন প্যানেল", "Admin Dashboard")}</p>
             </div>
           </div>

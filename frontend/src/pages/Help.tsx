@@ -30,29 +30,29 @@ const helpSections = [
     icon: Facebook,
     title: "Facebook Page",
     description: "আমাদের ফেসবুক পেজে ইনবক্স করুন।",
-    action: "Ss Seed Shop",
-    href: "https://www.facebook.com/ssseedshop",
+    action: "EB Seed Shop",
+    href: "https://www.facebook.com/ebseedshop",
   },
   {
     icon: Instagram,
     title: "Instagram",
     description: "আমাদের ইনস্টাগ্রাম পেজে ফলো ও মেসেজ করুন।",
-    action: "@ssseedshop",
-    href: "https://www.instagram.com/ssseedshop",
+    action: "@ebseedshop",
+    href: "https://www.instagram.com/ebseedshop",
   },
   {
     icon: Music2,
     title: "TikTok",
     description: "টিকটকে আমাদের ভিডিও দেখুন।",
-    action: "@ssseedshop",
-    href: "https://www.tiktok.com/@ssseedshop",
+    action: "@ebseedshop",
+    href: "https://www.tiktok.com/@ebseedshop",
   },
   {
     icon: Mail,
     title: "Email",
     description: "বিস্তারিত তথ্য বা ব্যবসায়িক যোগাযোগের জন্য ইমেইল করুন।",
-    action: "ssseedshop220@gmail.com",
-    href: "mailto:ssseedshop220@gmail.com",
+    action: "ebseedshop@gmail.com",
+    href: "mailto:ebseedshop@gmail.com",
   },
 ];
 
@@ -97,8 +97,8 @@ export default function Help() {
     return [breadcrumb, faqSchema];
   }, [domainInfo, helpCanonical]);
 
-  const helpTitle = `সাহায্য কেন্দ্র ও সাধারণ জিজ্ঞাসা (FAQ) | Ss Seed Shop`;
-  const helpDesc = `বীজ অর্ডার, দ্রুত ডেলিভারি, ক্যাশ অন ডেলিভারি ও রিটার্ন সংক্রান্ত সকল প্রশ্নের উত্তর জানুন। সার্বক্ষণিক কাস্টমার কেয়ার — SS Seed (Ss Seed Shop)।`;
+  const helpTitle = `সাহায্য কেন্দ্র ও সাধারণ জিজ্ঞাসা (FAQ) | EB Seed Shop`;
+  const helpDesc = `বীজ অর্ডার, দ্রুত ডেলিভারি, ক্যাশ অন ডেলিভারি ও রিটার্ন সংক্রান্ত সকল প্রশ্নের উত্তর জানুন। সার্বক্ষণিক কাস্টমার কেয়ার — EB Seed (EB Seed Shop)।`;
 
   return (
     <div className="min-h-screen bg-background flex flex-col">

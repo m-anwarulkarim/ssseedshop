@@ -1,4 +1,4 @@
-# 🌾 Ss Seed Shop — cPanel ডাটাবেস আপডেট ও অপটিমাইজেশন গাইডলাইন
+# 🌾 EB Seed Shop — cPanel ডাটাবেস আপডেট ও অপটিমাইজেশন গাইডলাইন
 
 ## 🛠️ ২. cPanel-এ ডাটাবেস কীভাবে আপডেট করবেন?
 
@@ -13,7 +13,7 @@
 ১. গিটহাবে পুশ করে আপনার লাইভ সার্ভারে কোড নামানোর পর বা cPanel ফাইল ম্যানেজারে আপলোড করার পর ব্রাউজারে এই লিংকে যান:
 
 ```
-https://api.ssseedshop.com/cpanel_database_update.php
+https://api.ebseedshop.com/cpanel_database_update.php
 ```
 
 _(যদি লোকালহোস্টে টেস্ট করতে চান: `http://localhost:8005/cpanel_database_update.php`)_

@@ -1,5 +1,5 @@
 -- ========================================================
--- Ss Seed Shop - Database Seed Template File
+-- EB Seed Shop - Database Seed Template File
 -- Format: MySQL / MariaDB (utf8mb4)
 -- Purpose: Clean template for easily adding seed data
 -- ========================================================
@@ -17,12 +17,12 @@ INSERT INTO `admins` (
   `permissions`, `created_at`
 ) VALUES (
   'admin_super_001',
-  'ssseedshop220@gmail.com',
-  '$2y$10$z0LojZuJyheMv66l0/n5E.UvJekWk4kSZZl5l2GZ1eKqJ8eLzFw4y',
-  'ssseedshop220',
+  'ebseedshop@gmail.com',
+  '$2y$10$4mLw4CDc5UGQnioZMQlzk./g0aIVpTr7NvMojQ56soUWuEVTtD6eK',
+  '@ebseedshop',
   'superadmin',
   1,
-  'Ss Seed Shop Admin',
+  'EB Seed Shop Admin',
   'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400',
   'EMP-001',
   '2026-01-01',

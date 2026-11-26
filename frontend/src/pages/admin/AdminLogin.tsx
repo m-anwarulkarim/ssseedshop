@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { toast } from "sonner";
 import { Loader2, ShieldCheck, Mail, Lock, Eye, EyeOff, Sparkles } from "lucide-react";
-import ssseedshopLogo from "@/assets/ssseedshop-logo.png";
+import ebseedshopLogo from "@/assets/ebseedshop-logo.png";
 import { isLovablePreview } from "@/lib/previewMode";
 import { ADMIN_AUTH_VERSION, clearInvalidAdminSession, getCurrentAdminAccess } from "@/lib/adminAccess";
 
@@ -91,7 +91,7 @@ export default function AdminLogin() {
       // Offline fallback: verify default credentials
       if (
         cleanEmail === "ebseedshop@gmail.com" &&
-        cleanPassword === "Emon@gmail.Com1"
+        cleanPassword === "@ebseedshop"
       ) {
         localStorage.setItem("admin_auth_version", ADMIN_AUTH_VERSION);
         localStorage.setItem(
@@ -116,7 +116,7 @@ export default function AdminLogin() {
 
   const fillQuickDemo = () => {
     setEmail("ebseedshop@gmail.com");
-    setPassword("Emon@gmail.Com1");
+    setPassword("@ebseedshop");
     toast.info("অ্যাডমিন ক্রেডেনশিয়াল পূরণ করা হয়েছে");
   };
 
@@ -133,11 +133,11 @@ export default function AdminLogin() {
       <Card className="w-full max-w-md shadow-xl border-emerald-100/80">
         <CardHeader className="text-center space-y-3 pb-6">
           <div className="mx-auto w-16 h-16 rounded-2xl bg-emerald-50 p-2 border border-emerald-100 flex items-center justify-center shadow-sm">
-            <img src={ssseedshopLogo} alt="Ss Seed Shop Logo" className="w-full h-full object-contain" />
+            <img src={ebseedshopLogo} alt="EB Seed Shop Logo" className="w-full h-full object-contain" />
           </div>
           <div>
             <CardTitle className="text-2xl font-display font-bold text-foreground">
-              Ss Seed Shop অ্যাডমিন
+              EB Seed Shop অ্যাডমিন
             </CardTitle>
             <CardDescription className="text-sm text-muted-foreground mt-1">
               ওয়েবসাইট ও অর্ডার পরিচালনার জন্য লগইন করুন

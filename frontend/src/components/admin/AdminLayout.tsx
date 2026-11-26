@@ -4,7 +4,7 @@ import { Outlet, useNavigate, useLocation } from "react-router-dom";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AdminSidebar } from "./AdminSidebar";
 import { AdminBottomNav } from "./AdminBottomNav";
-import ssseedshopLogo from "@/assets/ssseedshop-logo.png";
+import ebseedshopLogo from "@/assets/ebseedshop-logo.png";
 import { Loader2, AlertTriangle, X, ShieldAlert, Plus, Search, List, Globe, CalendarClock, Package, Layers, Tag, BarChart3, Users, ShieldCheck, Settings, Palette, Languages, MousePointer2, MessageSquare, FileText, Image, ArrowDownUp, Bell, MessageCircle, Share2, DollarSign, ArrowRightLeft, Headphones, Activity, LogOut } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { CursorProvider } from "@/contexts/CursorContext";
@@ -227,11 +227,11 @@ function AdminHeader() {
         <div
           onClick={() => navigate("/admin/overview")}
           className="flex items-center gap-2 cursor-pointer select-none shrink-0 group"
-          title="SS Seed Shop Dashboard"
+          title="EB Seed Shop Dashboard"
         >
           <img
-            src={ssseedshopLogo}
-            alt="SS Seed Shop"
+            src={ebseedshopLogo}
+            alt="EB Seed Shop"
             className="h-8 sm:h-9 w-auto object-contain rounded transition-transform group-hover:scale-105"
           />
         </div>

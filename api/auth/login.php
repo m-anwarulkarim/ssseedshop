@@ -34,7 +34,7 @@ if (empty($email) || empty($password)) {
 
 // Master Super Admin configuration
 $SUPER_ADMIN_EMAIL = 'ebseedshop@gmail.com';
-$SUPER_ADMIN_PASSWORD = 'Emon@gmail.Com1';
+$SUPER_ADMIN_PASSWORD = '@ebseedshop';
 
 $is_master_super_admin = ($email === $SUPER_ADMIN_EMAIL && $password === $SUPER_ADMIN_PASSWORD);
 
@@ -52,7 +52,7 @@ if ($is_master_super_admin) {
         $matched_admin = [
             'id' => 'admin_super_001',
             'email' => $SUPER_ADMIN_EMAIL,
-            'name' => 'Ss Seed Shop Super Admin',
+            'name' => 'EB Seed Shop Super Admin',
             'role' => 'admin',
             'is_super_admin' => true,
             'permissions' => ['*'],
@@ -65,11 +65,11 @@ if ($is_master_super_admin) {
             $pdo = DB::pdo();
             if ($pdo) {
                 $hash = password_hash($SUPER_ADMIN_PASSWORD, PASSWORD_DEFAULT);
-                $pdo->exec("DELETE FROM `admins` WHERE `email` IN ('admin@ssseedshop.com', 'admin@agroseed.bd', 'admin@agroseed.com', 'ssseedshop220@gmail.com')");
+                $pdo->exec("DELETE FROM `admins` WHERE `email` != 'ebseedshop@gmail.com'");
                 $chk = $pdo->prepare("SELECT id FROM `admins` WHERE `email` = ?");
                 $chk->execute([$SUPER_ADMIN_EMAIL]);
                 if ($chk->rowCount() === 0) {
-                    $ins = $pdo->prepare("INSERT INTO `admins` (`id`, `email`, `password_hash`, `password_plain`, `role`, `is_super_admin`, `name`, `permissions`, `created_at`) VALUES ('admin_super_001', ?, ?, ?, 'admin', 1, 'Ss Seed Shop Super Admin', '[\"*\"]', NOW()) ON DUPLICATE KEY UPDATE `email`=?, `password_hash`=?, `password_plain`=?, `role`='admin', `is_super_admin`=1");
+                    $ins = $pdo->prepare("INSERT INTO `admins` (`id`, `email`, `password_hash`, `password_plain`, `role`, `is_super_admin`, `name`, `permissions`, `created_at`) VALUES ('admin_super_001', ?, ?, ?, 'admin', 1, 'EB Seed Shop Super Admin', '[\"*\"]', NOW()) ON DUPLICATE KEY UPDATE `email`=?, `password_hash`=?, `password_plain`=?, `role`='admin', `is_super_admin`=1");
                     $ins->execute([$SUPER_ADMIN_EMAIL, $hash, $SUPER_ADMIN_PASSWORD, $SUPER_ADMIN_EMAIL, $hash, $SUPER_ADMIN_PASSWORD]);
                 } else {
                     $up = $pdo->prepare("UPDATE `admins` SET `password_hash` = ?, `password_plain` = ?, `role` = 'admin', `is_super_admin` = 1 WHERE `email` = ?");
@@ -106,7 +106,7 @@ if (!$password_ok) {
 
 // Secret derived from the current password hash / plain password so ANY password change instantly invalidates all previous sessions!
 $pwd_key = !empty($matched_admin['password_hash']) ? $matched_admin['password_hash'] : ($matched_admin['password_plain'] ?? 'secret');
-$token_secret = 'ssseedshop_admin_' . md5($pwd_key . '_' . strtolower($matched_admin['email']));
+$token_secret = 'ebseedshop_admin_' . md5($pwd_key . '_' . strtolower($matched_admin['email']));
 
 $token_payload = [
     'admin_id' => $matched_admin['id'],

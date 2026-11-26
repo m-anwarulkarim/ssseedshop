@@ -5,7 +5,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { cn } from "@/lib/utils";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useCart } from "@/contexts/CartContext";
-import shikderLogo from "@/assets/ssseedshop-logo.png";
+import shikderLogo from "@/assets/ebseedshop-logo.png";
 import SearchPopup from "@/components/SearchPopup";
 import DesktopSearchBar from "@/components/DesktopSearchBar";
 import { getCustomerSession, clearCustomerSession } from "@/components/CustomerLogin";
@@ -62,12 +62,12 @@ const Navbar = () => {
             <div className="w-10 h-10 rounded-full ring-2 ring-emerald-600/30 p-0.5 bg-white flex items-center justify-center overflow-hidden shrink-0 shadow-xs group-hover:scale-105 transition-transform">
               <img
                 src={shikderLogo}
-                alt="Ss Seed Shop"
+                alt="EB Seed Shop"
                 className="w-full h-full object-contain"
               />
             </div>
             <span className="font-extrabold text-[19px] sm:text-xl text-[#155d36] tracking-tight leading-none">
-              {lang === "en" ? "Ss Seed Shop" : "এস এস সিড শপ"}
+              {lang === "en" ? "EB Seed Shop" : "ইবি সিড শপ"}
             </span>
           </Link>
 
@@ -103,12 +103,12 @@ const Navbar = () => {
             <Link to="/" className="flex items-center gap-2.5 shrink-0 group">
               <img
                 src={shikderLogo}
-                alt="Ss Seed Shop"
+                alt="EB Seed Shop"
                 className="w-10 h-10 rounded-full object-contain ring-2 ring-primary/30 group-hover:scale-105 transition-transform"
               />
               <div className="hidden lg:block text-left">
                 <div className="font-extrabold text-base text-primary leading-tight flex items-center gap-1">
-                  <span>Ss Seed Shop</span>
+                  <span>EB Seed Shop</span>
                 </div>
                 <div className="text-[10px] text-gray-400 font-medium leading-none mt-0.5">
                   {lang === "en" ? "Trusted Seed Brand" : "সেরা বীজের বিশ্বস্ত ঠিকানা"}
@@ -207,7 +207,7 @@ const Navbar = () => {
             <div className="flex items-center gap-2 p-4 border-b border-gray-100">
               <img src={shikderLogo} alt="" className="w-9 h-9 rounded-full" />
               <div>
-                <div className="font-bold text-sm text-primary">Ss Seed Shop</div>
+                <div className="font-bold text-sm text-primary">EB Seed Shop</div>
                 <div className="text-[10px] text-gray-500">{lang === "en" ? "Trusted source of seeds" : "নির্ভরযোগ্য বীজের ঠিকানা"}</div>
               </div>
             </div>

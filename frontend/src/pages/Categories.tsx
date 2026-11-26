@@ -38,8 +38,8 @@ export default function Categories() {
     ];
   }, [domainInfo, catHubCanonical]);
 
-  const catHubTitle = `বীজের সকল ক্যাটাগরি — ফুল, ফল ও সবজি বীজের বিশ্বস্ত তালিকা | Ss Seed Shop`;
-  const catHubDesc = `ফুল বীজ, শাক-সবজি বীজ, ফল বীজ, হাইব্রিড বীজ সহ সকল ক্যাটাগরি থেকে আপনার পছন্দের বীজ বেছে নিন। ১০০% আসল ও পরীক্ষিত বীজ কিনুন — SS Seed (Ss Seed Shop)।`;
+  const catHubTitle = `বীজের সকল ক্যাটাগরি — ফুল, ফল ও সবজি বীজের বিশ্বস্ত তালিকা | EB Seed Shop`;
+  const catHubDesc = `ফুল বীজ, শাক-সবজি বীজ, ফল বীজ, হাইব্রিড বীজ সহ সকল ক্যাটাগরি থেকে আপনার পছন্দের বীজ বেছে নিন। ১০০% আসল ও পরীক্ষিত বীজ কিনুন — EB Seed (EB Seed Shop)।`;
 
   return (
     <div className="min-h-screen bg-background flex flex-col">

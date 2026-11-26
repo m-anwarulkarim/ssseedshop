@@ -78,7 +78,7 @@ const FeaturesSection = () => {
       <div className="section-container px-3 md:px-6">
         <div className="text-center max-w-3xl mx-auto mb-6 md:mb-10">
           <h2 className="font-extrabold text-foreground text-xl sm:text-2xl md:text-3xl lg:text-4xl leading-tight">
-            {t("কেন Ss Seed Shop আপনার প্রথম পছন্দ?", "Why Ss Seed Shop is Your First Choice?")}
+            {t("কেন EB Seed Shop আপনার প্রথম পছন্দ?", "Why EB Seed Shop is Your First Choice?")}
           </h2>
           <p className="mt-2 md:mt-3 text-[12px] sm:text-sm md:text-base text-muted-foreground leading-relaxed">
             {t(

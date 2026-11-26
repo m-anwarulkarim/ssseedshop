@@ -3,14 +3,15 @@
  * @description Dynamic Domain, Brand, and Keyword Engine for Multi-Domain Seed Shop SEO.
  * 
  * Supports dynamic adaptation across:
+ * - ebseedshop.com / ebseedshop.* (Brand: "EB Seed Shop" / "ইবি সিড শপ")
  * - abseed.com.bd / abseed.com / abseeds.com / abseed.* (Brand: "AB Seed" / "এবি সিড")
- * - ssseedshop.com / ssseedshop.* (Brand: "Ss Seed Shop" / "এস এস সিড শপ")
+ * - ssseedshop.com / ssseedshop.* (Legacy Brand: "Ss Seed Shop" / "এস এস সিড শপ")
  * - Localhost / custom staging domains
  *
  * Guarantees top Google Search ranking for:
  * - "বীজ" (seeds in Bengali)
  * - "সবজি বীজ", "ফুলের বীজ", "ফলের বীজ", "হাইব্রিড বীজ", "কৃষি বীজ"
- * - "ab seed", "AB Seed", "abseed", "এবি সিড", "ss seed shop", "ssseedshop"
+ * - "ebseedshop", "eb seed shop", "EB Seed Shop", "EB Seed", "ইবি সিড", "ইবি সিড শপ"
  */
 
 export interface DomainSeoInfo {
@@ -18,6 +19,7 @@ export interface DomainSeoInfo {
   origin: string;
   isAbSeedDomain: boolean;
   isSsSeedShopDomain: boolean;
+  isEbSeedShopDomain?: boolean;
   primaryBrandName: string;
   primaryBrandBn: string;
   alternateBrandName: string;
@@ -79,7 +81,20 @@ export const CORE_SEED_KEYWORDS: string[] = [
   "জিনিয়া ফুলের বীজ",
   "কসমস ফুলের বীজ",
   
-  // Brand Searches (Ss Seed Shop / SS Seed prioritized)
+  // Brand Searches (EB Seed Shop / EB Seed prioritized)
+  "EB Seed Shop",
+  "eb seed shop",
+  "ebseedshop",
+  "EB Seed",
+  "eb seed",
+  "EB Seeds",
+  "eb seeds",
+  "ebseed",
+  "EBSeed",
+  "ইবি সিড",
+  "ইবিসিড",
+  "ইবি সিড শপ",
+  "ইবিসিড শপ",
   "SS Seed",
   "ss seed",
   "Ss Seed",
@@ -124,8 +139,8 @@ export const CORE_SEED_KEYWORDS: string[] = [
  */
 export function detectDomainInfo(customOrigin?: string): DomainSeoInfo {
   const isBrowser = typeof window !== "undefined";
-  let hostname = "ssseedshop.com";
-  let origin = "https://ssseedshop.com";
+  let hostname = "ebseedshop.com";
+  let origin = "https://ebseedshop.com";
 
   if (customOrigin) {
     try {
@@ -146,24 +161,27 @@ export function detectDomainInfo(customOrigin?: string): DomainSeoInfo {
     hostname.includes("ab-seed") ||
     hostname.includes("ab_seed");
 
-  // Primary brand is strictly Ss Seed Shop, with AB Seed as secondary/cross-indexing brand
+  // Primary brand is strictly EB Seed Shop, with AB Seed and legacy SS Seed as secondary/cross-indexing brands
   return {
     hostname,
     origin,
     isAbSeedDomain: isAbSeed,
     isSsSeedShopDomain: !isAbSeed,
-    primaryBrandName: "Ss Seed Shop",
-    primaryBrandBn: "এস এস সিড শপ",
-    alternateBrandName: "SS Seed",
-    alternateBrandBn: "এস এস সিড",
-    brandCombo: "SS Seed / Ss Seed Shop",
-    brandComboBn: "এস এস সিড (Ss Seed Shop)",
+    isEbSeedShopDomain: !isAbSeed,
+    primaryBrandName: "EB Seed Shop",
+    primaryBrandBn: "ইবি সিড শপ",
+    alternateBrandName: "EB Seed",
+    alternateBrandBn: "ইবি সিড",
+    brandCombo: "EB Seed / EB Seed Shop",
+    brandComboBn: "ইবি সিড (EB Seed Shop)",
     taglineBn: "মাটি, ভালোবাসা ও বিশ্বাসের সঙ্গে আপনার বাগানের জন্য বাছাই করা বীজ",
     taglineEn: "Authentic & High-Germination Seeds Across Bangladesh",
     canonicalOrigin: origin,
-    defaultTitle: "Ss Seed Shop — দেশী ও বিদেশী ফুল, ফল ও সবজি বীজের বিশ্বস্ত অনলাইন শপ",
-    defaultDescription: "SS Seed (Ss Seed Shop / এস এস সিড) — বাংলাদেশের শীর্ষস্থানীয় অনলাইন বীজ শপ। উন্নত মানের ফুল, ফল, সবজি ও হাইব্রিড বীজ কিনুন সুলভ মূল্যে। সারাদেশে দ্রুত ক্যাশ অন হোম ডেলিভারি ও ১০০% আসল বীজের নিশ্চয়তা।",
+    defaultTitle: "EB Seed Shop — দেশী ও বিদেশী ফুল, ফল ও সবজি বীজের বিশ্বস্ত অনলাইন শপ",
+    defaultDescription: "EB Seed (EB Seed Shop / ইবি সিড) — বাংলাদেশের শীর্ষস্থানীয় অনলাইন বীজ শপ। উন্নত মানের ফুল, ফল, সবজি ও হাইব্রিড বীজ কিনুন সুলভ মূল্যে। সারাদেশে দ্রুত ক্যাশ অন হোম ডেলিভারি ও ১০০% আসল বীজের নিশ্চয়তা।",
     defaultKeywords: [
+      "EB Seed Shop", "eb seed shop", "ebseedshop", "EB Seed", "eb seed", "EB Seeds", "eb seeds", "ebseed", "EBSeed",
+      "ইবি সিড", "ইবিসিড", "ইবি সিড শপ", "ইবিসিড শপ",
       "SS Seed", "ss seed", "SS Seeds", "ss seeds", "Ss Seed Shop", "ss seed shop", "ssseedshop", "এস এস সিড", "এসএস সিড", "এস এস সিড শপ",
       "ab seed", "AB Seed", "abseed", "ab seeds", "ab seed bd", "এবি সিড", "এবি সীড",
       "বীজ", "অনলাইন বীজ শপ", "সবজি বীজ", "ফুলের বীজ", "ফলের বীজ", "হাইব্রিড বীজ",
@@ -171,7 +189,7 @@ export function detectDomainInfo(customOrigin?: string): DomainSeoInfo {
     ],
     logoUrl: `${origin}/favicon.png`,
     supportPhone: "01933819799",
-    supportEmail: "ssseedshop220@gmail.com",
+    supportEmail: "ebseedshop@gmail.com",
   };
 }
 
@@ -222,8 +240,10 @@ export function buildDynamicKeywords(params?: {
     add(`আসল ${name}`);
     add(`উন্নত জাতের ${name}`);
     add(`হাইব্রিড ${name}`);
-    add(`${name} ab seed`);
+    add(`${name} eb seed shop`);
+    add(`${name} ebseedshop`);
     add(`${name} ss seed shop`);
+    add(`${name} ab seed`);
   }
 
   // Category terms
@@ -293,6 +313,17 @@ export function buildOrganizationSchema(domainInfo: DomainSeoInfo): Record<strin
     "@id": `${domainInfo.origin}/#organization`,
     name: domainInfo.primaryBrandName,
     alternateName: [
+      "EB Seed",
+      "ebseedshop",
+      "eb seed",
+      "EB Seeds",
+      "eb seeds",
+      "EB Seed Shop",
+      "eb seed shop",
+      "ইবি সিড",
+      "ইবিসিড",
+      "ইবি সিড শপ",
+      "ইবিসিড শপ",
       "SS Seed",
       "Ss Seed",
       "ss seed",
@@ -325,8 +356,8 @@ export function buildOrganizationSchema(domainInfo: DomainSeoInfo): Record<strin
       availableLanguage: ["bn", "en"],
     },
     sameAs: [
-      "https://www.facebook.com/ssseedshop",
-      "https://ssseedshop.com",
+      "https://www.facebook.com/ebseedshop",
+      "https://ebseedshop.com",
     ],
   };
 }
@@ -342,6 +373,16 @@ export function buildWebSiteSchema(domainInfo: DomainSeoInfo): Record<string, an
     url: domainInfo.origin,
     name: domainInfo.primaryBrandName,
     alternateName: [
+      "EB Seed",
+      "ebseedshop",
+      "eb seed",
+      "EB Seeds",
+      "eb seeds",
+      "EB Seed Shop",
+      "eb seed shop",
+      "ইবি সিড",
+      "ইবিসিড",
+      "ইবি সিড শপ",
       "SS Seed",
       "Ss Seed",
       "ss seed",

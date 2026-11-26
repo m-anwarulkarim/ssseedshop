@@ -28,7 +28,7 @@ const vegetablePart: GuidePart = {
   partLabel: "পর্ব ১",
   partTitle: "সবজি বীজ বপন ও পরিচর্যা নির্দেশিকা",
   intro:
-    "প্রিয় গ্রাহক, Ss Seed Shop থেকে সংগ্রহ করা আপনার বীজগুলো থেকে সেরা ফলন পেতে নিচের নির্দেশিকা অনুসরণ করুন। বীজের ধরন অনুযায়ী আলাদা আলাদা পদ্ধতি ও যত্নের প্রয়োজন হয় — তাই বীজের গোত্র অনুযায়ী ভাগ করে প্রতিটির সঠিক পদ্ধতি নিচে দেওয়া হলো।",
+    "প্রিয় গ্রাহক, EB Seed Shop থেকে সংগ্রহ করা আপনার বীজগুলো থেকে সেরা ফলন পেতে নিচের নির্দেশিকা অনুসরণ করুন। বীজের ধরন অনুযায়ী আলাদা আলাদা পদ্ধতি ও যত্নের প্রয়োজন হয় — তাই বীজের গোত্র অনুযায়ী ভাগ করে প্রতিটির সঠিক পদ্ধতি নিচে দেওয়া হলো।",
   sections: [
     {
       title: "১. লতানো / কুমড়া জাতীয় বীজ",
@@ -265,7 +265,7 @@ const flowerPart: GuidePart = {
   partLabel: "পর্ব ২",
   partTitle: "ফুলের বীজ বপন ও পরিচর্যা নির্দেশিকা",
   intro:
-    "প্রিয় গ্রাহক, Ss Seed Shop থেকে সংগ্রহ করা ফুলের বীজ থেকে সেরা ফলন পেতে নিচের নির্দেশিকা অনুসরণ করুন। ফুলের ধরন অনুযায়ী বপন পদ্ধতি কিছুটা ভিন্ন হয় — তাই জাত অনুযায়ী ভাগ করে প্রতিটির সঠিক পদ্ধতি নিচে দেওয়া হলো।",
+    "প্রিয় গ্রাহক, EB Seed Shop থেকে সংগ্রহ করা ফুলের বীজ থেকে সেরা ফলন পেতে নিচের নির্দেশিকা অনুসরণ করুন। ফুলের ধরন অনুযায়ী বপন পদ্ধতি কিছুটা ভিন্ন হয় — তাই জাত অনুযায়ী ভাগ করে প্রতিটির সঠিক পদ্ধতি নিচে দেওয়া হলো।",
   sections: [
     {
       title: "১. জিনিয়া জাতীয় ফুল",
@@ -674,8 +674,8 @@ export default function CultivationGuide() {
     return [breadcrumb, howTo];
   }, [domainInfo, guideCanonical]);
 
-  const guideTitle = `বীজ বপন ও আধুনিক চাষাবাদ নির্দেশিকা — কৃষি ও ছাদবাগান গাইড | Ss Seed Shop`;
-  const guideDesc = `সহজ নিয়মে বিভিন্ন ফুল, ফল ও সবজি বীজ বপন, চারা তৈরি, টবের মাটি প্রস্তুত ও সঠিক পরিচর্যার পূর্ণাঙ্গ গাইডলাইন। ঘরে বসেই সফল বাগান গড়ে তুলুন — SS Seed (Ss Seed Shop)।`;
+  const guideTitle = `বীজ বপন ও আধুনিক চাষাবাদ নির্দেশিকা — কৃষি ও ছাদবাগান গাইড | EB Seed Shop`;
+  const guideDesc = `সহজ নিয়মে বিভিন্ন ফুল, ফল ও সবজি বীজ বপন, চারা তৈরি, টবের মাটি প্রস্তুত ও সঠিক পরিচর্যার পূর্ণাঙ্গ গাইডলাইন। ঘরে বসেই সফল বাগান গড়ে তুলুন — EB Seed (EB Seed Shop)।`;
 
   return (
     <>
@@ -704,7 +704,7 @@ export default function CultivationGuide() {
                 <Sprout className="w-7 h-7 text-emerald-700 dark:text-emerald-400" />
               </div>
               <p className="text-xs font-semibold uppercase tracking-wider text-emerald-700 dark:text-emerald-400">
-                Ss Seed Shop
+                EB Seed Shop
               </p>
               <h1 className="text-2xl md:text-3xl font-bold text-emerald-900 dark:text-emerald-50 mt-1">
                 চাষাবাদ নির্দেশিকা
@@ -758,26 +758,26 @@ export default function CultivationGuide() {
             {/* Contact box */}
             <div className="mt-8 bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800 rounded-xl p-4 md:p-5">
               <p className="text-sm md:text-base font-bold text-emerald-900 dark:text-emerald-100 text-center mb-3">
-                সেরা মানের বীজ, সেরা ফলন — Ss Seed Shop সবসময় আপনার পাশে
+                সেরা মানের বীজ, সেরা ফলন — EB Seed Shop সবসময় আপনার পাশে
               </p>
               <div className="grid md:grid-cols-3 gap-3 text-sm">
                 <a
-                  href="https://ssseedshop.com"
+                  href="https://ebseedshop.com"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center gap-2 text-emerald-900 dark:text-emerald-100 hover:text-emerald-600 dark:hover:text-emerald-300 transition-colors"
                 >
                   <Globe className="w-4 h-4" />
-                  <span>ssseedshop.com</span>
+                  <span>ebseedshop.com</span>
                 </a>
                 <a
-                  href="https://www.facebook.com/ssseedshop"
+                  href="https://www.facebook.com/ebseedshop"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center gap-2 text-emerald-900 dark:text-emerald-100 hover:text-emerald-600 dark:hover:text-emerald-300 transition-colors"
                 >
                   <Facebook className="w-4 h-4" />
-                  <span>Ss Seed Shop</span>
+                  <span>EB Seed Shop</span>
                 </a>
                 <a
                   href="tel:01933819799"
@@ -792,7 +792,7 @@ export default function CultivationGuide() {
             {/* Footer */}
             <div className="mt-6 pt-5 border-t border-border/60 text-center">
               <p className="text-sm italic text-muted-foreground">
-                Ss Seed Shop —{" "}
+                EB Seed Shop —{" "}
                 <span className="font-semibold text-foreground">
                   {t("সেরা মানের বীজ, সেরা ফলন", "Best seeds, best harvest")}
                 </span>

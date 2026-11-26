@@ -1,6 +1,6 @@
-# Ss Seed Shop
+# EB Seed Shop
 
-Official website for Ss Seed Shop (https://ssseedshop.com/)
+Official website for EB Seed Shop (https://ebseedshop.com/)
 
 
 This project was built with [Lovable](https://lovable.dev).
