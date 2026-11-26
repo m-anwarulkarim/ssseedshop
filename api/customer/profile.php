@@ -1,6 +1,6 @@
 <?php
 // api/customer/profile.php
-// Customer Profile Management Endpoint for Ss Seed Shop
+// Customer Profile Management Endpoint for EB Seed Shop
 
 require_once __DIR__ . '/../db.php';
 

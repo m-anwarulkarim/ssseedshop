@@ -1,6 +1,6 @@
 <?php
 // api/courier/steadfast.php
-// Steadfast Courier Integration API for Ss Seed Shop
+// Steadfast Courier Integration API for EB Seed Shop
 
 require_once __DIR__ . '/../db.php';
 
@@ -207,7 +207,7 @@ if ($action === 'create_order' || $action === 'create_parcel') {
 }
 
 // -------------------------------------------------------------------------
-// HELPER: Map Steadfast delivery_status to Ss Seed Shop local order status
+// HELPER: Map Steadfast delivery_status to EB Seed Shop local order status
 // -------------------------------------------------------------------------
 function mapSteadfastStatusToLocal(?string $sf_status): ?string {
     if (!$sf_status) return null;

@@ -1,6 +1,6 @@
 <?php
 // api/media/list.php
-// Lists uploaded media files for Ss Seed Shop
+// Lists uploaded media files for EB Seed Shop
 require_once __DIR__ . '/../db.php';
 
 header("Content-Type: application/json; charset=UTF-8");

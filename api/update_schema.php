@@ -1,6 +1,6 @@
 <?php
 // api/update_schema.php
-// Standalone Database Auto-Migration, Performance Indexing & Schema Repair for Ss Seed Shop
+// Standalone Database Auto-Migration, Performance Indexing & Schema Repair for EB Seed Shop
 
 require_once __DIR__ . '/db.php';
 

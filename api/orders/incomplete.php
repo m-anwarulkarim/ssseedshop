@@ -1,6 +1,6 @@
 <?php
 // api/orders/incomplete.php
-// Ss Seed Shop Incomplete / Abandoned Order Management API
+// EB Seed Shop Incomplete / Abandoned Order Management API
 
 require_once __DIR__ . '/../db.php';
 

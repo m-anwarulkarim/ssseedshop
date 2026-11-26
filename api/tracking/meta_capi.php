@@ -1,6 +1,6 @@
 <?php
 // api/tracking/meta_capi.php
-// Server-Side Meta Conversions API (CAPI) Proxy for Ss Seed Shop
+// Server-Side Meta Conversions API (CAPI) Proxy for EB Seed Shop
 
 require_once __DIR__ . '/../db.php';
 

@@ -72,7 +72,6 @@ export default function SEOHead({
       fullTitle.toLowerCase().includes(primaryName.toLowerCase()) ||
       fullTitle.toLowerCase().includes("eb seed") ||
       fullTitle.toLowerCase().includes("ebseedshop") ||
-      fullTitle.toLowerCase().includes("ss seed") ||
       fullTitle.includes(primaryBn);
 
     if (!hasBrand) {
@@ -103,16 +102,6 @@ export default function SEOHead({
     keywordSet.add("ইবি সিড");
     keywordSet.add("ইবিসিড");
     keywordSet.add("ইবি সিড শপ");
-    keywordSet.add("SS Seed");
-    keywordSet.add("ss seed");
-    keywordSet.add("SS Seeds");
-    keywordSet.add("ss seeds");
-    keywordSet.add("Ss Seed Shop");
-    keywordSet.add("ss seed shop");
-    keywordSet.add("ssseedshop");
-    keywordSet.add("এস এস সিড");
-    keywordSet.add("এসএস সিড");
-    keywordSet.add("এস এস সিড শপ");
     keywordSet.add("বীজ");
     keywordSet.add("অনলাইন বীজ শপ");
     keywordSet.add("সবজি বীজ");

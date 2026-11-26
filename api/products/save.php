@@ -1,6 +1,6 @@
 <?php
 // api/products/save.php
-// Create or Update Product in Ss Seed Shop JSON Database
+// Create or Update Product in EB Seed Shop JSON Database
 
 require_once __DIR__ . '/../db.php';
 

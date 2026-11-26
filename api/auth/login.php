@@ -1,6 +1,6 @@
 <?php
 // api/auth/login.php
-// Local Admin Authentication for Ss Seed Shop
+// Local Admin Authentication for EB Seed Shop
 
 header("Content-Type: application/json; charset=UTF-8");
 header("Access-Control-Allow-Origin: *");

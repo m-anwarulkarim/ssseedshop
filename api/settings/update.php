@@ -1,6 +1,6 @@
 <?php
 // api/settings/update.php
-// Ss Seed Shop Settings Update & Upsert API
+// EB Seed Shop Settings Update & Upsert API
 
 require_once __DIR__ . '/../db.php';
 

@@ -5,7 +5,6 @@
  * Supports dynamic adaptation across:
  * - ebseedshop.com / ebseedshop.* (Brand: "EB Seed Shop" / "ইবি সিড শপ")
  * - abseed.com.bd / abseed.com / abseeds.com / abseed.* (Brand: "AB Seed" / "এবি সিড")
- * - ssseedshop.com / ssseedshop.* (Legacy Brand: "Ss Seed Shop" / "এস এস সিড শপ")
  * - Localhost / custom staging domains
  *
  * Guarantees top Google Search ranking for:
@@ -18,7 +17,6 @@ export interface DomainSeoInfo {
   hostname: string;
   origin: string;
   isAbSeedDomain: boolean;
-  isSsSeedShopDomain: boolean;
   isEbSeedShopDomain?: boolean;
   primaryBrandName: string;
   primaryBrandBn: string;
@@ -95,20 +93,6 @@ export const CORE_SEED_KEYWORDS: string[] = [
   "ইবিসিড",
   "ইবি সিড শপ",
   "ইবিসিড শপ",
-  "SS Seed",
-  "ss seed",
-  "Ss Seed",
-  "SS Seeds",
-  "ss seeds",
-  "Ss Seed Shop",
-  "ss seed shop",
-  "ssseedshop",
-  "ssseed",
-  "SSSeed",
-  "এস এস সিড",
-  "এসএস সিড",
-  "এস এস সিড শপ",
-  "এসএস সিড শপ",
   "ab seed",
   "AB Seed",
   "abseed",
@@ -161,12 +145,11 @@ export function detectDomainInfo(customOrigin?: string): DomainSeoInfo {
     hostname.includes("ab-seed") ||
     hostname.includes("ab_seed");
 
-  // Primary brand is strictly EB Seed Shop, with AB Seed and legacy SS Seed as secondary/cross-indexing brands
+  // Primary brand is strictly EB Seed Shop
   return {
     hostname,
     origin,
     isAbSeedDomain: isAbSeed,
-    isSsSeedShopDomain: !isAbSeed,
     isEbSeedShopDomain: !isAbSeed,
     primaryBrandName: "EB Seed Shop",
     primaryBrandBn: "ইবি সিড শপ",
@@ -182,7 +165,6 @@ export function detectDomainInfo(customOrigin?: string): DomainSeoInfo {
     defaultKeywords: [
       "EB Seed Shop", "eb seed shop", "ebseedshop", "EB Seed", "eb seed", "EB Seeds", "eb seeds", "ebseed", "EBSeed",
       "ইবি সিড", "ইবিসিড", "ইবি সিড শপ", "ইবিসিড শপ",
-      "SS Seed", "ss seed", "SS Seeds", "ss seeds", "Ss Seed Shop", "ss seed shop", "ssseedshop", "এস এস সিড", "এসএস সিড", "এস এস সিড শপ",
       "ab seed", "AB Seed", "abseed", "ab seeds", "ab seed bd", "এবি সিড", "এবি সীড",
       "বীজ", "অনলাইন বীজ শপ", "সবজি বীজ", "ফুলের বীজ", "ফলের বীজ", "হাইব্রিড বীজ",
       ...CORE_SEED_KEYWORDS
@@ -242,7 +224,6 @@ export function buildDynamicKeywords(params?: {
     add(`হাইব্রিড ${name}`);
     add(`${name} eb seed shop`);
     add(`${name} ebseedshop`);
-    add(`${name} ss seed shop`);
     add(`${name} ab seed`);
   }
 
@@ -324,17 +305,6 @@ export function buildOrganizationSchema(domainInfo: DomainSeoInfo): Record<strin
       "ইবিসিড",
       "ইবি সিড শপ",
       "ইবিসিড শপ",
-      "SS Seed",
-      "Ss Seed",
-      "ss seed",
-      "SS Seeds",
-      "ss seeds",
-      "Ss Seed Shop",
-      "ss seed shop",
-      "ssseedshop",
-      "এস এস সিড",
-      "এসএস সিড",
-      "এস এস সিড শপ",
       domainInfo.primaryBrandBn,
       domainInfo.alternateBrandName,
       domainInfo.alternateBrandBn,
@@ -383,17 +353,6 @@ export function buildWebSiteSchema(domainInfo: DomainSeoInfo): Record<string, an
       "ইবি সিড",
       "ইবিসিড",
       "ইবি সিড শপ",
-      "SS Seed",
-      "Ss Seed",
-      "ss seed",
-      "SS Seeds",
-      "ss seeds",
-      "Ss Seed Shop",
-      "ss seed shop",
-      "ssseedshop",
-      "এস এস সিড",
-      "এসএস সিড",
-      "এস এস সিড শপ",
       domainInfo.primaryBrandBn,
       "AB Seed",
     ],

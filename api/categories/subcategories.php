@@ -1,6 +1,6 @@
 <?php
 // api/categories/subcategories.php
-// Subcategories API for Ss Seed Shop
+// Subcategories API for EB Seed Shop
 require_once __DIR__ . '/../db.php';
 
 header('Content-Type: application/json; charset=UTF-8');

@@ -1,6 +1,6 @@
 <?php
 // api/admin/manage.php
-// Local Admin & Moderator Management for Ss Seed Shop
+// Local Admin & Moderator Management for EB Seed Shop
 
 header("Content-Type: application/json; charset=UTF-8");
 header("Access-Control-Allow-Origin: *");

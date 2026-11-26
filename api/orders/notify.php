@@ -1,6 +1,6 @@
 <?php
 // api/orders/notify.php
-// Ss Seed Shop Order Notification (SMS disabled by user request)
+// EB Seed Shop Order Notification (SMS disabled by user request)
 
 header('Content-Type: application/json; charset=UTF-8');
 header("Access-Control-Allow-Origin: *");

@@ -1,6 +1,6 @@
 <?php
 // api/customer/google_auth.php
-// Google Sign-In Authentication Endpoint for Ss Seed Shop Customers
+// Google Sign-In Authentication Endpoint for EB Seed Shop Customers
 
 require_once __DIR__ . '/../db.php';
 

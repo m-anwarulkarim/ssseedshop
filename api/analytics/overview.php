@@ -1,6 +1,6 @@
 <?php
 // api/analytics/overview.php
-// Ultra-Fast Dashboard Analytics & Overview API for Ss Seed Shop
+// Ultra-Fast Dashboard Analytics & Overview API for EB Seed Shop
 require_once __DIR__ . '/../db.php';
 
 header('Content-Type: application/json; charset=utf-8');

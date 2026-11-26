@@ -1,6 +1,6 @@
 <?php
 // api/categories/get.php
-// Ss Seed Shop - Optimized High-Performance Categories API
+// EB Seed Shop - Optimized High-Performance Categories API
 require_once __DIR__ . '/../db.php';
 
 $isAdmin = isset($_GET['admin']) && ($_GET['admin'] === '1' || $_GET['admin'] === 'true');

@@ -1,6 +1,6 @@
 <?php
 // api/orders/delete.php
-// Ss Seed Shop Order Deletion API (Soft & Permanent Deletion, Single & Batch)
+// EB Seed Shop Order Deletion API (Soft & Permanent Deletion, Single & Batch)
 require_once __DIR__ . '/../db.php';
 
 header('Content-Type: application/json; charset=UTF-8');

@@ -1,6 +1,6 @@
 <?php
 // api/media/upload.php
-// Local File & Media Uploader with High-Efficiency WebP Optimization for Ss Seed Shop
+// Local File & Media Uploader with High-Efficiency WebP Optimization for EB Seed Shop
 require_once __DIR__ . '/../db.php';
 
 header("Content-Type: application/json; charset=UTF-8");

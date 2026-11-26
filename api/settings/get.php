@@ -1,6 +1,6 @@
 <?php
 // api/settings/get.php
-// Ss Seed Shop - Optimized High-Performance Settings API
+// EB Seed Shop - Optimized High-Performance Settings API
 require_once __DIR__ . '/../db.php';
 
 header('Content-Type: application/json; charset=utf-8');

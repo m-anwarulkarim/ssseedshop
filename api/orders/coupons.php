@@ -1,6 +1,6 @@
 <?php
 // api/orders/coupons.php
-// Ss Seed Shop Coupon Validation & Usage Management API
+// EB Seed Shop Coupon Validation & Usage Management API
 
 require_once __DIR__ . '/../db.php';
 

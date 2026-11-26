@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { toast } from "sonner";
-import { Loader2, ShieldCheck, Mail, Lock, Eye, EyeOff, Sparkles } from "lucide-react";
+import { Loader2, ShieldCheck, Mail, Lock, Eye, EyeOff } from "lucide-react";
 import ebseedshopLogo from "@/assets/ebseedshop-logo.png";
 import { isLovablePreview } from "@/lib/previewMode";
 import { ADMIN_AUTH_VERSION, clearInvalidAdminSession, getCurrentAdminAccess } from "@/lib/adminAccess";
@@ -88,36 +88,9 @@ export default function AdminLogin() {
       setLoading(false);
       toast.error(data?.message || "ভুল ইমেইল বা পাসওয়ার্ড");
     } catch {
-      // Offline fallback: verify default credentials
-      if (
-        cleanEmail === "ebseedshop@gmail.com" &&
-        cleanPassword === "@ebseedshop"
-      ) {
-        localStorage.setItem("admin_auth_version", ADMIN_AUTH_VERSION);
-        localStorage.setItem(
-          "admin_session",
-          JSON.stringify({
-            id: "admin_super_default",
-            email: cleanEmail,
-            role: "admin",
-            is_super_admin: true,
-          })
-        );
-        localStorage.setItem("admin_token", "dev_token_" + Date.now());
-        setLoading(false);
-        toast.success("অ্যাডমিন প্যানেলে স্বাগতম!");
-        navigate("/admin/overview");
-        return;
-      }
       setLoading(false);
-      toast.error("সার্ভারের সাথে সংযোগ স্থাপন করা যায়নি। অনুগ্রহ করে ব্যাকএন্ড চালু রাখুন।");
+      toast.error("সার্ভারের সাথে সংযোগ স্থাপন করা যায়নি। অনুগ্রহ করে ইন্টারনেট সংযোগ পরীক্ষা করুন।");
     }
-  };
-
-  const fillQuickDemo = () => {
-    setEmail("ebseedshop@gmail.com");
-    setPassword("@ebseedshop");
-    toast.info("অ্যাডমিন ক্রেডেনশিয়াল পূরণ করা হয়েছে");
   };
 
   if (checkingAdmin) {
@@ -203,18 +176,6 @@ export default function AdminLogin() {
               )}
             </Button>
           </form>
-
-          {/* Quick Helper */}
-          <div className="mt-6 pt-5 border-t border-border/60 text-center">
-            <button
-              type="button"
-              onClick={fillQuickDemo}
-              className="inline-flex items-center gap-1.5 text-xs text-emerald-700 hover:text-emerald-800 bg-emerald-50 hover:bg-emerald-100/70 border border-emerald-200/60 rounded-full px-3.5 py-1.5 transition-colors"
-            >
-              <Sparkles className="w-3.5 h-3.5 text-emerald-600" />
-              ডিফল্ট অ্যাডমিন তথ্য পূরণ করুন
-            </button>
-          </div>
         </CardContent>
       </Card>
     </div>

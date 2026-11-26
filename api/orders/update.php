@@ -1,6 +1,6 @@
 <?php
 // api/orders/update.php
-// Ss Seed Shop Order Update API (Status, Customer Info & Bulk Support)
+// EB Seed Shop Order Update API (Status, Customer Info & Bulk Support)
 
 require_once __DIR__ . '/../db.php';
 

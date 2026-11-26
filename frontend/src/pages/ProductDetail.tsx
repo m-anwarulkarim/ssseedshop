@@ -1276,7 +1276,7 @@ export default function ProductDetail() {
     brand: {
       "@type": "Brand",
       name: domainInfo.primaryBrandName,
-      alternateName: [domainInfo.alternateBrandName, domainInfo.primaryBrandBn, "EB Seed", "EB Seed Shop", "Ss Seed Shop", "AB Seed"],
+      alternateName: [domainInfo.alternateBrandName, domainInfo.primaryBrandBn, "EB Seed", "EB Seed Shop", "AB Seed"],
     },
     offers: {
       "@type": "Offer",

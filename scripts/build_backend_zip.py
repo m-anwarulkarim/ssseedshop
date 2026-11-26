@@ -15,7 +15,7 @@ def build_safe_backend_zip(output_path="backend_api.zip", api_dir="api"):
         ".env",
         ".env.local",
         ".env.production",
-        "ssseedshop_db_offline",
+        "ebseedshop_db_offline",
         "ebseedshop_db_offline",
     }
     

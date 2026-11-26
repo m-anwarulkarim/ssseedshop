@@ -1,6 +1,6 @@
 <?php
 // api/migrate.php
-// Automated MySQL Schema Setup & Data Migration from JSON for Ss Seed Shop
+// Automated MySQL Schema Setup & Data Migration from JSON for EB Seed Shop
 
 header("Content-Type: text/html; charset=UTF-8");
 require_once __DIR__ . '/db.php';
@@ -16,7 +16,7 @@ $db   = $env['DB_NAME'] ?? '';
 $user = $env['DB_USER'] ?? '';
 $pass = $env['DB_PASS'] ?? '';
 
-echo "<!DOCTYPE html><html><head><meta charset='utf-8'><title>Ss Seed Shop Database Migration</title>
+echo "<!DOCTYPE html><html><head><meta charset='utf-8'><title>EB Seed Shop Database Migration</title>
 <style>
 body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #0f172a; color: #f8fafc; padding: 40px; }
 .card { max-width: 800px; margin: 0 auto; background: #1e293b; border-radius: 12px; padding: 24px; box-shadow: 0 4px 20px rgba(0,0,0,0.5); }
@@ -28,7 +28,7 @@ h1 { color: #10b981; margin-top: 0; }
 .badge { display: inline-block; padding: 2px 8px; border-radius: 4px; font-weight: bold; background: #10b981; color: #064e3b; font-size: 12px; }
 </style></head><body><div class='card'>";
 
-echo "<h1>🌱 Ss Seed Shop MySQL Migration Tool</h1>";
+echo "<h1>🌱 EB Seed Shop MySQL Migration Tool</h1>";
 echo "<p>Checking database configuration and migrating JSON data into MySQL tables...</p>";
 
 if (empty($db) || $db === 'cpanel_database_name') {

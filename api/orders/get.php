@@ -1,6 +1,6 @@
 <?php
 // api/orders/get.php
-// Ss Seed Shop Orders Retrieval with High-Performance Database Pushdown
+// EB Seed Shop Orders Retrieval with High-Performance Database Pushdown
 require_once __DIR__ . '/../db.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {

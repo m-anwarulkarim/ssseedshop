@@ -1,6 +1,6 @@
 <?php
 // api/customer/orders.php
-// Customer Order History Fetch Endpoint for Ss Seed Shop
+// Customer Order History Fetch Endpoint for EB Seed Shop
 
 require_once __DIR__ . '/../db.php';
 
