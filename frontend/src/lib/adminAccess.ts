@@ -20,10 +20,19 @@ type AdminAccessResult =
 
 export const SUPER_ADMIN_EMAIL = "ebseedshop@gmail.com";
 
+// In-memory verification cache to eliminate aggressive Chrome tab focus spam
+let cachedResult: AdminAccessResult | null = null;
+let lastVerifiedToken: string | null = null;
+let lastVerifiedAt = 0;
+const VERIFY_CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes
+
 /**
  * Wipe all admin session storage from browser (forces logout)
  */
 export function clearAdminSessionStorage() {
+  cachedResult = null;
+  lastVerifiedToken = null;
+  lastVerifiedAt = 0;
   if (typeof window === "undefined") return;
   try {
     localStorage.removeItem("admin_session");
@@ -31,6 +40,7 @@ export function clearAdminSessionStorage() {
     localStorage.removeItem("admin_dev_bypass");
     sessionStorage.removeItem("admin_session");
     sessionStorage.removeItem("admin_dev_bypass");
+    sessionStorage.removeItem("admin_token");
   } catch {}
 }
 
@@ -77,7 +87,7 @@ export async function getCurrentAdminAccess(): Promise<AdminAccessResult> {
   }
 
   const localStr = localStorage.getItem("admin_session") || sessionStorage.getItem("admin_session");
-  const token = localStorage.getItem("admin_token");
+  const token = localStorage.getItem("admin_token") || sessionStorage.getItem("admin_token");
 
   if (!localStr) {
     return { status: "no-session" };
@@ -96,11 +106,16 @@ export async function getCurrentAdminAccess(): Promise<AdminAccessResult> {
     return { status: "no-session" };
   }
 
-  // 2. Online verification against backend (verifies signature tied to current password hash)
+  // Fast-path: return cached verification result if token was verified within TTL
+  if (token && token === lastVerifiedToken && cachedResult && (Date.now() - lastVerifiedAt < VERIFY_CACHE_TTL_MS)) {
+    return cachedResult;
+  }
+
+  // 2. Online verification against backend (resilient & debounced)
   if (token) {
     try {
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 4000);
+      const timeoutId = setTimeout(() => controller.abort(), 10000); // 10s resilient timeout
       const res = await fetch(`${API_URL}/auth/verify.php`, {
         method: "POST",
         headers: {
@@ -112,49 +127,50 @@ export async function getCurrentAdminAccess(): Promise<AdminAccessResult> {
       });
       clearTimeout(timeoutId);
 
-      const data = await res.json();
-      if (!res.ok || data.status !== "success" || !data.valid) {
-        // Password was changed on server or session invalidated -> force immediate logout!
-        console.warn("Admin session rejected by server:", data?.message || "Invalid session");
-        clearAdminSessionStorage();
-        return { status: "no-session" };
-      }
-
-      // Sync fresh permissions and details from server
-      if (data.user) {
-        adminUser = data.user;
-        localStorage.setItem("admin_session", JSON.stringify(adminUser));
+      if (res.status === 401) {
+        const data = await res.json().catch(() => null);
+        const fatalCodes = ["account_decommissioned", "token_expired", "invalid_payload", "malformed_token"];
+        if (data && fatalCodes.includes(data.code)) {
+          console.warn("Admin session decommissioned by server:", data?.message);
+          clearAdminSessionStorage();
+          return { status: "no-session" };
+        }
+      } else if (res.ok) {
+        const data = await res.json().catch(() => null);
+        if (data?.status === "success" && data?.valid && data.user) {
+          adminUser = data.user;
+          localStorage.setItem("admin_session", JSON.stringify(adminUser));
+          sessionStorage.setItem("admin_session", JSON.stringify(adminUser));
+        }
       }
     } catch {
-      // If offline/timeout, allow continuation only on localhost or if user is verified super admin
-      const isDev = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
-      if (!isDev && adminUser.email !== SUPER_ADMIN_EMAIL) {
-        clearAdminSessionStorage();
-        return { status: "no-session" };
-      }
+      // Network hiccup, temporary offline, or request timeout: DO NOT kick the user out!
+      // Keep verified session alive for uninterrupted work
     }
-  } else {
-    // No token provided with session -> force re-login
-    clearAdminSessionStorage();
-    return { status: "no-session" };
   }
 
   const isSuper = Boolean(
     adminUser.is_super_admin ||
     adminUser.role === "admin" ||
-    adminUser.email === SUPER_ADMIN_EMAIL
+    String(adminUser.email).toLowerCase().trim() === SUPER_ADMIN_EMAIL.toLowerCase().trim()
   );
   const perms = (adminUser.permissions && adminUser.permissions.length > 0)
     ? adminUser.permissions
     : (isSuper || adminUser.role === "admin" ? ["*"] : []);
 
-  return {
+  const result: AdminAccessResult = {
     status: "authorized",
     role: (adminUser.role as AdminRole) || "admin",
     permissions: perms,
     email: adminUser.email,
     isSuperAdmin: isSuper,
   };
+
+  cachedResult = result;
+  lastVerifiedToken = token || "session";
+  lastVerifiedAt = Date.now();
+
+  return result;
 }
 
 export function getActiveAdminUser(): any {

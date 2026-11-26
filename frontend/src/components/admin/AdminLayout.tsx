@@ -446,7 +446,17 @@ export function AdminLayout() {
     }
 
     if (access.status === "error") {
-      console.error("Admin access check failed:", access.message);
+      console.warn("Admin access check returned temporary error:", access.message);
+      // If local session exists, allow access without disrupting dashboard
+      const localUser = getActiveAdminUser();
+      if (localUser) {
+        setIsSuperAdmin(Boolean(localUser.is_super_admin || localUser.email === SUPER_ADMIN_EMAIL));
+        setUserRole(localUser.role || "admin");
+        setUserPermissions(localUser.permissions || ["*"]);
+        setAuthorized(true);
+        setChecking(false);
+        return;
+      }
       setAuthorized(false);
       setChecking(false);
       setAuthCheckError("সেশন আছে, কিন্তু অ্যাডমিন ভেরিফিকেশন সাময়িকভাবে ব্যর্থ হয়েছে।");

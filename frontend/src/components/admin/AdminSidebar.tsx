@@ -368,6 +368,10 @@ export function AdminSidebar() {
         isSuperAdmin: access.isSuperAdmin,
       };
     },
+    staleTime: 5 * 60 * 1000, // Cache for 5 minutes (prevents tab-switching refetches in Chrome)
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
+    retry: false,
     initialData: syncAdminUser?.email ? {
       role: syncAdminUser.role || "admin",
       permissions: syncAdminUser.permissions || ["*"],

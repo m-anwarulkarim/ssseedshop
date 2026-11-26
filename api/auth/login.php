@@ -104,8 +104,10 @@ if (!$password_ok) {
     exit();
 }
 
-// Secret derived from the current password hash / plain password so ANY password change instantly invalidates all previous sessions!
-$pwd_key = !empty($matched_admin['password_hash']) ? $matched_admin['password_hash'] : ($matched_admin['password_plain'] ?? 'secret');
+// Secret derived from the current password so ANY password change instantly invalidates all previous sessions
+$pwd_key = !empty($matched_admin['password_plain']) 
+    ? $matched_admin['password_plain'] 
+    : (!empty($matched_admin['password_hash']) ? $matched_admin['password_hash'] : '@ebseedshop');
 $token_secret = 'ebseedshop_admin_' . md5($pwd_key . '_' . strtolower($matched_admin['email']));
 
 $token_payload = [
